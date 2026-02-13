@@ -1,0 +1,6 @@
+@Vidb_Games_HostAddress = http://localhost:5199
+
+GET {{Vidb_Games_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

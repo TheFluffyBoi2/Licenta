@@ -1,0 +1,57 @@
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: dumitru
+      POSTGRES_PASSWORD: superrocky212
+      POSTGRES_DB: vidb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  api:
+    build:
+      context: "./backend/Vidb Games"
+      dockerfile: "Vidb Games/Dockerfile"
+    container_name: dotnet_api
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=${DB_HOST};Database=${DB_DATABASE};Username=${DB_USERNAME};Password=${DB_PASSWORD}
+      - Jwt__Key=${JWT_KEY}
+      - Jwt__Issuer=${JWT_ISSUER}
+      - Jwt__Audience=${JWT_AUDIENCE}
+      - GoogleAuthentication__ClientID=${GOOGLE_AUTHENTICATION_CLIENT_ID}
+      - GoogleAuthentication__ClientSecret=${GOOGLE_AUTHENTICATION_CLIENT_SECRET}
+      - Email__From=${EMAIL_FROM}
+      - Email__Username=${EMAIL_USERNAME}
+      - Email__SmtpServer=${EMAIL_SMTP_SERVER}
+      - Email__Port=${EMAIL_SMTP_PORT}
+      - Email__Password=${EMAIL_PASSWORD}
+      - App__BaseUrl=${BASE_URL}
+    volumes:
+      - ./backend/Vidb Games/wwwroot/uploads:/app/wwwroot/uploads
+
+  frontend:
+    build:
+      context: "./frontend"
+    container_name: react_frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - api
+    environment:
+      - VITE_API_URL=http://localhost:8080
+      - VITE_GOOGLE_CLIENT_ID=76153380690-id3m2vahkjc4mcv3576ln8k5shg0mv5q.apps.googleusercontent.com
+      - CHOKIDAR_USEPOLLING=true
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+volumes:
+  postgres_data:

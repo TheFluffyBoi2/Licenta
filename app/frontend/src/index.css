@@ -1,0 +1,57 @@
+@import "tailwindcss";
+
+#nprogress {
+  pointer-events: none;
+}
+
+#nprogress .bar {
+  background: #ffd700 !important;
+  height: 5px !important;
+  border: 1px solid black;
+  text-shadow: 0 0 4px black;
+  position: fixed;
+  z-index: 99999 !important;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+
+#nprogress .peg {
+  display: block;
+  position: absolute;
+  right: 0px;
+  width: 100px;
+  height: 100%;
+  box-shadow:
+    0 0 15px #ffd700,
+    0 0 8px #ffd700 !important;
+  opacity: 1 !important;
+  transform: rotate(3deg) translate(0px, -4px);
+}
+
+#nprogress .spinner {
+  display: block;
+  position: fixed;
+  z-index: 99999;
+  top: 15px;
+  right: 15px;
+}
+
+#nprogress .spinner-icon {
+  width: 24px !important;
+  height: 24px !important;
+  border: solid 3px transparent !important;
+  border-top-color: #ff4d4d !important;
+  border-left-color: #ff4d4d !important;
+  border-radius: 50%;
+  animation: nprogress-spinner 400ms linear infinite;
+}
+
+@keyframes nprogress-spinner {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
