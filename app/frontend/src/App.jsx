@@ -15,6 +15,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import nprogress from "nprogress";
 import "nprogress/nprogress.css";
+import LoadingScreen from "./components/LoadingScreen";
 
 const NavigationTracker = () => {
   const location = useLocation();
@@ -30,7 +31,7 @@ const NavigationTracker = () => {
 const ProtectedRoute = ({ children, adminOnly = false }) => {
   const { user, loading } = useAuth();
   if (loading) {
-    return <div>Loading...</div>;
+    return <LoadingScreen />;
   }
   if (!user) {
     return <Navigate to="/login" />;
@@ -56,7 +57,9 @@ function App() {
             path="/"
             element={
               <ProtectedRoute>
-                <h1>Welcome to Vidb Games</h1>
+                <div>
+                  <h1>Welcome to Vidb Games</h1>
+                </div>
               </ProtectedRoute>
             }
           />

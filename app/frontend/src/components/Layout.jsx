@@ -1,17 +1,13 @@
-import React from 'react';
+import React from "react";
+import Navbar from "./Navbar";
 
 const Layout = ({ children }) => {
   return (
-    <div>
-      <header>
-        {/* You can add a navbar or header content here */}
-        <h1>Vidb Games</h1>
-      </header>
-      <main>
-        {children}
-      </main>
+    <div class="min-h-screen flex flex-col bg-linear-to-tr from-[#FF4D4D] via-[#FFD700] to-[#4DFFBC]">
+      <header>{<Navbar />}</header>
+      <main>{children}</main>
       <footer>
-        {/* You can add footer content here */}
+        {}
         <p>&copy; 2026 Vidb Games</p>
       </footer>
     </div>

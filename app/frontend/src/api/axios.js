@@ -1,6 +1,5 @@
 import axios from "axios";
 import nprogress from "nprogress";
-import "nprogress/nprogress.css";
 
 const api = axios.create({
   baseURL: "http://localhost:8080",

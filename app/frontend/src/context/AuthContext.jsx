@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect, useContext } from "react";
 import api from "../api/axios";
+import LoadingScreen from "../components/LoadingScreen";
 
 const AuthContext = createContext();
 
@@ -10,6 +11,9 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const checkAuth = async () => {
       const token = localStorage.getItem("token");
+
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+
       if (token) {
         try {
           const response = await api.get("api/auth/myprofile");
@@ -114,7 +118,7 @@ export const AuthProvider = ({ children }) => {
         resetPassword,
       }}
     >
-      {!loading && children}
+      {loading ? <LoadingScreen /> : children}
     </AuthContext.Provider>
   );
 };
