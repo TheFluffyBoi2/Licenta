@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
+import ThemeButton from "../components/ThemeButton";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -26,11 +27,14 @@ const Login = () => {
     <div class="min-h-screen flex items-center justify-center bg-linear-to-tr from-[#FF4D4D] via-[#FFD700] to-[#4DFFBC] p-6">
       <form
         onSubmit={handleSubmit}
-        class="w-full max-w-md bg-white/85 backdrop-blur-md p-8 rounded-2xl shadow-xl space-y-6"
+        class="w-full max-w-md bg-white/85 dark:bg-[#343434]/90 backdrop-blur-md p-8 rounded-2xl shadow-xl space-y-6"
       >
-        <h2 class="text-3xl font-extrabold text-center text-gray-800">
-          Welcome Back!
-        </h2>
+        <div class="flex justify-center items-center space-x-5">
+          <h2 class="text-3xl font-extrabold text-center text-gray-800 dark:text-white">
+            Welcome Back!
+          </h2>
+          <ThemeButton />
+        </div>
         {error && (
           <p class="bg-red-50 text-red-600 p-3 rounded-lg text-sm border border-red-200">
             {error}
@@ -39,7 +43,7 @@ const Login = () => {
         <div class="space-y-4">
           <div class="flex flex-col gap-1.5">
             <label
-              class="text-sm font-semibold text-gray-700 ml-1"
+              class="text-sm font-semibold text-gray-700 ml-1 dark:text-white"
               htmlFor="email"
             >
               Email
@@ -50,12 +54,12 @@ const Login = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#FFD700] focus:border-transparent outline-none transition-all"
+              class="w-full px-4 py-3 dark:text-white rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#FFD700] focus:border-transparent outline-none transition-all"
             />
           </div>
           <div class="flex flex-col gap-1.5">
             <label
-              class="text-sm font-semibold text-gray-700 ml-1"
+              class="text-sm font-semibold text-gray-700 ml-1 dark:text-white"
               htmlFor="password"
             >
               Password
@@ -66,13 +70,13 @@ const Login = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#FFD700] focus:border-transparent outline-none transition-all"
+              class="w-full px-4 py-3 dark:text-white rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#FFD700] focus:border-transparent outline-none transition-all"
             />
           </div>
         </div>
         <button
           type="submit"
-          class="relative w-full overflow-hidden group font-bold py-3.5 rounded-xl text-white bg-[#444] transition-all"
+          class="relative cursor-pointer w-full overflow-hidden group font-bold py-3.5 rounded-xl dark:text-[#343434] dark:bg-white text-white bg-[#444] transition-all"
         >
           <span class="absolute inset-0 w-full h-full bg-linear-to-tr from-[#FF4D4D] to-[#FFD700] opacity-0 group-hover:opacity-100 transition-opacity duration-500"></span>
 
@@ -113,17 +117,20 @@ const Login = () => {
           logo_alignment="left"
         />
 
-        <p class="text-center text-sm text-gray-600">
+        <p class="text-center text-sm text-gray-600 dark:text-[#EDF2F7]">
           Don't have an account?{" "}
-          <Link to="/register" class="text-[#FF4D4D] font-bold hover:underline">
+          <Link
+            to="/register"
+            class="text-[#FF4D4D] dark:text-[#4DFFBC] font-bold hover:underline"
+          >
             Register here
           </Link>
         </p>
-        <p class="text-center text-sm text-gray-600">
+        <p class="text-center text-sm text-gray-600 dark:text-[#EDF2F7]">
           Forgot password?{" "}
           <Link
             to="/forgot-password"
-            class="text-[#FF4D4D] font-bold hover:underline"
+            class="text-[#FF4D4D] dark:text-[#4DFFBC] font-bold hover:underline"
           >
             Reset here
           </Link>

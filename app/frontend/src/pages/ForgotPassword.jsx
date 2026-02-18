@@ -37,21 +37,24 @@ const ForgotPassword = () => {
   if (isSubmitted) {
     return (
       <div class="min-h-screen flex items-center justify-center bg-linear-to-tr from-[#FF4D4D] via-[#FFD700] to-[#4DFFBC] p-6">
-        <div class="w-full max-w-md bg-white/90 backdrop-blur-md p-8 rounded-2xl shadow-xl text-center space-y-6 border border-white/20">
+        <div class="w-full max-w-md bg-white/90 dark:bg-[#343434]/95 backdrop-blur-md p-8 rounded-2xl shadow-xl text-center space-y-6 border border-white/20">
           <div class="text-6xl animate-bounce">♻️</div>
-          <h2 class="text-3xl font-extrabold text-gray-800">
+          <h2 class="text-3xl font-extrabold text-gray-800 dark:text-white">
             Check your email!
           </h2>
-          <p class="text-gray-600 text-lg">
+          <p class="text-gray-600 text-lg dark:text-[#EDF2F7]">
             We've sent a reset link to{" "}
-            <span class="font-bold text-gray-800">{email}</span>.
+            <span class="font-bold text-gray-800 dark:text-[#FF4D4D]">
+              {email}
+            </span>
+            .
           </p>
-          <p class="text-sm text-gray-500 italic">
+          <p class="text-sm text-gray-500 italic dark:text-[#EDF2F7]">
             Don't see it? Check your spam folder.
           </p>
           <Link
             to="/login"
-            class="inline-block w-full py-3.5 rounded-xl text-white font-bold bg-[#444] hover:bg-[#222] transition-colors"
+            class="inline-block w-full py-3.5 rounded-xl dark:text-[#343434] dark:bg-[#EDF2F7] dark:hover:bg-white text-white font-bold bg-[#444] hover:bg-[#222] transition-colors"
           >
             Go to Login
           </Link>
@@ -64,9 +67,9 @@ const ForgotPassword = () => {
     <div class="min-h-screen flex items-center justify-center bg-linear-to-tr from-[#FF4D4D] via-[#FFD700] to-[#4DFFBC] p-6">
       <form
         onSubmit={handleSubmit}
-        class="w-full max-w-md bg-white/85 backdrop-blur-md p-8 rounded-2xl shadow-xl space-y-6"
+        class="w-full max-w-md bg-white/85 dark:bg-[#343434]/90 backdrop-blur-md p-8 rounded-2xl shadow-xl space-y-6"
       >
-        <h2 class="text-3xl font-extrabold text-center text-gray-800">
+        <h2 class="text-3xl font-extrabold text-center text-gray-800 dark:text-white">
           Forgot Your Password?
         </h2>
         {error && (
@@ -77,7 +80,7 @@ const ForgotPassword = () => {
         <div class="space-y-4">
           <div class="flex flex-col gap-1.5">
             <label
-              class="text-sm font-semibold text-gray-700 ml-1"
+              class="text-sm font-semibold text-gray-700 dark:text-white ml-1"
               htmlFor="email"
             >
               Email
@@ -88,24 +91,24 @@ const ForgotPassword = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#FFD700] focus:border-transparent outline-none transition-all"
+              class="w-full px-4 py-3 rounded-xl border dark:text-white border-gray-200 focus:ring-2 focus:ring-[#FFD700] focus:border-transparent outline-none transition-all"
             />
           </div>
         </div>
         <button
           type="submit"
-          class="relative w-full overflow-hidden group font-bold py-3.5 rounded-xl text-white bg-[#444] transition-all"
+          class="relative cursor-pointer w-full overflow-hidden group font-bold py-3.5 rounded-xl dark:bg-white dark:text-[#343434] text-white bg-[#444] transition-all"
         >
           <span class="absolute inset-0 w-full h-full bg-linear-to-tr from-[#FF4D4D] to-[#FFD700] opacity-0 group-hover:opacity-100 transition-opacity duration-500"></span>
 
           <span class="relative z-10">Reset</span>
         </button>
 
-        <p class="text-center text-sm text-gray-600">
+        <p class="text-center text-sm text-gray-600 dark:text-[#EDF2F7]">
           Don't have an account?{" "}
           <Link
             to="/register"
-            class="text-[#FF4D4D] font-bold hover:underline cursor-pointer"
+            class="text-[#FF4D4D] dark:text-[#4DFFBC] font-bold hover:underline cursor-pointer"
           >
             Register here
           </Link>
