@@ -3,40 +3,40 @@
   "WorkspaceRootPath": "C:\\Users\\dumit\\Desktop\\Licenta\\app\\backend\\Vidb Games\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{81BDAB0E-074A-461F-9F06-9D089C3FF48A}|Vidb Games\\Vidb Games.csproj|c:\\users\\dumit\\desktop\\licenta\\app\\backend\\vidb games\\vidb games\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{81BDAB0E-074A-461F-9F06-9D089C3FF48A}|Vidb Games\\Vidb Games.csproj|solutionrelative:vidb games\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{81BDAB0E-074A-461F-9F06-9D089C3FF48A}|Vidb Games\\Vidb Games.csproj|c:\\users\\dumit\\desktop\\licenta\\app\\backend\\vidb games\\vidb games\\controllers\\homecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{81BDAB0E-074A-461F-9F06-9D089C3FF48A}|Vidb Games\\Vidb Games.csproj|solutionrelative:vidb games\\controllers\\homecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{81BDAB0E-074A-461F-9F06-9D089C3FF48A}|Vidb Games\\Vidb Games.csproj|c:\\users\\dumit\\desktop\\licenta\\app\\backend\\vidb games\\vidb games\\models\\dtos\\resetrequestdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{81BDAB0E-074A-461F-9F06-9D089C3FF48A}|Vidb Games\\Vidb Games.csproj|solutionrelative:vidb games\\models\\dtos\\resetrequestdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{81BDAB0E-074A-461F-9F06-9D089C3FF48A}|Vidb Games\\Vidb Games.csproj|c:\\users\\dumit\\desktop\\licenta\\app\\backend\\vidb games\\vidb games\\services\\rawgservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{81BDAB0E-074A-461F-9F06-9D089C3FF48A}|Vidb Games\\Vidb Games.csproj|solutionrelative:vidb games\\services\\rawgservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{81BDAB0E-074A-461F-9F06-9D089C3FF48A}|Vidb Games\\Vidb Games.csproj|c:\\users\\dumit\\desktop\\licenta\\app\\backend\\vidb games\\vidb games\\models\\dtos\\resetpassworddto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{81BDAB0E-074A-461F-9F06-9D089C3FF48A}|Vidb Games\\Vidb Games.csproj|solutionrelative:vidb games\\models\\dtos\\resetpassworddto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{81BDAB0E-074A-461F-9F06-9D089C3FF48A}|Vidb Games\\Vidb Games.csproj|c:\\users\\dumit\\desktop\\licenta\\app\\backend\\vidb games\\vidb games\\models\\dtos\\gamedto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{81BDAB0E-074A-461F-9F06-9D089C3FF48A}|Vidb Games\\Vidb Games.csproj|solutionrelative:vidb games\\models\\dtos\\gamedto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{81BDAB0E-074A-461F-9F06-9D089C3FF48A}|Vidb Games\\Vidb Games.csproj|c:\\users\\dumit\\desktop\\licenta\\app\\backend\\vidb games\\vidb games\\services\\authservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{81BDAB0E-074A-461F-9F06-9D089C3FF48A}|Vidb Games\\Vidb Games.csproj|solutionrelative:vidb games\\services\\authservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{81BDAB0E-074A-461F-9F06-9D089C3FF48A}|Vidb Games\\Vidb Games.csproj|c:\\users\\dumit\\desktop\\licenta\\app\\backend\\vidb games\\vidb games\\models\\dtos\\rawgdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{81BDAB0E-074A-461F-9F06-9D089C3FF48A}|Vidb Games\\Vidb Games.csproj|solutionrelative:vidb games\\models\\dtos\\rawgdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{81BDAB0E-074A-461F-9F06-9D089C3FF48A}|Vidb Games\\Vidb Games.csproj|c:\\users\\dumit\\desktop\\licenta\\app\\backend\\vidb games\\vidb games\\models\\dtos\\tagsdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{81BDAB0E-074A-461F-9F06-9D089C3FF48A}|Vidb Games\\Vidb Games.csproj|solutionrelative:vidb games\\models\\dtos\\tagsdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{81BDAB0E-074A-461F-9F06-9D089C3FF48A}|Vidb Games\\Vidb Games.csproj|c:\\users\\dumit\\desktop\\licenta\\app\\backend\\vidb games\\vidb games\\services\\interfaces\\irawgservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{81BDAB0E-074A-461F-9F06-9D089C3FF48A}|Vidb Games\\Vidb Games.csproj|solutionrelative:vidb games\\services\\interfaces\\irawgservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{81BDAB0E-074A-461F-9F06-9D089C3FF48A}|Vidb Games\\Vidb Games.csproj|c:\\users\\dumit\\desktop\\licenta\\app\\backend\\vidb games\\vidb games\\test.http||{5703B403-55E7-4C63-8C88-A8F52C7A45C5}",
+      "RelativeMoniker": "D:0:0:{81BDAB0E-074A-461F-9F06-9D089C3FF48A}|Vidb Games\\Vidb Games.csproj|solutionrelative:vidb games\\test.http||{5703B403-55E7-4C63-8C88-A8F52C7A45C5}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{81BDAB0E-074A-461F-9F06-9D089C3FF48A}|Vidb Games\\Vidb Games.csproj|c:\\users\\dumit\\desktop\\licenta\\app\\backend\\vidb games\\vidb games\\models\\entities\\review.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{81BDAB0E-074A-461F-9F06-9D089C3FF48A}|Vidb Games\\Vidb Games.csproj|solutionrelative:vidb games\\models\\entities\\review.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{81BDAB0E-074A-461F-9F06-9D089C3FF48A}|Vidb Games\\Vidb Games.csproj|c:\\users\\dumit\\desktop\\licenta\\app\\backend\\vidb games\\vidb games\\services\\interfaces\\iauthservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{81BDAB0E-074A-461F-9F06-9D089C3FF48A}|Vidb Games\\Vidb Games.csproj|solutionrelative:vidb games\\services\\interfaces\\iauthservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{81BDAB0E-074A-461F-9F06-9D089C3FF48A}|Vidb Games\\Vidb Games.csproj|c:\\users\\dumit\\desktop\\licenta\\app\\backend\\vidb games\\vidb games\\models\\entities\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{81BDAB0E-074A-461F-9F06-9D089C3FF48A}|Vidb Games\\Vidb Games.csproj|solutionrelative:vidb games\\models\\entities\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{81BDAB0E-074A-461F-9F06-9D089C3FF48A}|Vidb Games\\Vidb Games.csproj|c:\\users\\dumit\\desktop\\licenta\\app\\backend\\vidb games\\vidb games\\services\\emailservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{81BDAB0E-074A-461F-9F06-9D089C3FF48A}|Vidb Games\\Vidb Games.csproj|solutionrelative:vidb games\\services\\emailservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{81BDAB0E-074A-461F-9F06-9D089C3FF48A}|Vidb Games\\Vidb Games.csproj|c:\\users\\dumit\\desktop\\licenta\\app\\backend\\vidb games\\vidb games\\models\\dtos\\cancelregisterdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{81BDAB0E-074A-461F-9F06-9D089C3FF48A}|Vidb Games\\Vidb Games.csproj|solutionrelative:vidb games\\models\\dtos\\cancelregisterdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{81BDAB0E-074A-461F-9F06-9D089C3FF48A}|Vidb Games\\Vidb Games.csproj|c:\\users\\dumit\\desktop\\licenta\\app\\backend\\vidb games\\vidb games\\migrations\\20260212164947_reset password token.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{81BDAB0E-074A-461F-9F06-9D089C3FF48A}|Vidb Games\\Vidb Games.csproj|solutionrelative:vidb games\\migrations\\20260212164947_reset password token.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -46,7 +46,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 10,
+          "SelectedChildIndex": 6,
           "Children": [
             {
               "$type": "Bookmark",
@@ -62,117 +62,119 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "ResetRequestDto.cs",
-              "DocumentMoniker": "C:\\Users\\dumit\\Desktop\\Licenta\\app\\backend\\Vidb Games\\Vidb Games\\Models\\DTOs\\ResetRequestDto.cs",
-              "RelativeDocumentMoniker": "Vidb Games\\Models\\DTOs\\ResetRequestDto.cs",
-              "ToolTip": "C:\\Users\\dumit\\Desktop\\Licenta\\app\\backend\\Vidb Games\\Vidb Games\\Models\\DTOs\\ResetRequestDto.cs",
-              "RelativeToolTip": "Vidb Games\\Models\\DTOs\\ResetRequestDto.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAAqAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-13T15:38:25.016Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "20260212164947_Reset Password Token.cs",
-              "DocumentMoniker": "C:\\Users\\dumit\\Desktop\\Licenta\\app\\backend\\Vidb Games\\Vidb Games\\Migrations\\20260212164947_Reset Password Token.cs",
-              "RelativeDocumentMoniker": "Vidb Games\\Migrations\\20260212164947_Reset Password Token.cs",
-              "ToolTip": "C:\\Users\\dumit\\Desktop\\Licenta\\app\\backend\\Vidb Games\\Vidb Games\\Migrations\\20260212164947_Reset Password Token.cs",
-              "RelativeToolTip": "Vidb Games\\Migrations\\20260212164947_Reset Password Token.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-12T16:49:48.176Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "ResetPasswordDto.cs",
-              "DocumentMoniker": "C:\\Users\\dumit\\Desktop\\Licenta\\app\\backend\\Vidb Games\\Vidb Games\\Models\\DTOs\\ResetPasswordDto.cs",
-              "RelativeDocumentMoniker": "Vidb Games\\Models\\DTOs\\ResetPasswordDto.cs",
-              "ToolTip": "C:\\Users\\dumit\\Desktop\\Licenta\\app\\backend\\Vidb Games\\Vidb Games\\Models\\DTOs\\ResetPasswordDto.cs",
-              "RelativeToolTip": "Vidb Games\\Models\\DTOs\\ResetPasswordDto.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-12T16:20:59.54Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "User.cs",
-              "DocumentMoniker": "C:\\Users\\dumit\\Desktop\\Licenta\\app\\backend\\Vidb Games\\Vidb Games\\Models\\Entities\\User.cs",
-              "RelativeDocumentMoniker": "Vidb Games\\Models\\Entities\\User.cs",
-              "ToolTip": "C:\\Users\\dumit\\Desktop\\Licenta\\app\\backend\\Vidb Games\\Vidb Games\\Models\\Entities\\User.cs",
-              "RelativeToolTip": "Vidb Games\\Models\\Entities\\User.cs",
-              "ViewState": "AgIAAA4AAAAAAAAAAAAgwBMAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-12T15:48:48.268Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 4,
-              "Title": "IAuthService.cs",
-              "DocumentMoniker": "C:\\Users\\dumit\\Desktop\\Licenta\\app\\backend\\Vidb Games\\Vidb Games\\Services\\Interfaces\\IAuthService.cs",
-              "RelativeDocumentMoniker": "Vidb Games\\Services\\Interfaces\\IAuthService.cs",
-              "ToolTip": "C:\\Users\\dumit\\Desktop\\Licenta\\app\\backend\\Vidb Games\\Vidb Games\\Services\\Interfaces\\IAuthService.cs",
-              "RelativeToolTip": "Vidb Games\\Services\\Interfaces\\IAuthService.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAABBAAAAAAAAAA==",
+              "Title": "TagsDto.cs",
+              "DocumentMoniker": "C:\\Users\\dumit\\Desktop\\Licenta\\app\\backend\\Vidb Games\\Vidb Games\\Models\\DTOs\\TagsDto.cs",
+              "RelativeDocumentMoniker": "Vidb Games\\Models\\DTOs\\TagsDto.cs",
+              "ToolTip": "C:\\Users\\dumit\\Desktop\\Licenta\\app\\backend\\Vidb Games\\Vidb Games\\Models\\DTOs\\TagsDto.cs",
+              "RelativeToolTip": "Vidb Games\\Models\\DTOs\\TagsDto.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAA4AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-12T15:45:07.209Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "CancelRegisterDto.cs",
-              "DocumentMoniker": "C:\\Users\\dumit\\Desktop\\Licenta\\app\\backend\\Vidb Games\\Vidb Games\\Models\\DTOs\\CancelRegisterDto.cs",
-              "RelativeDocumentMoniker": "Vidb Games\\Models\\DTOs\\CancelRegisterDto.cs",
-              "ToolTip": "C:\\Users\\dumit\\Desktop\\Licenta\\app\\backend\\Vidb Games\\Vidb Games\\Models\\DTOs\\CancelRegisterDto.cs",
-              "RelativeToolTip": "Vidb Games\\Models\\DTOs\\CancelRegisterDto.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-12T15:06:03.239Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "EmailService.cs",
-              "DocumentMoniker": "C:\\Users\\dumit\\Desktop\\Licenta\\app\\backend\\Vidb Games\\Vidb Games\\Services\\EmailService.cs",
-              "RelativeDocumentMoniker": "Vidb Games\\Services\\EmailService.cs",
-              "ToolTip": "C:\\Users\\dumit\\Desktop\\Licenta\\app\\backend\\Vidb Games\\Vidb Games\\Services\\EmailService.cs",
-              "RelativeToolTip": "Vidb Games\\Services\\EmailService.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAJAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-12T14:57:46.234Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "AuthController.cs",
-              "DocumentMoniker": "C:\\Users\\dumit\\Desktop\\Licenta\\app\\backend\\Vidb Games\\Vidb Games\\Controllers\\AuthController.cs",
-              "RelativeDocumentMoniker": "Vidb Games\\Controllers\\AuthController.cs",
-              "ToolTip": "C:\\Users\\dumit\\Desktop\\Licenta\\app\\backend\\Vidb Games\\Vidb Games\\Controllers\\AuthController.cs",
-              "RelativeToolTip": "Vidb Games\\Controllers\\AuthController.cs",
-              "ViewState": "AgIAAFAAAAAAAAAAAAD4v1oAAAAJAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-12T14:57:15.552Z",
+              "WhenOpened": "2026-03-06T17:23:33.516Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 3,
-              "Title": "AuthService.cs",
-              "DocumentMoniker": "C:\\Users\\dumit\\Desktop\\Licenta\\app\\backend\\Vidb Games\\Vidb Games\\Services\\AuthService.cs",
-              "RelativeDocumentMoniker": "Vidb Games\\Services\\AuthService.cs",
-              "ToolTip": "C:\\Users\\dumit\\Desktop\\Licenta\\app\\backend\\Vidb Games\\Vidb Games\\Services\\AuthService.cs",
-              "RelativeToolTip": "Vidb Games\\Services\\AuthService.cs",
-              "ViewState": "AgIAAIAAAAAAAAAAAAAAAJQAAAArAAAAAAAAAA==",
+              "Title": "RawgDto.cs",
+              "DocumentMoniker": "C:\\Users\\dumit\\Desktop\\Licenta\\app\\backend\\Vidb Games\\Vidb Games\\Models\\DTOs\\RawgDto.cs",
+              "RelativeDocumentMoniker": "Vidb Games\\Models\\DTOs\\RawgDto.cs",
+              "ToolTip": "C:\\Users\\dumit\\Desktop\\Licenta\\app\\backend\\Vidb Games\\Vidb Games\\Models\\DTOs\\RawgDto.cs",
+              "RelativeToolTip": "Vidb Games\\Models\\DTOs\\RawgDto.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAwAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-03T16:45:33.832Z",
+              "WhenOpened": "2026-03-06T17:08:02.986Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "GameDto.cs",
+              "DocumentMoniker": "C:\\Users\\dumit\\Desktop\\Licenta\\app\\backend\\Vidb Games\\Vidb Games\\Models\\DTOs\\GameDto.cs",
+              "RelativeDocumentMoniker": "Vidb Games\\Models\\DTOs\\GameDto.cs",
+              "ToolTip": "C:\\Users\\dumit\\Desktop\\Licenta\\app\\backend\\Vidb Games\\Vidb Games\\Models\\DTOs\\GameDto.cs",
+              "RelativeToolTip": "Vidb Games\\Models\\DTOs\\GameDto.cs",
+              "ViewState": "AgIAAAIAAAAAAAAAAAAAABMAAABJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-06T17:02:19.618Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "HomeController.cs",
+              "DocumentMoniker": "C:\\Users\\dumit\\Desktop\\Licenta\\app\\backend\\Vidb Games\\Vidb Games\\Controllers\\HomeController.cs",
+              "RelativeDocumentMoniker": "Vidb Games\\Controllers\\HomeController.cs",
+              "ToolTip": "C:\\Users\\dumit\\Desktop\\Licenta\\app\\backend\\Vidb Games\\Vidb Games\\Controllers\\HomeController.cs",
+              "RelativeToolTip": "Vidb Games\\Controllers\\HomeController.cs",
+              "ViewState": "AgIAABAAAAAAAAAAAAAQwBwAAAAEAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-05T17:03:01.62Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "test.http",
+              "DocumentMoniker": "C:\\Users\\dumit\\Desktop\\Licenta\\app\\backend\\Vidb Games\\Vidb Games\\test.http",
+              "RelativeDocumentMoniker": "Vidb Games\\test.http",
+              "ToolTip": "C:\\Users\\dumit\\Desktop\\Licenta\\app\\backend\\Vidb Games\\Vidb Games\\test.http",
+              "RelativeToolTip": "Vidb Games\\test.http",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAuwAAAAAADAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003502|",
+              "WhenOpened": "2026-03-05T17:00:49.041Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "Review.cs",
+              "DocumentMoniker": "C:\\Users\\dumit\\Desktop\\Licenta\\app\\backend\\Vidb Games\\Vidb Games\\Models\\Entities\\Review.cs",
+              "RelativeDocumentMoniker": "Vidb Games\\Models\\Entities\\Review.cs",
+              "ToolTip": "C:\\Users\\dumit\\Desktop\\Licenta\\app\\backend\\Vidb Games\\Vidb Games\\Models\\Entities\\Review.cs",
+              "RelativeToolTip": "Vidb Games\\Models\\Entities\\Review.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-05T16:39:22.793Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "RawgService.cs",
+              "DocumentMoniker": "C:\\Users\\dumit\\Desktop\\Licenta\\app\\backend\\Vidb Games\\Vidb Games\\Services\\RawgService.cs",
+              "RelativeDocumentMoniker": "Vidb Games\\Services\\RawgService.cs",
+              "ToolTip": "C:\\Users\\dumit\\Desktop\\Licenta\\app\\backend\\Vidb Games\\Vidb Games\\Services\\RawgService.cs",
+              "RelativeToolTip": "Vidb Games\\Services\\RawgService.cs",
+              "ViewState": "AgIAACUAAAAAAAAAAAA5wDcAAABNAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-05T16:37:59.286Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "IRawgService.cs",
+              "DocumentMoniker": "C:\\Users\\dumit\\Desktop\\Licenta\\app\\backend\\Vidb Games\\Vidb Games\\Services\\Interfaces\\IRawgService.cs",
+              "RelativeDocumentMoniker": "Vidb Games\\Services\\Interfaces\\IRawgService.cs",
+              "ToolTip": "C:\\Users\\dumit\\Desktop\\Licenta\\app\\backend\\Vidb Games\\Vidb Games\\Services\\Interfaces\\IRawgService.cs",
+              "RelativeToolTip": "Vidb Games\\Services\\Interfaces\\IRawgService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAUAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-05T16:37:47.281Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "IAuthService.cs",
+              "DocumentMoniker": "C:\\Users\\dumit\\Desktop\\Licenta\\app\\backend\\Vidb Games\\Vidb Games\\Services\\Interfaces\\IAuthService.cs",
+              "RelativeDocumentMoniker": "Vidb Games\\Services\\Interfaces\\IAuthService.cs",
+              "ToolTip": "C:\\Users\\dumit\\Desktop\\Licenta\\app\\backend\\Vidb Games\\Vidb Games\\Services\\Interfaces\\IAuthService.cs",
+              "RelativeToolTip": "Vidb Games\\Services\\Interfaces\\IAuthService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-05T16:35:59.5Z",
               "EditorCaption": ""
             }
           ]

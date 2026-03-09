@@ -34,6 +34,7 @@ services:
       - Email__Port=${EMAIL_SMTP_PORT}
       - Email__Password=${EMAIL_PASSWORD}
       - App__BaseUrl=${BASE_URL}
+      - Rawg__ApiKey=${RAWG_API_KEY}
     volumes:
       - ./backend/Vidb Games/wwwroot/uploads:/app/wwwroot/uploads
 

@@ -20,6 +20,10 @@ namespace Vidb_Games.Models.Entities
 
         public string ProfilePictureUrl { get; set; } = "default_avatar.png";
 
+        public int TotalReviews { get; set; } = 0;
+
+        public int Reputation { get; set; } = 0;
+
         public string Provider { get; set; } = string.Empty;
 
         public string? VerificationToken { get; set; } = string.Empty;
