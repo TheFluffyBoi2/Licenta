@@ -58,6 +58,10 @@
               "target": "Package",
               "version": "[1.68.0, )"
             },
+            "IGDB": {
+              "target": "Package",
+              "version": "[6.1.0, )"
+            },
             "MailKit": {
               "target": "Package",
               "version": "[4.15.1, )"

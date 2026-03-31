@@ -185,3 +185,14 @@ C:\Users\dumit\Desktop\Licenta\app\backend\Vidb Games\Vidb Games\bin\Debug\net9.
 C:\Users\dumit\Desktop\Licenta\app\backend\Vidb Games\Vidb Games\bin\Debug\net9.0\System.Management.dll
 C:\Users\dumit\Desktop\Licenta\app\backend\Vidb Games\Vidb Games\bin\Debug\net9.0\runtimes\win\lib\net7.0\System.Management.dll
 C:\Users\dumit\Desktop\Licenta\app\backend\Vidb Games\Vidb Games\obj\Debug\net9.0\Vidb Games.sourcelink.json
+C:\Users\dumit\Desktop\Licenta\app\backend\Vidb Games\Vidb Games\bin\Debug\net9.0\IGDB.dll
+C:\Users\dumit\Desktop\Licenta\app\backend\Vidb Games\Vidb Games\bin\Debug\net9.0\Microsoft.Extensions.Configuration.dll
+C:\Users\dumit\Desktop\Licenta\app\backend\Vidb Games\Vidb Games\bin\Debug\net9.0\Microsoft.Extensions.Configuration.Binder.dll
+C:\Users\dumit\Desktop\Licenta\app\backend\Vidb Games\Vidb Games\bin\Debug\net9.0\Microsoft.Extensions.Diagnostics.dll
+C:\Users\dumit\Desktop\Licenta\app\backend\Vidb Games\Vidb Games\bin\Debug\net9.0\Microsoft.Extensions.Diagnostics.Abstractions.dll
+C:\Users\dumit\Desktop\Licenta\app\backend\Vidb Games\Vidb Games\bin\Debug\net9.0\Microsoft.Extensions.Http.dll
+C:\Users\dumit\Desktop\Licenta\app\backend\Vidb Games\Vidb Games\bin\Debug\net9.0\Microsoft.Extensions.Http.Polly.dll
+C:\Users\dumit\Desktop\Licenta\app\backend\Vidb Games\Vidb Games\bin\Debug\net9.0\Microsoft.Extensions.Options.ConfigurationExtensions.dll
+C:\Users\dumit\Desktop\Licenta\app\backend\Vidb Games\Vidb Games\bin\Debug\net9.0\Polly.dll
+C:\Users\dumit\Desktop\Licenta\app\backend\Vidb Games\Vidb Games\bin\Debug\net9.0\Polly.Extensions.Http.dll
+C:\Users\dumit\Desktop\Licenta\app\backend\Vidb Games\Vidb Games\bin\Debug\net9.0\RestEase.dll

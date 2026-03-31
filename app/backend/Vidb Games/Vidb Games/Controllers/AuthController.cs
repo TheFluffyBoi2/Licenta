@@ -105,6 +105,7 @@ namespace Vidb_Games.Controllers
             }
         }
 
+        // TREBUIE SA FIE POST
         [HttpGet("confirm-reset")]
         public async Task<IActionResult> ConfirmReset([FromQuery] string token)
         {

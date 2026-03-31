@@ -22,43 +22,131 @@ namespace Vidb_Games.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Vidb_Games.Models.Entities.Game", b =>
+            modelBuilder.Entity("GameGenre", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("GamesId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("GenresId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("GamesId", "GenresId");
+
+                    b.HasIndex("GenresId");
+
+                    b.ToTable("GameGenre");
+                });
+
+            modelBuilder.Entity("GameKeyword", b =>
+                {
+                    b.Property<Guid>("GamesId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("KeywordsId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("GamesId", "KeywordsId");
+
+                    b.HasIndex("KeywordsId");
+
+                    b.ToTable("GameKeyword");
+                });
+
+            modelBuilder.Entity("GameMode", b =>
+                {
+                    b.Property<Guid>("GamesId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ModesId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("GamesId", "ModesId");
+
+                    b.HasIndex("ModesId");
+
+                    b.ToTable("GameMode");
+                });
+
+            modelBuilder.Entity("GamePlatform", b =>
+                {
+                    b.Property<Guid>("GamesId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("PlatformsId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("GamesId", "PlatformsId");
+
+                    b.HasIndex("PlatformsId");
+
+                    b.ToTable("GamePlatform");
+                });
+
+            modelBuilder.Entity("GameTheme", b =>
+                {
+                    b.Property<Guid>("GamesId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ThemesId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("GamesId", "ThemesId");
+
+                    b.HasIndex("ThemesId");
+
+                    b.ToTable("GameTheme");
+                });
+
+            modelBuilder.Entity("Vidb_Games.Models.Entities.Company", b =>
+                {
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("uuid");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("BackgroundImage")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("LastViewed")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("MetacriticScore")
-                        .HasColumnType("integer");
+                    b.Property<long>("IgdbId")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("ReleaseDate")
-                        .IsRequired()
+                    b.HasKey("Id");
+
+                    b.ToTable("Companies");
+                });
+
+            modelBuilder.Entity("Vidb_Games.Models.Entities.Game", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Cover")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("FirstReleaseDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<double?>("IGDBRating")
+                        .HasColumnType("double precision");
+
+                    b.Property<long>("IgdbId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("LastViewed")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
                         .HasColumnType("text");
 
                     b.Property<string>("Slug")
-                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.PrimitiveCollection<string[]>("Tags")
-                        .IsRequired()
-                        .HasColumnType("text[]");
+                    b.Property<string>("Storyline")
+                        .HasColumnType("text");
 
                     b.Property<int>("ViewCount")
                         .HasColumnType("integer");
@@ -66,6 +154,104 @@ namespace Vidb_Games.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Games");
+                });
+
+            modelBuilder.Entity("Vidb_Games.Models.Entities.Genre", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<long>("IgdbId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Genres");
+                });
+
+            modelBuilder.Entity("Vidb_Games.Models.Entities.InvolvedCompany", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CompanyId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("GameId")
+                        .HasColumnType("uuid");
+
+                    b.Property<long>("IgdbId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsDeveloper")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsPublisher")
+                        .HasColumnType("boolean");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompanyId");
+
+                    b.HasIndex("GameId");
+
+                    b.ToTable("InvolvedCompanies");
+                });
+
+            modelBuilder.Entity("Vidb_Games.Models.Entities.Keyword", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<long>("IgdbId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Keywords");
+                });
+
+            modelBuilder.Entity("Vidb_Games.Models.Entities.Mode", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<long>("IgdbId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Developers");
+                });
+
+            modelBuilder.Entity("Vidb_Games.Models.Entities.Platform", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<long>("IgdbId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Platforms");
                 });
 
             modelBuilder.Entity("Vidb_Games.Models.Entities.Review", b =>
@@ -83,6 +269,9 @@ namespace Vidb_Games.Migrations
                     b.Property<int>("GameId")
                         .HasColumnType("integer");
 
+                    b.Property<Guid?>("GameId1")
+                        .HasColumnType("uuid");
+
                     b.Property<int>("Likes")
                         .HasColumnType("integer");
 
@@ -94,11 +283,55 @@ namespace Vidb_Games.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("GameId");
+                    b.HasIndex("GameId1");
 
                     b.HasIndex("UserId");
 
                     b.ToTable("Reviews");
+                });
+
+            modelBuilder.Entity("Vidb_Games.Models.Entities.Store", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("GameId")
+                        .HasColumnType("uuid");
+
+                    b.Property<long>("IgdbId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GameId");
+
+                    b.ToTable("Stores");
+                });
+
+            modelBuilder.Entity("Vidb_Games.Models.Entities.Theme", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<long>("IgdbId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Themes");
                 });
 
             modelBuilder.Entity("Vidb_Games.Models.Entities.User", b =>
@@ -160,13 +393,160 @@ namespace Vidb_Games.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Vidb_Games.Models.Entities.Review", b =>
+            modelBuilder.Entity("Vidb_Games.Models.Entities.UserGameEntry", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("GameId")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid?>("GameId1")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GameId1");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserGameEntries");
+                });
+
+            modelBuilder.Entity("GameGenre", b =>
                 {
                     b.HasOne("Vidb_Games.Models.Entities.Game", null)
-                        .WithMany("Reviews")
+                        .WithMany()
+                        .HasForeignKey("GamesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Vidb_Games.Models.Entities.Genre", null)
+                        .WithMany()
+                        .HasForeignKey("GenresId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("GameKeyword", b =>
+                {
+                    b.HasOne("Vidb_Games.Models.Entities.Game", null)
+                        .WithMany()
+                        .HasForeignKey("GamesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Vidb_Games.Models.Entities.Keyword", null)
+                        .WithMany()
+                        .HasForeignKey("KeywordsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("GameMode", b =>
+                {
+                    b.HasOne("Vidb_Games.Models.Entities.Game", null)
+                        .WithMany()
+                        .HasForeignKey("GamesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Vidb_Games.Models.Entities.Mode", null)
+                        .WithMany()
+                        .HasForeignKey("ModesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("GamePlatform", b =>
+                {
+                    b.HasOne("Vidb_Games.Models.Entities.Game", null)
+                        .WithMany()
+                        .HasForeignKey("GamesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Vidb_Games.Models.Entities.Platform", null)
+                        .WithMany()
+                        .HasForeignKey("PlatformsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("GameTheme", b =>
+                {
+                    b.HasOne("Vidb_Games.Models.Entities.Game", null)
+                        .WithMany()
+                        .HasForeignKey("GamesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Vidb_Games.Models.Entities.Theme", null)
+                        .WithMany()
+                        .HasForeignKey("ThemesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Vidb_Games.Models.Entities.InvolvedCompany", b =>
+                {
+                    b.HasOne("Vidb_Games.Models.Entities.Company", "Company")
+                        .WithMany()
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Vidb_Games.Models.Entities.Game", "Game")
+                        .WithMany("InvolvedCompanies")
                         .HasForeignKey("GameId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Company");
+
+                    b.Navigation("Game");
+                });
+
+            modelBuilder.Entity("Vidb_Games.Models.Entities.Review", b =>
+                {
+                    b.HasOne("Vidb_Games.Models.Entities.Game", "Game")
+                        .WithMany("Reviews")
+                        .HasForeignKey("GameId1");
+
+                    b.HasOne("Vidb_Games.Models.Entities.User", "User")
+                        .WithMany("Reviews")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Game");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Vidb_Games.Models.Entities.Store", b =>
+                {
+                    b.HasOne("Vidb_Games.Models.Entities.Game", "Game")
+                        .WithMany("Stores")
+                        .HasForeignKey("GameId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Game");
+                });
+
+            modelBuilder.Entity("Vidb_Games.Models.Entities.UserGameEntry", b =>
+                {
+                    b.HasOne("Vidb_Games.Models.Entities.Game", "Game")
+                        .WithMany()
+                        .HasForeignKey("GameId1");
 
                     b.HasOne("Vidb_Games.Models.Entities.User", "User")
                         .WithMany()
@@ -174,10 +554,21 @@ namespace Vidb_Games.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Game");
+
                     b.Navigation("User");
                 });
 
             modelBuilder.Entity("Vidb_Games.Models.Entities.Game", b =>
+                {
+                    b.Navigation("InvolvedCompanies");
+
+                    b.Navigation("Reviews");
+
+                    b.Navigation("Stores");
+                });
+
+            modelBuilder.Entity("Vidb_Games.Models.Entities.User", b =>
                 {
                     b.Navigation("Reviews");
                 });

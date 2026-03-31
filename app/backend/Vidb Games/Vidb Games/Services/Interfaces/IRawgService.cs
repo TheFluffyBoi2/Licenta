@@ -8,5 +8,6 @@ namespace Vidb_Games.Services.Interfaces
         Task<RawgDto?> GetUpcomingGames();
         Task<RawgDto?> GetTopAllTimes();
         Task<RawgDto?> GetGamesPage(int page, int pageSize);
+        Task PopulateDatabase();
     }
 }

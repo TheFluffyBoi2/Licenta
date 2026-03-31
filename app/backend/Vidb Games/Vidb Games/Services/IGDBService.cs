@@ -1,0 +1,118 @@
+﻿using IGDB;
+using IGDB.Models;
+using System.Text.Json;
+using Vidb_Games.Data;
+using Vidb_Games.Models.DTOs;
+using Vidb_Games.Models.Entities;
+
+namespace Vidb_Games.Services
+{
+
+    public class IGDBService
+    {
+        private AppDbContext _context;
+        private IConfiguration _configuration;
+        private IGDBClient _IGDBClient;
+
+        private static readonly HashSet<string> StoreTypes = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "Steam", "Epic Games", "GOG", "PlayStation", "Xbox",
+            "Nintendo", "App Store", "Google Play"
+        };
+
+        public IGDBService(AppDbContext context, IConfiguration configuration, IGDBClient IGDBClient)
+        {
+            _context = context;
+            _configuration = configuration;
+            _IGDBClient = IGDBClient;
+        }
+
+        private async Task<GameDto[]> SendRequestAsync(int limit = 500, int offset = 0)
+        {
+            string query_params = $"""
+                fields id, name, slug, summary, cover.url,
+                aggregated_rating, total_rating_count, storyline,
+                first_release_date, genres.name, themes.name,
+                platforms.name, game_modes.name,
+                keywords.name, involved_companies.developer,
+                involved_companies.publisher,
+                involved_companies.company.name,
+                websites.url, websites.type.type;
+                where aggregated_rating != null & total_rating_count > 10;
+                sort aggregated_rating desc;
+                limit {limit};
+                offset {offset};
+            """;
+
+            var games = await _IGDBClient.QueryAsync<GameDto>(IGDBClient.Endpoints.Games, query: query_params);
+
+            return games ?? Array.Empty<GameDto>();
+        }
+
+        public async Task PopulateDatabase()
+        {
+            int offset = 0;
+            int batchSize = 500;
+            int totalGames = 10_000;
+            int requestNumber =  totalGames / batchSize;
+            for (int i = 0; i < requestNumber; i++)
+            {
+                offset = i * batchSize;
+                var games = await SendRequestAsync(batchSize, offset);
+                foreach (var game in games)
+                {
+                    var db_game = new Vidb_Games.Models.Entities.Game
+                    {
+                        IgdbId = game.IgdbId,
+                        Name = game.Name,
+                        Slug = game.Slug,
+                        Description = game.Description,
+                        Cover = game.Cover?.Url != null
+                            ? "https:" + game.Cover.Url
+                            : null,
+                        IGDBRating = game.IGDBRating,
+                        Storyline = game.Storyline,
+                        FirstReleaseDate = game.ReleaseDate.HasValue
+                            ? DateTimeOffset.FromUnixTimeSeconds(game.ReleaseDate.Value).UtcDateTime
+                            : null,
+                        Genres = game.Genres.Select(g => new Vidb_Games.Models.Entities.Genre
+                        { IgdbId = g.Id, Name = g.Name ?? "" }).ToList(),
+                        Themes = game.Themes.Select(t => new Vidb_Games.Models.Entities.Theme
+                        { IgdbId = t.Id, Name = t.Name ?? "" }).ToList(),
+                        Platforms = game.Platforms.Select(p => new Vidb_Games.Models.Entities.Platform
+                        { IgdbId = p.Id, Name = p.Name ?? "" }).ToList(),
+                        Modes = game.Modes.Select(m => new Vidb_Games.Models.Entities.Mode
+                        { IgdbId = m.Id, Name = m.Name ?? "" }).ToList(),
+                        Keywords = game.Keywords.Select(k => new Vidb_Games.Models.Entities.Keyword
+                        { IgdbId = k.Id, Name = k.Name ?? "" }).ToList(),
+                        InvolvedCompanies = game.InvolvedCompanies.Select(ic => new Vidb_Games.Models.Entities.InvolvedCompany
+                        {
+                            IgdbId = ic.Id,
+                            IsDeveloper = ic.IsDeveloper,
+                            IsPublisher = ic.IsPublisher,
+                            Company = new Vidb_Games.Models.Entities.Company
+                            {
+                                IgdbId = ic.Company?.Id ?? 0,
+                                Name = ic.Company?.Name ?? ""
+                            }
+                        }).ToList(),
+
+                        Stores = game.Websites
+                        .Where(w => StoreTypes.Contains(w.Type?.TypeName ?? ""))
+                        .Select(w => new Store
+                        {
+                            IgdbId = w.Id,
+                            Type = w.Type?.TypeName ?? "",
+                            Url = w.Url ?? ""
+                        }).ToList(),
+                    };
+
+                    _context.Games.Add(db_game);
+                }
+
+                await _context.SaveChangesAsync();
+                await Task.Delay(250);
+            }
+        }
+    }
+}

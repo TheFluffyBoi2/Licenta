@@ -35,6 +35,8 @@ services:
       - Email__Password=${EMAIL_PASSWORD}
       - App__BaseUrl=${BASE_URL}
       - Rawg__ApiKey=${RAWG_API_KEY}
+      - IGDB__ClientId=${IGDB_CLIENT_ID}
+      - IGDB__ClientSecret=${IGDB_CLIENT_SECRET}
     volumes:
       - ./backend/Vidb Games/wwwroot/uploads:/app/wwwroot/uploads
 

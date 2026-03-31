@@ -14,6 +14,8 @@ namespace Vidb_Games.Models.Entities
 
         [Required]
         public int GameId { get; set; }
+        
+        public Game? Game { get; set; }
 
         public int Likes { get; set; } = 0;
 

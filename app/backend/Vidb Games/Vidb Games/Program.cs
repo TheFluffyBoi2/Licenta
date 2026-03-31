@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.Google;
 using Vidb_Games.Data;
 using Vidb_Games.Services;
 using Vidb_Games.Services.Interfaces;
+using IGDB;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -70,7 +71,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUsersService, UsersService>();
 builder.Services.AddScoped<EmailService>();
-builder.Services.AddHttpClient<IRawgService, RawgService>();
+//builder.Services.AddHttpClient<IRawgService, RawgService>();
+builder.Services.AddSingleton(_ => IGDBClient.CreateWithDefaults(
+    builder.Configuration["IGDB:ClientId"]!,
+    builder.Configuration["IGDB:ClientSecret"]!
+));
+builder.Services.AddScoped<IGDBService>();
 
 builder.Services.AddCors(options =>
     {

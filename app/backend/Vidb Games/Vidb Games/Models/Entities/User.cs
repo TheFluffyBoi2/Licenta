@@ -36,5 +36,7 @@ namespace Vidb_Games.Models.Entities
         public string Bio { get; set; } = "Hi there! I am using Vidb Games.";
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        public ICollection<Review> Reviews { get; set; } = new List<Review>();
     }
 }

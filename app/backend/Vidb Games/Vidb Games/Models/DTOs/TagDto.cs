@@ -2,8 +2,10 @@
 
 namespace Vidb_Games.Models.DTOs
 {
-    public class TagsDto
+    public class TagDto
     {
+        [JsonPropertyName("id")]
+        public int Id { get; set; }
         [JsonPropertyName("name")]
         public string Name { get; set; } = string.Empty;
     }
