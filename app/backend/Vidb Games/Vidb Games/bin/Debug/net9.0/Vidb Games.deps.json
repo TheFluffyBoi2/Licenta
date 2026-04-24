@@ -11,7 +11,7 @@
           "BCrypt.Net-Next": "4.0.3",
           "Google.Apis.Auth": "1.68.0",
           "IGDB": "6.1.0",
-          "MailKit": "4.15.1",
+          "MailKit": "4.9.0",
           "Microsoft.AspNetCore.Authentication.Google": "9.0.12",
           "Microsoft.AspNetCore.Authentication.JwtBearer": "9.0.12",
           "Microsoft.AspNetCore.OpenApi": "9.0.11",
@@ -99,15 +99,15 @@
           }
         }
       },
-      "MailKit/4.15.1": {
+      "MailKit/4.9.0": {
         "dependencies": {
           "MimeKit": "4.15.1",
           "System.Formats.Asn1": "8.0.1"
         },
         "runtime": {
           "lib/net8.0/MailKit.dll": {
-            "assemblyVersion": "4.15.0.0",
-            "fileVersion": "4.15.1.0"
+            "assemblyVersion": "4.9.0.0",
+            "fileVersion": "4.9.0.0"
           }
         }
       },
@@ -1467,12 +1467,12 @@
       "path": "igdb/6.1.0",
       "hashPath": "igdb.6.1.0.nupkg.sha512"
     },
-    "MailKit/4.15.1": {
+    "MailKit/4.9.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-4mLbqTbH3ctd0NlukHjVQbU3ZnNDuCtB6ttNZDLPZLWMA2Dr31rh/eCSTqOwDojUX8zfDOVaxstMgJTE9PwZNA==",
-      "path": "mailkit/4.15.1",
-      "hashPath": "mailkit.4.15.1.nupkg.sha512"
+      "sha512": "sha512-wRUVzYXRWbjdUixwtSp7ivVHPhWw17h+BvwIVaouBike68B56Xk9b5+QRT39EK/QN8XF7MtOgt9caHvUaCvhIQ==",
+      "path": "mailkit/4.9.0",
+      "hashPath": "mailkit.4.9.0.nupkg.sha512"
     },
     "Microsoft.AspNetCore.Authentication.Google/9.0.12": {
       "type": "package",

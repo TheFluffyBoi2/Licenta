@@ -4,7 +4,6 @@
     (
         string Email,
         string Username,
-        string JwtToken,
         string VerificationToken
     );
 }

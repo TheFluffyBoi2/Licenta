@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "6aV/iTnWLgI=",
+  "dgSpecHash": "W+m1Bg6qvXM=",
   "success": true,
   "projectFilePath": "C:\\Users\\dumit\\Desktop\\Licenta\\app\\backend\\Vidb Games\\Vidb Games\\Vidb Games.csproj",
   "expectedPackageFiles": [
@@ -11,7 +11,7 @@
     "C:\\Users\\dumit\\.nuget\\packages\\google.apis.core\\1.68.0\\google.apis.core.1.68.0.nupkg.sha512",
     "C:\\Users\\dumit\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\dumit\\.nuget\\packages\\igdb\\6.1.0\\igdb.6.1.0.nupkg.sha512",
-    "C:\\Users\\dumit\\.nuget\\packages\\mailkit\\4.15.1\\mailkit.4.15.1.nupkg.sha512",
+    "C:\\Users\\dumit\\.nuget\\packages\\mailkit\\4.9.0\\mailkit.4.9.0.nupkg.sha512",
     "C:\\Users\\dumit\\.nuget\\packages\\microsoft.aspnetcore.authentication.google\\9.0.12\\microsoft.aspnetcore.authentication.google.9.0.12.nupkg.sha512",
     "C:\\Users\\dumit\\.nuget\\packages\\microsoft.aspnetcore.authentication.jwtbearer\\9.0.12\\microsoft.aspnetcore.authentication.jwtbearer.9.0.12.nupkg.sha512",
     "C:\\Users\\dumit\\.nuget\\packages\\microsoft.aspnetcore.openapi\\9.0.11\\microsoft.aspnetcore.openapi.9.0.11.nupkg.sha512",
@@ -136,5 +136,27 @@
     "C:\\Users\\dumit\\.nuget\\packages\\system.threading.channels\\7.0.0\\system.threading.channels.7.0.0.nupkg.sha512",
     "C:\\Users\\dumit\\.nuget\\packages\\system.threading.tasks\\4.3.0\\system.threading.tasks.4.3.0.nupkg.sha512"
   ],
-  "logs": []
+  "logs": [
+    {
+      "code": "Undefined",
+      "level": "Warning",
+      "message": "An invalid cache entry was found for URL 'https://api.nuget.org/v3-flatcontainer/mailkit/4.9.0/mailkit.4.9.0.nupkg' and will be replaced.\r\nThe nupkg at 'https://api.nuget.org/v3-flatcontainer/mailkit/4.9.0/mailkit.4.9.0.nupkg' is not valid.\r\n  End of Central Directory record could not be found.",
+      "projectPath": "C:\\Users\\dumit\\Desktop\\Licenta\\app\\backend\\Vidb Games\\Vidb Games\\Vidb Games.csproj",
+      "warningLevel": 1,
+      "filePath": "C:\\Users\\dumit\\Desktop\\Licenta\\app\\backend\\Vidb Games\\Vidb Games\\Vidb Games.csproj",
+      "targetGraphs": []
+    },
+    {
+      "code": "NU1902",
+      "level": "Warning",
+      "message": "Package 'MailKit' 4.9.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-9j88-vvj5-vhgr",
+      "projectPath": "C:\\Users\\dumit\\Desktop\\Licenta\\app\\backend\\Vidb Games\\Vidb Games\\Vidb Games.csproj",
+      "warningLevel": 1,
+      "filePath": "C:\\Users\\dumit\\Desktop\\Licenta\\app\\backend\\Vidb Games\\Vidb Games\\Vidb Games.csproj",
+      "libraryId": "MailKit",
+      "targetGraphs": [
+        "net9.0"
+      ]
+    }
+  ]
 }

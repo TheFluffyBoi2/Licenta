@@ -24,16 +24,16 @@ const Navbar = () => {
 
   return (
     <div className="px-2 py-2">
-      <nav className="bg-white dark:bg-[#343434] rounded-2xl text-black dark:text-white px-6 py-4 flex justify-between items-center shadow-lg transition-all duration-500 ease-in-out">
+      <nav className="bg-white dark:bg-[#1C1C1C] rounded-2xl text-black dark:text-white px-6 py-4 flex justify-between items-center shadow-lg transition-all duration-500 ease-in-out">
         <div className="flex items-center space-x-5">
           <span>
             <img src="/logo.ico" alt="Vidb Games" className="w-10 h-10" />
           </span>
           <div className="h-8 w-px bg-gray-500 items-center" />
-          <span className="group hover:bg-[#EDF2F7] dark:hover:text-white dark:hover:bg-[#464646] cursor-pointer flex items-center space-x-1 rounded-full transition">
+          <span className="group hover:bg-[#EDF2F7] dark:hover:text-white dark:hover:bg-[#383838] cursor-pointer flex items-center space-x-1 rounded-full transition">
             <a
               href="#"
-              className=" flex p-2 bg-[#EDF2F7] dark:bg-[#464646] rounded-full transition"
+              className=" flex p-2 bg-[#EDF2F7] dark:bg-[#383838] rounded-full transition"
             >
               <img
                 src="/users-solid-full.svg"
@@ -50,7 +50,7 @@ const Navbar = () => {
           <ThemeButton />
           <button
             onClick={logout}
-            className="flex p-2 bg-[#EDF2F7] dark:bg-[#464646] rounded-full transition"
+            className="flex p-2 bg-[#EDF2F7] dark:bg-[#383838] rounded-full transition"
           >
             <img
               src="/right-from-bracket-solid-full.svg"

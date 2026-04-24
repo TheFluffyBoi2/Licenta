@@ -21,6 +21,7 @@ const ThemeButton = () => {
 
   return (
     <button
+      type="button"
       onClick={toggleTheme}
       className="w-6 h-6 cursor-pointer hover:opacity-50 dark:invert dark:opacity-50 dark:hover:opacity-100 transition-opacity"
     >

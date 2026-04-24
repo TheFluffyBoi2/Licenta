@@ -15,5 +15,7 @@ namespace Vidb_Games.Services.Interfaces
         Task<bool> CancelRegistrationAsync(string email);
 
         Task<bool> VerifyEmailAsync(string token);
+
+        Task<string?> VerifyPasswordReset(string token);
     }
 }

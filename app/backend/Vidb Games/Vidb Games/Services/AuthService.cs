@@ -103,7 +103,20 @@ namespace Vidb_Games.Services
 
         public async Task<VerificationDto?> RegisterAsync(RegisterDto registerDto)
         {
-            if (await _context.Users.AnyAsync(u => u.Email == registerDto.Email)) throw new Exception("Email already in use");
+            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == registerDto.Email);
+            if (existingUser != null)
+            {
+                if (existingUser.EmailVerified == false && existingUser.VerificationTokenDate < DateTime.UtcNow)
+                {
+                    _context.Users.Remove(existingUser);
+                    await _context.SaveChangesAsync();
+                }
+                else
+                {
+                    throw new Exception("Email already in use or verification pending");
+                }
+            }
+
             if (await _context.Users.AnyAsync(u => u.Username == SanitizeUsername(registerDto.Username))) throw new Exception("Username already in use");
 
             var user = new User
@@ -113,24 +126,54 @@ namespace Vidb_Games.Services
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(registerDto.Password),
                 Provider = "Local",
                 VerificationToken = Guid.NewGuid().ToString(),
+                VerificationTokenDate = DateTime.UtcNow.AddMinutes(1),
                 Role = "User",
                 EmailVerified = false,
+                CreatedAt = DateTime.UtcNow,
             };
 
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            return new VerificationDto(user.Email, user.Username, GenerateJwtToken(user), user.VerificationToken);
+            return new VerificationDto(user.Email, user.Username, user.VerificationToken);
         }
 
         public async Task<AuthDto?> LoginAsync(LoginDto loginDto)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == loginDto.Email);
 
-            if (user == null || !BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash))
+            if (user == null || user.EmailVerified == false)
             {
-                return null;
+                throw new Exception("Invalid credentials");
             }
+
+            if (user.LockoutEnd.HasValue && user.LockoutEnd > DateTime.UtcNow)
+            {
+                var remainingTime = (user.LockoutEnd.Value - DateTime.UtcNow).TotalMinutes;
+                throw new Exception($"Account locked. Try again in {Math.Ceiling(remainingTime)} minutes.");
+            }
+
+            bool isValidPassword = BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash);
+
+            if (!isValidPassword)
+            {
+                user.FailedAttempts += 1;
+
+                if (user.FailedAttempts >= 5)
+                {
+                    user.LockoutEnd = DateTime.UtcNow.AddMinutes(15);
+                    await _context.SaveChangesAsync();
+                    throw new Exception("Account locked for 15 minutes due to too many failed attempts.");
+                }
+
+                await _context.SaveChangesAsync();
+                throw new Exception("Invalid credentials");
+            }
+
+            user.FailedAttempts = 0;
+            user.LockoutEnd = null;
+            await _context.SaveChangesAsync();
+
             return new AuthDto(user.Email, user.Username, GenerateJwtToken(user));
         }
 
@@ -139,6 +182,7 @@ namespace Vidb_Games.Services
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
             if (user == null) return null;
             user.PasswordResetToken = Guid.NewGuid().ToString();
+            user.PasswordResetTokenDate = DateTime.UtcNow.AddMinutes(1);
             await _context.SaveChangesAsync();
             return new ResetPasswordDto(email, user.PasswordResetToken);
         }
@@ -158,10 +202,27 @@ namespace Vidb_Games.Services
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.VerificationToken == token);
             if (user == null) return false;
+            if (user.VerificationTokenDate < DateTime.UtcNow) return false;
             user.EmailVerified = true;
             user.VerificationToken = null;
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<string?> VerifyPasswordReset(string token)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.PasswordResetToken == token);
+            if (user == null) return null;
+            if (user.PasswordResetTokenDate < DateTime.UtcNow)
+            {
+                user.PasswordResetToken = null;
+                return null;
+            }
+            string tempPassword = Guid.NewGuid().ToString().Substring(0, 8);
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(tempPassword);
+            user.PasswordResetToken = null;
+            await _context.SaveChangesAsync();
+            return tempPassword;
         }
 
         private string SanitizeUsername(string name)

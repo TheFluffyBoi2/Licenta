@@ -18,7 +18,17 @@ const Login = () => {
       await login(email, password);
       navigate("/");
     } catch (err) {
-      setError(err.response?.data?.message || "Invalid email and/or password.");
+      if (err.response?.data?.errors) {
+        const firstErrorKey = Object.keys(err.response.data.errors)[0];
+        const firstErrorMessage = err.response.data.errors[firstErrorKey][0];
+        setError(firstErrorMessage);
+      } else if (err.response?.data?.message) {
+        setError(err.response.data.message);
+      } else if (typeof err.response?.data === "string") {
+        setError(err.response.data);
+      } else {
+        setError("Invalid email and/or password");
+      }
       console.error(err);
     }
   };

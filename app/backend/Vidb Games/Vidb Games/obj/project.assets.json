@@ -105,10 +105,10 @@
           "lib/netstandard2.0/IGDB.dll": {}
         }
       },
-      "MailKit/4.15.1": {
+      "MailKit/4.9.0": {
         "type": "package",
         "dependencies": {
-          "MimeKit": "4.15.1",
+          "MimeKit": "4.9.0",
           "System.Formats.Asn1": "8.0.1"
         },
         "compile": {
@@ -2537,10 +2537,10 @@
         "lib/netstandard2.0/IGDB.dll"
       ]
     },
-    "MailKit/4.15.1": {
-      "sha512": "4mLbqTbH3ctd0NlukHjVQbU3ZnNDuCtB6ttNZDLPZLWMA2Dr31rh/eCSTqOwDojUX8zfDOVaxstMgJTE9PwZNA==",
+    "MailKit/4.9.0": {
+      "sha512": "wRUVzYXRWbjdUixwtSp7ivVHPhWw17h+BvwIVaouBike68B56Xk9b5+QRT39EK/QN8XF7MtOgt9caHvUaCvhIQ==",
       "type": "package",
-      "path": "mailkit/4.15.1",
+      "path": "mailkit/4.9.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -2549,10 +2549,6 @@
         "docs/GMailOAuth2.md",
         "docs/README.md",
         "icons/mailkit-50.png",
-        "lib/net10.0/MailKit.dll",
-        "lib/net10.0/MailKit.dll.config",
-        "lib/net10.0/MailKit.pdb",
-        "lib/net10.0/MailKit.xml",
         "lib/net462/MailKit.dll",
         "lib/net462/MailKit.dll.config",
         "lib/net462/MailKit.pdb",
@@ -2577,7 +2573,7 @@
         "lib/netstandard2.1/MailKit.dll.config",
         "lib/netstandard2.1/MailKit.pdb",
         "lib/netstandard2.1/MailKit.xml",
-        "mailkit.4.15.1.nupkg.sha512",
+        "mailkit.4.9.0.nupkg.sha512",
         "mailkit.nuspec"
       ]
     },
@@ -7630,7 +7626,7 @@
       "BCrypt.Net-Next >= 4.0.3",
       "Google.Apis.Auth >= 1.68.0",
       "IGDB >= 6.1.0",
-      "MailKit >= 4.15.1",
+      "MailKit >= 4.9.0",
       "Microsoft.AspNetCore.Authentication.Google >= 9.0.12",
       "Microsoft.AspNetCore.Authentication.JwtBearer >= 9.0.12",
       "Microsoft.AspNetCore.OpenApi >= 9.0.11",
@@ -7707,7 +7703,7 @@
           },
           "MailKit": {
             "target": "Package",
-            "version": "[4.15.1, )"
+            "version": "[4.9.0, )"
           },
           "Microsoft.AspNetCore.Authentication.Google": {
             "target": "Package",
@@ -7776,5 +7772,23 @@
         "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.308/PortableRuntimeIdentifierGraph.json"
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "Undefined",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "An invalid cache entry was found for URL 'https://api.nuget.org/v3-flatcontainer/mailkit/4.9.0/mailkit.4.9.0.nupkg' and will be replaced.\r\nThe nupkg at 'https://api.nuget.org/v3-flatcontainer/mailkit/4.9.0/mailkit.4.9.0.nupkg' is not valid.\r\n  End of Central Directory record could not be found."
+    },
+    {
+      "code": "NU1902",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'MailKit' 4.9.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-9j88-vvj5-vhgr",
+      "libraryId": "MailKit",
+      "targetGraphs": [
+        "net9.0"
+      ]
+    }
+  ]
 }

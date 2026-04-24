@@ -28,14 +28,22 @@ namespace Vidb_Games.Models.Entities
 
         public string? VerificationToken { get; set; } = string.Empty;
 
+        public DateTime? VerificationTokenDate { get; set; }
+
         public bool EmailVerified { get; set; } = false;
 
         public string? PasswordResetToken { get; set; } = string.Empty;
+
+        public DateTime? PasswordResetTokenDate { get; set; }
 
         [MaxLength(250)]
         public string Bio { get; set; } = "Hi there! I am using Vidb Games.";
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        public DateTime? LockoutEnd { get; set; } = null;
+
+        public int FailedAttempts { get; set; } = 0;
 
         public ICollection<Review> Reviews { get; set; } = new List<Review>();
     }

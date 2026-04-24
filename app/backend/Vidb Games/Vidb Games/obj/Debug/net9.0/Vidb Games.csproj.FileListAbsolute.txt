@@ -167,7 +167,6 @@ C:\Users\dumit\Desktop\Licenta\app\backend\Vidb Games\Vidb Games\obj\Debug\net9.
 C:\Users\dumit\Desktop\Licenta\app\backend\Vidb Games\Vidb Games\obj\Debug\net9.0\staticwebassets.build.json.cache
 C:\Users\dumit\Desktop\Licenta\app\backend\Vidb Games\Vidb Games\obj\Debug\net9.0\staticwebassets.development.json
 C:\Users\dumit\Desktop\Licenta\app\backend\Vidb Games\Vidb Games\obj\Debug\net9.0\staticwebassets.build.endpoints.json
-C:\Users\dumit\Desktop\Licenta\app\backend\Vidb Games\Vidb Games\obj\Debug\net9.0\staticwebassets.upToDateCheck.txt
 C:\Users\dumit\Desktop\Licenta\app\backend\Vidb Games\Vidb Games\obj\Debug\net9.0\Vidb Games.csproj.Up2Date
 C:\Users\dumit\Desktop\Licenta\app\backend\Vidb Games\Vidb Games\obj\Debug\net9.0\Vidb Games.dll
 C:\Users\dumit\Desktop\Licenta\app\backend\Vidb Games\Vidb Games\obj\Debug\net9.0\refint\Vidb Games.dll

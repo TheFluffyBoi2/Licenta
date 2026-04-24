@@ -13,6 +13,7 @@ import Layout from "./components/Layout";
 import VerifyEmail from "./pages/VerifyEmail";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import HomePage from "./pages/HomePage";
 import nprogress from "nprogress";
 import "nprogress/nprogress.css";
 import LoadingScreen from "./components/LoadingScreen";
@@ -57,9 +58,7 @@ function App() {
             path="/"
             element={
               <ProtectedRoute>
-                <div>
-                  <h1>Welcome to Vidb Games</h1>
-                </div>
+                <HomePage />
               </ProtectedRoute>
             }
           />

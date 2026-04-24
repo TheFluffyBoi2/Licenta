@@ -13,17 +13,15 @@ namespace Vidb_Games.Controllers
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
-        private readonly AppDbContext _context;
         private readonly IAuthService _authService;
         private readonly IUsersService _usersService;
         private readonly EmailService _emailService;
 
-        public AuthController(IAuthService authService, IUsersService usersService, EmailService emailService, AppDbContext context)
+        public AuthController(IAuthService authService, IUsersService usersService, EmailService emailService)
         {
             _authService = authService;
             _usersService = usersService;
             _emailService = emailService;
-            _context = context;
         }
 
         [HttpPost("google")]
@@ -47,11 +45,19 @@ namespace Vidb_Games.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterDto registerDto)
         {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Where(x => x.Value.Errors.Count > 0).ToDictionary(
+                    kvp => kvp.Key,
+                    kvp => kvp.Value.Errors.Select(e => e.ErrorMessage).ToArray()
+                );
+
+                return BadRequest( new { errors });
+            }
+
             try
             {
                 var result = await _authService.RegisterAsync(registerDto);
-
-                if (result == null) return BadRequest("Registration failed.");
 
                 await _emailService.SendVerificationEmailAsync(result.Email, result.VerificationToken);
 
@@ -78,16 +84,29 @@ namespace Vidb_Games.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginDto loginDto)
         {
-            var result = await _authService.LoginAsync(loginDto);
-            if (result == null)
+            if (!ModelState.IsValid)
             {
-                return Unauthorized("Invalid email or password.");
+                var errors = ModelState.Where(x => x.Value.Errors.Count > 0).ToDictionary(
+                    kvp => kvp.Key,
+                    kvp => kvp.Value.Errors.Select(e => e.ErrorMessage).ToArray()
+                );
+
+                return BadRequest( new { errors });
             }
-            return Ok(result);
+
+            try
+            {
+                var result = await _authService.LoginAsync(loginDto);
+                return Ok(result);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { message = e.Message });
+            }
         }
 
         [HttpPost("reset")]
-        public async Task<IActionResult> ResetPassword(ResetRequestDto dto) 
+        public async Task<IActionResult> ResetPassword(ResetRequestDto dto)
         {
             try
             {
@@ -105,24 +124,15 @@ namespace Vidb_Games.Controllers
             }
         }
 
-        // TREBUIE SA FIE POST
         [HttpGet("confirm-reset")]
         public async Task<IActionResult> ConfirmReset([FromQuery] string token)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.PasswordResetToken == token);
+            var tempPassword = await _authService.VerifyPasswordReset(token);
 
-            if (user == null)
+            if (tempPassword == null)
             {
-                return BadRequest("Token invalid sau expirat.");
+                return BadRequest("Invalid or expired token");
             }
-
-            string tempPassword = Guid.NewGuid().ToString().Substring(0, 8);
-
-            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(tempPassword);
-
-            user.PasswordResetToken = null;
-
-            await _context.SaveChangesAsync();
 
             return Ok(new { NewPassword = tempPassword });
         }

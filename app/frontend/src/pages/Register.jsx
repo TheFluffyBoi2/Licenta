@@ -19,11 +19,17 @@ const Register = () => {
       await register(email, username, password);
       setIsSubmitted(true);
     } catch (err) {
-      const errorMsg =
-        err.response?.data?.message ||
-        err.response?.data ||
-        "Registration failed.";
-      setError(errorMsg);
+      if (err.response?.data?.errors) {
+        const firstErrorKey = Object.keys(err.response.data.errors)[0];
+        const firstErrorMessage = err.response.data.errors[firstErrorKey][0];
+        setError(firstErrorMessage);
+      } else if (err.response?.data?.message) {
+        setError(err.response.data.message);
+      } else if (typeof err.response?.data === "string") {
+        setError(err.response.data);
+      } else {
+        setError("Registration failed.");
+      }
       console.error(err);
     }
   };

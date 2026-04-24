@@ -355,12 +355,21 @@ namespace Vidb_Games.Migrations
                     b.Property<bool>("EmailVerified")
                         .HasColumnType("boolean");
 
+                    b.Property<int>("FailedAttempts")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("LockoutEnd")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("PasswordResetToken")
                         .HasColumnType("text");
+
+                    b.Property<DateTime?>("PasswordResetTokenDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("ProfilePictureUrl")
                         .IsRequired()
@@ -387,6 +396,9 @@ namespace Vidb_Games.Migrations
 
                     b.Property<string>("VerificationToken")
                         .HasColumnType("text");
+
+                    b.Property<DateTime?>("VerificationTokenDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
