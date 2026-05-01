@@ -27,26 +27,56 @@ namespace Vidb_Games.Services
             _IGDBClient = IGDBClient;
         }
 
-        private async Task<GameDto[]> SendRequestAsync(int limit = 500, int offset = 0)
+        private async Task<GameDto[]> SendRequestAsync(string queryParams)
         {
-            string query_params = $"""
-                fields id, name, slug, summary, cover.url,
-                aggregated_rating, total_rating_count, storyline,
-                first_release_date, genres.name, themes.name,
-                platforms.name, game_modes.name,
-                keywords.name, involved_companies.developer,
-                involved_companies.publisher,
-                involved_companies.company.name,
-                websites.url, websites.type.type;
-                where aggregated_rating != null & total_rating_count > 10;
-                sort aggregated_rating desc;
-                limit {limit};
-                offset {offset};
-            """;
+            var games = await _IGDBClient.QueryAsync<GameDto>(IGDBClient.Endpoints.Games, query: queryParams);
 
-            var games = await _IGDBClient.QueryAsync<GameDto>(IGDBClient.Endpoints.Games, query: query_params);
+            if (games != null)
+            {
+                foreach (var game in games)
+                {
+                    if (game.Cover?.Url != null)
+                    {
+                        game.Cover.Url = "https:" + game.Cover.Url.Replace("t_thumb", "t_720p");
+                    }
+                }
+            }
 
             return games ?? Array.Empty<GameDto>();
+        }
+
+        public async Task<GameDto[]> GetTopGames()
+        {
+            string queryParams = "fields id, name, slug, summary, cover.url, aggregated_rating, total_rating_count, first_release_date, genres.name, platforms.name; " +
+                         "where aggregated_rating != null & total_rating_count > 300 & cover != null; " +
+                         "sort aggregated_rating desc; " +
+                         "limit 10;";
+
+            return await SendRequestAsync(queryParams);
+        }
+
+        public async Task<GameDto[]> GetTopUpcoming()
+        {
+            long currentUnixTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+
+            string queryParams = $"fields id, name, slug, summary, cover.url, first_release_date, genres.name, platforms.name; " +
+                         $"where (first_release_date > {currentUnixTime} | first_release_date = null) & cover != null; " +
+                         $"sort popularity asc; " +
+                         $"limit 10;";
+
+            return await SendRequestAsync(queryParams);
+        }
+
+        public async Task<GameDto[]> GetTopRecent()
+        {
+            long currentUnixTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+
+            string queryParams = $"fields id, name, slug, summary, cover.url, aggregated_rating, total_rating_count, first_release_date, genres.name, platforms.name; " +
+                         $"where first_release_date < {currentUnixTime} & aggregated_rating != null & total_rating_count > 10 & cover != null; " +
+                         $"sort first_release_date desc; " +
+                         $"limit 10;";
+
+            return await SendRequestAsync(queryParams);
         }
 
         public async Task PopulateDatabase()
@@ -58,7 +88,21 @@ namespace Vidb_Games.Services
             for (int i = 0; i < requestNumber; i++)
             {
                 offset = i * batchSize;
-                var games = await SendRequestAsync(batchSize, offset);
+                string queryParams = $"""
+                    fields id, name, slug, summary, cover.url,
+                    aggregated_rating, total_rating_count, storyline,
+                    first_release_date, genres.name, themes.name,
+                    platforms.name, game_modes.name,
+                    keywords.name, involved_companies.developer,
+                    involved_companies.publisher,
+                    involved_companies.company.name,
+                    websites.url, websites.type.type;
+                    where aggregated_rating != null & total_rating_count > 10;
+                    sort aggregated_rating desc;
+                    limit 500;
+                    offset {offset};
+                    """;
+                var games = await SendRequestAsync(queryParams);
                 foreach (var game in games)
                 {
                     var db_game = new Vidb_Games.Models.Entities.Game

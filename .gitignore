@@ -11,5 +11,10 @@ frontend/build/
 .env
 .env.*
 
+.venv
+__pycache__/
+*.pyc
+app/backend/FastApi/game_dataset_cleaned.csv
+
 .DS_Store
 Thumbs.db

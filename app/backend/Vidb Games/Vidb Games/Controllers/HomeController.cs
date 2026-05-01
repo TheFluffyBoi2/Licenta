@@ -17,6 +17,30 @@ namespace Vidb_Games.Controllers
             _usersService = usersService;
         }
 
+        [HttpGet("feed")]
+        public async Task<IActionResult> GetHomeFeed()
+        {
+            try
+            {
+                var allTimeTasks = _IGDBService.GetTopGames();
+                var upcomingTasks = _IGDBService.GetTopUpcoming();
+                var recentTasks = _IGDBService.GetTopRecent();
+
+                await Task.WhenAll(allTimeTasks, upcomingTasks, recentTasks);
+
+                return Ok(new
+                {
+                TopAllTime = await allTimeTasks,
+                TopUpcoming = await upcomingTasks,
+                TopRecent = await recentTasks
+                });
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, $"Internal server error: {e.Message}");
+            }
+        }
+
         //[HttpGet("main-page-games")]
         //public async Task<IActionResult> GetMainPageGames()
         //{
