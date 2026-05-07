@@ -8,7 +8,6 @@ namespace Vidb_Games.Models.Entities
         PlanToPlay,
         CurrentlyPlaying,
         Completed,
-        Dropped
     }
     public class UserGameEntry
     {
@@ -20,7 +19,7 @@ namespace Vidb_Games.Models.Entities
         public User? User { get; set; }
 
         [Required]
-        public int GameId { get; set; }
+        public long GameId { get; set; }
         public Game? Game { get; set; }
 
         [Required]

@@ -56,5 +56,15 @@ services:
       - ./frontend:/app
       - /app/node_modules
 
+  recommender:
+    build:
+      context: "./backend/FastApi"
+      dockerfile: "Dockerfile"
+    container_name: fastapi_recommender
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./recommender:/app
+
 volumes:
   postgres_data:

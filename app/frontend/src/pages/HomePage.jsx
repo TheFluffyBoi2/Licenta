@@ -5,6 +5,7 @@ import api from "../api/axios";
 const HomePage = () => {
   const [gameStatuses, setGameStatuses] = useState({});
   const [homeFeed, setHomeFeed] = useState({
+    recommendations: [],
     topAllTime: [],
     topUpcoming: [],
     topRecent: [],
@@ -18,6 +19,7 @@ const HomePage = () => {
         const data = response.data;
 
         setHomeFeed({
+          recommendations: data.recommendations || data.Recommendations || [],
           topAllTime: data.topAllTime || data.TopAllTime || [],
           topUpcoming: data.topUpcoming || data.TopUpcoming || [],
           topRecent: data.topRecent || data.TopRecent || [],
@@ -39,6 +41,9 @@ const HomePage = () => {
     }));
   };
 
+  const recommendations = Array.isArray(homeFeed.recommendations)
+    ? homeFeed.recommendations
+    : [];
   const topAllTime = Array.isArray(homeFeed.topAllTime)
     ? homeFeed.topAllTime
     : [];
@@ -225,20 +230,20 @@ const HomePage = () => {
 
   return (
     <div className="pb-12 flex flex-col gap-3 max-w-400 mx-auto">
-      {/* <div className="bg-white dark:bg-[#1C1C1C] rounded-2xl text-black dark:text-white px-8 py-4 shadow-lg transition-all duration-500 ease-in-out"> */}
-      {/* Recommended for You */}
-      {/* <div className="flex items-center gap-3 mb-6"> */}
-      {/* <h2 className="text-3xl font-bold">Recommended for You</h2> */}
-      {/* <div className="h-1 grow bg-linear-to-r from-[#FFD700] to-transparent rounded" /> */}
-      {/* </div> */}
-      {/* <section> */}
-      {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-6"> */}
-      {/* {recommendedGames.slice(0, 2).map((game, idx) => ( */}
-      {/* // <LargeGameCard key={game.id} game={game} rank={idx + 1} /> */}
-      {/* // ))} */}
-      {/* </div> */}
-      {/* </section> */}
-      {/* </div> */}
+      <div className="bg-white dark:bg-[#1C1C1C] rounded-2xl text-black dark:text-white px-8 py-4 shadow-lg transition-all duration-500 ease-in-out">
+        Recommended for You
+        <div className="flex items-center gap-3 mb-6">
+          <h2 className="text-3xl font-bold">Recommended for You</h2>
+          <div className="h-1 grow bg-linear-to-r from-[#FFD700] to-transparent rounded" />
+        </div>
+        <section>
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+            {recommendations.map((game, idx) => (
+              <SmallGameCard key={game.id} game={game} rank={idx + 1} />
+            ))}
+          </div>
+        </section>
+      </div>
 
       <div className="bg-white dark:bg-[#1C1C1C] rounded-2xl text-black dark:text-white px-6 py-4 shadow-lg transition-all duration-500 ease-in-out">
         {/* Top 10 All Time */}

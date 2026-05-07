@@ -5,8 +5,7 @@ namespace Vidb_Games.Models.Entities
     public class Game
     {
         [Key]
-        public Guid Id { get; set; } = Guid.NewGuid();
-        public long IgdbId { get; set; }
+        public long Id { get; set; }
         public string? Name { get; set; } = string.Empty;
         public string? Slug { get; set; } = string.Empty;
         public string? Cover { get; set; } = string.Empty;
@@ -103,7 +102,7 @@ namespace Vidb_Games.Models.Entities
         public long IgdbId { get; set; }
         public string Type { get; set; } = string.Empty;
         public string Url { get; set; } = string.Empty;
-        
+
         public Guid GameId { get; set; }
         public Game Game { get; set; } = null!;
     }

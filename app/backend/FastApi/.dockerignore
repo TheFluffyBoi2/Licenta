@@ -1,0 +1,14 @@
+venv/
+.venv/
+__pycache__
+*.pyc
+
+.git/
+.vscode/
+.ide/
+.env/
+
+dfindex_gameindex.pkl
+gameindex_dfindex.pkl
+model.py
+game_dataset_cleaned.csv

@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from sentence_transformers import SentenceTransformer
 from contextlib import asynccontextmanager
-from recommender import get_description_recommendations, get_recommendations
+from recommender import get_description_recommendations, get_recommendations, get_recommendations_from_user
 
 DATA_PATH: str = 'working.csv'
 EMBEDDINGS_PATH: str = 'embeddings.pkl'
@@ -42,6 +42,9 @@ app.add_middleware(
 class SearchRequest(BaseModel):
     description: str
 
+class UserGamesRequest(BaseModel):
+    game_ids: list[int]
+
 class RecommendationResponse(BaseModel):
     id: int
     name: str
@@ -50,19 +53,29 @@ class RecommendationResponse(BaseModel):
 @app.post("/recommendations", response_model=list[RecommendationResponse])
 async def get_games_from_description(request: SearchRequest):
     try:
-        return get_description_recommendations(request.description, app_data['df'], app_data['model'], app_data['embeddings'])
+        return get_description_recommendations(request.description, app_data['df'],
+                                               app_data['model'], app_data['embeddings'])
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/recommendations/game/{game_id}", response_model=list[RecommendationResponse])
 async def get_games_from_id(game_id: int):
     try:
-        return get_recommendations(game_id, app_data['df'], app_data['top_games'])
+        return get_recommendations(game_id,
+                                   app_data['df'],
+                                   app_data['top_games'])
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/recommendations/user/{user_id}")
-async def get_games_from_user(user_id: int):
-    pass
+@app.post("/recommendations/user", response_model=list[RecommendationResponse])
+async def get_games_from_user(request: UserGamesRequest):
+    try:
+        return get_recommendations_from_user(
+            request.game_ids,
+            app_data['df'],
+            app_data['top_games']
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 

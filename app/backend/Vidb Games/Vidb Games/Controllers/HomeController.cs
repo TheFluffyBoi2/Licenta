@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
+using Vidb_Games.Models.DTOs;
 using Vidb_Games.Services;
 using Vidb_Games.Services.Interfaces;
 
@@ -6,15 +9,16 @@ namespace Vidb_Games.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class HomeController : ControllerBase
     {
         private readonly IGDBService _IGDBService;
-        private readonly IUsersService _usersService;
+        private readonly IRecommendService _recommendService;
 
-        public HomeController(IGDBService IGDBService, IUsersService usersService)
+        public HomeController(IGDBService IGDBService, IRecommendService recommendService)
         {
             _IGDBService = IGDBService;
-            _usersService = usersService;
+            _recommendService = recommendService;
         }
 
         [HttpGet("feed")]
@@ -22,6 +26,10 @@ namespace Vidb_Games.Controllers
         {
             try
             {
+                var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (!Guid.TryParse(userIdString, out var userId)) return Unauthorized();
+
+                var recommendedTasks = _recommendService.GetUserRecommendations(userId);
                 var allTimeTasks = _IGDBService.GetTopGames();
                 var upcomingTasks = _IGDBService.GetTopUpcoming();
                 var recentTasks = _IGDBService.GetTopRecent();
@@ -30,6 +38,7 @@ namespace Vidb_Games.Controllers
 
                 return Ok(new
                 {
+                Recommendations = await recommendedTasks,
                 TopAllTime = await allTimeTasks,
                 TopUpcoming = await upcomingTasks,
                 TopRecent = await recentTasks
@@ -41,31 +50,9 @@ namespace Vidb_Games.Controllers
             }
         }
 
-        //[HttpGet("main-page-games")]
-        //public async Task<IActionResult> GetMainPageGames()
-        //{
-        //    try
-        //    {
-        //        var lastYearGames = _rawgService.GetLastYearGames();
-        //        var upcomingGames = _rawgService.GetUpcomingGames();
-        //        var topAllTimes = _rawgService.GetTopAllTimes();
-
-        //        await Task.WhenAll(lastYearGames, upcomingGames, topAllTimes);
-
-        //        return Ok(new
-        //        {
-        //            LastYearGames = lastYearGames,
-        //            UpcomingGames = upcomingGames,
-        //            TopAllTimes = topAllTimes
-        //        });
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        return StatusCode(500, $"Internal server error: {e.Message}");
-        //    }
-        //}
 
         [HttpPost("populate-database")]
+        [Authorize(Roles="Admin")]
         public async Task<IActionResult> PopulateDatabase()
         {
             await Task.Run(async () => await _IGDBService.PopulateDatabase());

@@ -4,15 +4,16 @@ using System.Text.Json;
 using Vidb_Games.Data;
 using Vidb_Games.Models.DTOs;
 using Vidb_Games.Models.Entities;
+using Vidb_Games.Services.Interfaces;
 
 namespace Vidb_Games.Services
 {
 
-    public class IGDBService
+    public class IGDBService : IIGDBService
     {
-        private AppDbContext _context;
-        private IConfiguration _configuration;
-        private IGDBClient _IGDBClient;
+        private readonly AppDbContext _context;
+        private readonly IConfiguration _configuration;
+        private readonly IGDBClient _IGDBClient;
 
         private static readonly HashSet<string> StoreTypes = new(StringComparer.OrdinalIgnoreCase)
         {
@@ -27,7 +28,7 @@ namespace Vidb_Games.Services
             _IGDBClient = IGDBClient;
         }
 
-        private async Task<GameDto[]> SendRequestAsync(string queryParams)
+        public async Task<GameDto[]> SendRequestAsync(string queryParams)
         {
             var games = await _IGDBClient.QueryAsync<GameDto>(IGDBClient.Endpoints.Games, query: queryParams);
 
@@ -107,7 +108,7 @@ namespace Vidb_Games.Services
                 {
                     var db_game = new Vidb_Games.Models.Entities.Game
                     {
-                        IgdbId = game.IgdbId,
+                        Id = game.IgdbId,
                         Name = game.Name,
                         Slug = game.Slug,
                         Description = game.Description,

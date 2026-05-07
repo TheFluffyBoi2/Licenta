@@ -2,6 +2,8 @@
 using Vidb_Games.Services.Interfaces;
 using Vidb_Games.Models.DTOs;
 using Microsoft.EntityFrameworkCore;
+using System.Collections;
+using Vidb_Games.Models.Entities;
 
 namespace Vidb_Games.Services
 {

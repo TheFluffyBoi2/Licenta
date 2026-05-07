@@ -18,10 +18,11 @@ def get_recommendations(game_id, df, top_games):
     recommendations = top_games[game_id]
 
     potential_rec = []
+    df_indexed = df.set_index('id')
 
     for rec_id, score in recommendations:
         try:
-            rec_game = df[df['id'] == rec_id].iloc[0]
+            rec_game = df_indexed.loc[rec_id]
             rec_name = str(rec_game['name'])
             rec_franchise = str(rec_game['franchise']) if pd.notna(rec_game['franchise']) else None
             rec_series = str(rec_game['series']) if pd.notna(rec_game['series']) else None
@@ -86,6 +87,33 @@ def get_description_recommendations(description, df, model, embeddings):
         print(f"{game_data['name']:<45} | {game_data['id']} | Scor Similitudine: {game_data['score']*100:>6.2f}%")
 
     return recommendations
+
+def get_recommendations_from_user(game_ids, df, top_games):
+    scores = {}
+    for game_id in game_ids:
+        recs = get_recommendations(game_id, df, top_games)
+
+        for rec in recs:
+            rec_id = rec["id"]
+            score = rec["score"]
+
+            if rec_id in game_ids:
+                continue
+
+            if rec_id not in scores:
+                scores[rec_id] = {
+                    "id": rec_id,
+                    "name": rec["name"],
+                    "score": score,
+                }
+            else:
+                scores[rec_id]["score"] = (score + scores[rec_id]["score"]) / 2
+
+    final_recs = list(scores.values())
+    final_recs.sort(key=lambda x: x["score"], reverse=True)
+
+    return final_recs[:10]
+
 
 # game_names = ["The Legend of Zelda: Breath of the Wild", "Dark Souls III",
 #              "Sid Meier's Civilization VI", "Factorio", "The Witcher 3: Wild Hunt",
