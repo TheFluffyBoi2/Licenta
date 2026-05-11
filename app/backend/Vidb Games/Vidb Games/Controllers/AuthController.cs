@@ -138,7 +138,7 @@ namespace Vidb_Games.Controllers
         }
 
         [HttpGet("verify-email")]
-        public async Task<IActionResult> VerifyEmail(string token)
+        public async Task<IActionResult> VerifyEmail([FromQuery] string token)
         {
             var success = await _authService.VerifyEmailAsync(token);
 

@@ -28,6 +28,9 @@ namespace Vidb_Games.Models.DTOs
         [JsonPropertyName("first_release_date")]
         [Newtonsoft.Json.JsonProperty("first_release_date")]
         public long? ReleaseDate { get; set; }
+        [JsonPropertyName("recommendation_score")]
+        [Newtonsoft.Json.JsonProperty("recommendation_score")]
+        public float RecommendationScore { get; set; }
         [JsonPropertyName("genres")]
         public ICollection<NamedGamePropertyDto> Genres { get; set; } = new List<NamedGamePropertyDto>();
         [JsonPropertyName("themes")]

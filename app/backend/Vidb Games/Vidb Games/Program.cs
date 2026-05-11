@@ -78,7 +78,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUsersService, UsersService>();
 builder.Services.AddScoped<EmailService>();
-builder.Services.AddHttpClient<IIGDBService, IGDBService>();
+builder.Services.AddScoped<IIGDBService, IGDBService>();
+builder.Services.AddScoped<IGameService, GameService>();
 builder.Services.AddHttpClient<IRecommendService, RecommendService>();
 builder.Services.AddSingleton(_ => IGDBClient.CreateWithDefaults(
     builder.Configuration["IGDB:ClientId"]!,

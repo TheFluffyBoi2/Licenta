@@ -51,12 +51,12 @@ namespace Vidb_Games.Controllers
         }
 
 
-        [HttpPost("populate-database")]
-        [Authorize(Roles="Admin")]
-        public async Task<IActionResult> PopulateDatabase()
-        {
-            await Task.Run(async () => await _IGDBService.PopulateDatabase());
-            return Ok("Database population started.");
-        }
+        // [HttpPost("populate-database")]
+        // [Authorize(Roles="Admin")]
+        // public async Task<IActionResult> PopulateDatabase()
+        // {
+        //     await Task.Run(async () => await _IGDBService.PopulateDatabase());
+        //     return Ok("Database population started.");
+        // }
     }
 }

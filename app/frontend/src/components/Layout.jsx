@@ -1,34 +1,16 @@
-// import React from "react";
-// import Navbar from "./Navbar";
-
-// const Layout = ({ children }) => {
-//   return (
-//     <div class="min-h-screen flex flex-col bg-linear-to-tr from-[#FF4D4D] via-[#FFD700] to-[#4DFFBC]">
-//       <header>{<Navbar />}</header>
-//       <main>{children}</main>
-//       <footer>
-//         {}
-//         <p>&copy; 2026 Vidb Games</p>
-//       </footer>
-//     </div>
-//   );
-// };
-
-// export default Layout;
 import React from "react";
 import Navbar from "./Navbar";
 
 const Layout = ({ children }) => {
   return (
-    <div className="min-h-screen flex flex-col bg-[#121212] text-white font-sans">
+    <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-[#121212] text-gray-900 dark:text-white font-sans transition-colors duration-500">
       <header>
         <Navbar />
       </header>
-      {/* Am mărit max-w ca să aibă loc grid-ul și am dat un padding elegant */}
-      <main className="grow px-3 py-4 max-w-400 mx-auto w-full">
+      <main className="grow px-2 py-4 max-w-7xl mx-auto w-full">
         {children}
       </main>
-      <footer className="bg-[#1a1a1a] border-t border-white/5 py-8 text-center text-gray-500">
+      <footer className="bg-gray-100 dark:bg-[#1a1a1a] border-t border-gray-200 dark:border-white/5 py-8 text-center text-gray-600 dark:text-gray-500 transition-colors duration-500">
         <p>&copy; 2026 Vidb Games. All rights reserved.</p>
       </footer>
     </div>

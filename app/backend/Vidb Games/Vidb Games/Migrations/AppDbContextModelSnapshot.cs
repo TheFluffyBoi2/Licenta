@@ -24,8 +24,8 @@ namespace Vidb_Games.Migrations
 
             modelBuilder.Entity("GameGenre", b =>
                 {
-                    b.Property<Guid>("GamesId")
-                        .HasColumnType("uuid");
+                    b.Property<long>("GamesId")
+                        .HasColumnType("bigint");
 
                     b.Property<Guid>("GenresId")
                         .HasColumnType("uuid");
@@ -39,8 +39,8 @@ namespace Vidb_Games.Migrations
 
             modelBuilder.Entity("GameKeyword", b =>
                 {
-                    b.Property<Guid>("GamesId")
-                        .HasColumnType("uuid");
+                    b.Property<long>("GamesId")
+                        .HasColumnType("bigint");
 
                     b.Property<Guid>("KeywordsId")
                         .HasColumnType("uuid");
@@ -54,8 +54,8 @@ namespace Vidb_Games.Migrations
 
             modelBuilder.Entity("GameMode", b =>
                 {
-                    b.Property<Guid>("GamesId")
-                        .HasColumnType("uuid");
+                    b.Property<long>("GamesId")
+                        .HasColumnType("bigint");
 
                     b.Property<Guid>("ModesId")
                         .HasColumnType("uuid");
@@ -69,8 +69,8 @@ namespace Vidb_Games.Migrations
 
             modelBuilder.Entity("GamePlatform", b =>
                 {
-                    b.Property<Guid>("GamesId")
-                        .HasColumnType("uuid");
+                    b.Property<long>("GamesId")
+                        .HasColumnType("bigint");
 
                     b.Property<Guid>("PlatformsId")
                         .HasColumnType("uuid");
@@ -84,8 +84,8 @@ namespace Vidb_Games.Migrations
 
             modelBuilder.Entity("GameTheme", b =>
                 {
-                    b.Property<Guid>("GamesId")
-                        .HasColumnType("uuid");
+                    b.Property<long>("GamesId")
+                        .HasColumnType("bigint");
 
                     b.Property<Guid>("ThemesId")
                         .HasColumnType("uuid");
@@ -103,9 +103,6 @@ namespace Vidb_Games.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<long>("IgdbId")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
@@ -117,9 +114,11 @@ namespace Vidb_Games.Migrations
 
             modelBuilder.Entity("Vidb_Games.Models.Entities.Game", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
                     b.Property<string>("Cover")
                         .HasColumnType("text");
@@ -132,9 +131,6 @@ namespace Vidb_Games.Migrations
 
                     b.Property<double?>("IGDBRating")
                         .HasColumnType("double precision");
-
-                    b.Property<long>("IgdbId")
-                        .HasColumnType("bigint");
 
                     b.Property<DateTime>("LastViewed")
                         .HasColumnType("timestamp with time zone");
@@ -182,10 +178,7 @@ namespace Vidb_Games.Migrations
                     b.Property<Guid>("CompanyId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("GameId")
-                        .HasColumnType("uuid");
-
-                    b.Property<long>("IgdbId")
+                    b.Property<long>("GameId")
                         .HasColumnType("bigint");
 
                     b.Property<bool>("IsDeveloper")
@@ -209,9 +202,6 @@ namespace Vidb_Games.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<long>("IgdbId")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("Name")
                         .HasColumnType("text");
 
@@ -226,9 +216,6 @@ namespace Vidb_Games.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<long>("IgdbId")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("Name")
                         .HasColumnType("text");
 
@@ -242,9 +229,6 @@ namespace Vidb_Games.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
-
-                    b.Property<long>("IgdbId")
-                        .HasColumnType("bigint");
 
                     b.Property<string>("Name")
                         .HasColumnType("text");
@@ -266,11 +250,8 @@ namespace Vidb_Games.Migrations
                     b.Property<int>("Dislikes")
                         .HasColumnType("integer");
 
-                    b.Property<int>("GameId")
-                        .HasColumnType("integer");
-
-                    b.Property<Guid?>("GameId1")
-                        .HasColumnType("uuid");
+                    b.Property<long>("GameId")
+                        .HasColumnType("bigint");
 
                     b.Property<int>("Likes")
                         .HasColumnType("integer");
@@ -283,7 +264,7 @@ namespace Vidb_Games.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("GameId1");
+                    b.HasIndex("GameId");
 
                     b.HasIndex("UserId");
 
@@ -296,10 +277,7 @@ namespace Vidb_Games.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("GameId")
-                        .HasColumnType("uuid");
-
-                    b.Property<long>("IgdbId")
+                    b.Property<long>("GameId")
                         .HasColumnType("bigint");
 
                     b.Property<string>("Type")
@@ -322,9 +300,6 @@ namespace Vidb_Games.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
-
-                    b.Property<long>("IgdbId")
-                        .HasColumnType("bigint");
 
                     b.Property<string>("Name")
                         .HasColumnType("text");
@@ -411,11 +386,8 @@ namespace Vidb_Games.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<int>("GameId")
-                        .HasColumnType("integer");
-
-                    b.Property<Guid?>("GameId1")
-                        .HasColumnType("uuid");
+                    b.Property<long>("GameId")
+                        .HasColumnType("bigint");
 
                     b.Property<int>("Status")
                         .HasColumnType("integer");
@@ -425,7 +397,7 @@ namespace Vidb_Games.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("GameId1");
+                    b.HasIndex("GameId");
 
                     b.HasIndex("UserId");
 
@@ -530,7 +502,9 @@ namespace Vidb_Games.Migrations
                 {
                     b.HasOne("Vidb_Games.Models.Entities.Game", "Game")
                         .WithMany("Reviews")
-                        .HasForeignKey("GameId1");
+                        .HasForeignKey("GameId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Vidb_Games.Models.Entities.User", "User")
                         .WithMany("Reviews")
@@ -558,7 +532,9 @@ namespace Vidb_Games.Migrations
                 {
                     b.HasOne("Vidb_Games.Models.Entities.Game", "Game")
                         .WithMany()
-                        .HasForeignKey("GameId1");
+                        .HasForeignKey("GameId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Vidb_Games.Models.Entities.User", "User")
                         .WithMany()

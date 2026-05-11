@@ -56,17 +56,17 @@ def get_recommendations(game_id, df, top_games):
             potential_rec.append({
                 "id": int(rec_id),
                 "name": rec_name,
-                "score": float(final_score),
+                "recommendation_score": float(final_score),
             })
 
         except IndexError:
             continue
 
-    potential_rec.sort(key=lambda x: x["score"], reverse=True)
+    potential_rec.sort(key=lambda x: x["recommendation_score"], reverse=True)
 
     print(f"\n--- Recomandări Sortate pentru: {source_game_name.upper()} ---")
     for rec in potential_rec[:10]:
-        print(f"{rec["name"]:<45} | {rec["id"]} | Scorul Final: {rec["score"]*100:>6.2f}%")
+        print(f"{rec['name']:<45} | {rec['id']} | Scorul Final: {rec['recommendation_score']*100:>6.2f}%")
 
     return potential_rec[:10]
 
@@ -74,19 +74,27 @@ def get_description_recommendations(description, df, model, embeddings):
     user_vector = model.encode(description).reshape(1, -1)
     similarities = cosine_similarity(user_vector, embeddings)[0]
 
-    top_indices = similarities.argsort()[-10:][::-1]
+    top_indices = similarities.argsort()[-50:][::-1]
 
     recommendations = []
+    bonus_procent = 0.10
     for i in top_indices:
+        final_score= float(similarities[i]) * (1 + (df.iloc[i]['total_score'] / 100) * bonus_procent)
+
         game_data = {
             "id": int(df.iloc[i]['id']),
             "name": str(df.iloc[i]['name']),
-            "score": float(similarities[i])
+            "recommendation_score": float(final_score)
         }
         recommendations.append(game_data)
-        print(f"{game_data['name']:<45} | {game_data['id']} | Scor Similitudine: {game_data['score']*100:>6.2f}%")
 
-    return recommendations
+    recommendations.sort(key=lambda x: x['recommendation_score'], reverse=True)
+    final_top = recommendations[:10]
+
+    for game_data in final_top:
+        print(f"{game_data['name']:<45} | {game_data['id']} | Scor Similitudine: {game_data['recommendation_score']*100:>6.2f}%")
+
+    return final_top
 
 def get_recommendations_from_user(game_ids, df, top_games):
     scores = {}
@@ -95,7 +103,7 @@ def get_recommendations_from_user(game_ids, df, top_games):
 
         for rec in recs:
             rec_id = rec["id"]
-            score = rec["score"]
+            score = rec["recommendation_score"]
 
             if rec_id in game_ids:
                 continue
@@ -104,13 +112,13 @@ def get_recommendations_from_user(game_ids, df, top_games):
                 scores[rec_id] = {
                     "id": rec_id,
                     "name": rec["name"],
-                    "score": score,
+                    "recommendation_score": score,
                 }
             else:
-                scores[rec_id]["score"] = (score + scores[rec_id]["score"]) / 2
+                scores[rec_id]["recommendation_score"] = (score + scores[rec_id]["recommendation_score"]) / 2
 
     final_recs = list(scores.values())
-    final_recs.sort(key=lambda x: x["score"], reverse=True)
+    final_recs.sort(key=lambda x: x["recommendation_score"], reverse=True)
 
     return final_recs[:10]
 

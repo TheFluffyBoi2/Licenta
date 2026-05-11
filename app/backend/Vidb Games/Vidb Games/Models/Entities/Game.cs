@@ -39,7 +39,6 @@ namespace Vidb_Games.Models.Entities
     {
         [Key]
         public Guid Id { get; set; } = Guid.NewGuid();
-        public long IgdbId { get; set; }
         public string? Name { get; set; } = string.Empty;
         public ICollection<Game> Games { get; set; } = new List<Game>();
     }
@@ -48,7 +47,6 @@ namespace Vidb_Games.Models.Entities
     {
         [Key]
         public Guid Id { get; set; } = Guid.NewGuid();
-        public long IgdbId { get; set; }
         public string? Name { get; set; } = string.Empty;
         public ICollection<Game> Games { get; set; } = new List<Game>();
     }
@@ -57,7 +55,6 @@ namespace Vidb_Games.Models.Entities
     {
         [Key]
         public Guid Id { get; set; } = Guid.NewGuid();
-        public long IgdbId { get; set; }
         public string? Name { get; set; } = string.Empty;
         public ICollection<Game> Games { get; set; } = new List<Game>();
     }
@@ -66,7 +63,6 @@ namespace Vidb_Games.Models.Entities
     {
         [Key]
         public Guid Id { get; set; } = Guid.NewGuid();
-        public long IgdbId { get; set; }
         public string? Name { get; set; } = string.Empty;
         public ICollection<Game> Games { get; set; } = new List<Game>();
     }
@@ -75,7 +71,6 @@ namespace Vidb_Games.Models.Entities
     {
         [Key]
         public Guid Id { get; set; } = Guid.NewGuid();
-        public long IgdbId { get; set; }
         public string Name { get; set; } = string.Empty;
 
     }
@@ -84,11 +79,10 @@ namespace Vidb_Games.Models.Entities
     {
         [Key]
         public Guid Id { get; set; } = Guid.NewGuid();
-        public long IgdbId { get; set; }
         public bool IsDeveloper { get; set; }
         public bool IsPublisher { get; set; }
 
-        public Guid GameId { get; set; }
+        public long GameId { get; set; }
         public Game Game { get; set; } = null!;
 
         public Guid CompanyId { get; set; }
@@ -99,11 +93,10 @@ namespace Vidb_Games.Models.Entities
     {
         [Key]
         public Guid Id { get; set; } = Guid.NewGuid();
-        public long IgdbId { get; set; }
         public string Type { get; set; } = string.Empty;
         public string Url { get; set; } = string.Empty;
 
-        public Guid GameId { get; set; }
+        public long GameId { get; set; }
         public Game Game { get; set; } = null!;
     }
 }

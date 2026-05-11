@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
@@ -16,7 +17,6 @@ namespace Vidb_Games.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    IgdbId = table.Column<long>(type: "bigint", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
@@ -29,7 +29,6 @@ namespace Vidb_Games.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    IgdbId = table.Column<long>(type: "bigint", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
@@ -41,15 +40,15 @@ namespace Vidb_Games.Migrations
                 name: "Games",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    IgdbId = table.Column<long>(type: "bigint", nullable: false),
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "text", nullable: true),
                     Slug = table.Column<string>(type: "text", nullable: true),
                     Cover = table.Column<string>(type: "text", nullable: true),
                     Description = table.Column<string>(type: "text", nullable: true),
                     Storyline = table.Column<string>(type: "text", nullable: true),
                     FirstReleaseDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    IGDBRating = table.Column<double>(type: "double precision", nullable: false),
+                    IGDBRating = table.Column<double>(type: "double precision", nullable: true),
                     ViewCount = table.Column<int>(type: "integer", nullable: false),
                     LastViewed = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
@@ -76,7 +75,6 @@ namespace Vidb_Games.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    IgdbId = table.Column<long>(type: "bigint", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
@@ -89,7 +87,6 @@ namespace Vidb_Games.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    IgdbId = table.Column<long>(type: "bigint", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
@@ -102,7 +99,6 @@ namespace Vidb_Games.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    IgdbId = table.Column<long>(type: "bigint", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
@@ -124,10 +120,14 @@ namespace Vidb_Games.Migrations
                     Reputation = table.Column<int>(type: "integer", nullable: false),
                     Provider = table.Column<string>(type: "text", nullable: false),
                     VerificationToken = table.Column<string>(type: "text", nullable: true),
+                    VerificationTokenDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     EmailVerified = table.Column<bool>(type: "boolean", nullable: false),
                     PasswordResetToken = table.Column<string>(type: "text", nullable: true),
+                    PasswordResetTokenDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     Bio = table.Column<string>(type: "character varying(250)", maxLength: 250, nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LockoutEnd = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    FailedAttempts = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -138,7 +138,7 @@ namespace Vidb_Games.Migrations
                 name: "GameMode",
                 columns: table => new
                 {
-                    GamesId = table.Column<Guid>(type: "uuid", nullable: false),
+                    GamesId = table.Column<long>(type: "bigint", nullable: false),
                     ModesId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
@@ -163,10 +163,9 @@ namespace Vidb_Games.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    IgdbId = table.Column<long>(type: "bigint", nullable: false),
                     IsDeveloper = table.Column<bool>(type: "boolean", nullable: false),
                     IsPublisher = table.Column<bool>(type: "boolean", nullable: false),
-                    GameId = table.Column<Guid>(type: "uuid", nullable: false),
+                    GameId = table.Column<long>(type: "bigint", nullable: false),
                     CompanyId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
@@ -191,10 +190,9 @@ namespace Vidb_Games.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    IgdbId = table.Column<long>(type: "bigint", nullable: false),
                     Type = table.Column<string>(type: "text", nullable: false),
                     Url = table.Column<string>(type: "text", nullable: false),
-                    GameId = table.Column<Guid>(type: "uuid", nullable: false)
+                    GameId = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -211,7 +209,7 @@ namespace Vidb_Games.Migrations
                 name: "GameGenre",
                 columns: table => new
                 {
-                    GamesId = table.Column<Guid>(type: "uuid", nullable: false),
+                    GamesId = table.Column<long>(type: "bigint", nullable: false),
                     GenresId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
@@ -235,7 +233,7 @@ namespace Vidb_Games.Migrations
                 name: "GameKeyword",
                 columns: table => new
                 {
-                    GamesId = table.Column<Guid>(type: "uuid", nullable: false),
+                    GamesId = table.Column<long>(type: "bigint", nullable: false),
                     KeywordsId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
@@ -259,7 +257,7 @@ namespace Vidb_Games.Migrations
                 name: "GamePlatform",
                 columns: table => new
                 {
-                    GamesId = table.Column<Guid>(type: "uuid", nullable: false),
+                    GamesId = table.Column<long>(type: "bigint", nullable: false),
                     PlatformsId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
@@ -283,7 +281,7 @@ namespace Vidb_Games.Migrations
                 name: "GameTheme",
                 columns: table => new
                 {
-                    GamesId = table.Column<Guid>(type: "uuid", nullable: false),
+                    GamesId = table.Column<long>(type: "bigint", nullable: false),
                     ThemesId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
@@ -310,8 +308,7 @@ namespace Vidb_Games.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Rating = table.Column<int>(type: "integer", nullable: false),
                     Comment = table.Column<string>(type: "text", nullable: true),
-                    GameId = table.Column<int>(type: "integer", nullable: false),
-                    GameId1 = table.Column<Guid>(type: "uuid", nullable: true),
+                    GameId = table.Column<long>(type: "bigint", nullable: false),
                     Likes = table.Column<int>(type: "integer", nullable: false),
                     Dislikes = table.Column<int>(type: "integer", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false)
@@ -320,10 +317,11 @@ namespace Vidb_Games.Migrations
                 {
                     table.PrimaryKey("PK_Reviews", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Reviews_Games_GameId1",
-                        column: x => x.GameId1,
+                        name: "FK_Reviews_Games_GameId",
+                        column: x => x.GameId,
                         principalTable: "Games",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Reviews_Users_UserId",
                         column: x => x.UserId,
@@ -338,18 +336,18 @@ namespace Vidb_Games.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    GameId = table.Column<int>(type: "integer", nullable: false),
-                    GameId1 = table.Column<Guid>(type: "uuid", nullable: true),
+                    GameId = table.Column<long>(type: "bigint", nullable: false),
                     Status = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_UserGameEntries", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_UserGameEntries_Games_GameId1",
-                        column: x => x.GameId1,
+                        name: "FK_UserGameEntries_Games_GameId",
+                        column: x => x.GameId,
                         principalTable: "Games",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_UserGameEntries_Users_UserId",
                         column: x => x.UserId,
@@ -394,9 +392,9 @@ namespace Vidb_Games.Migrations
                 column: "GameId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Reviews_GameId1",
+                name: "IX_Reviews_GameId",
                 table: "Reviews",
-                column: "GameId1");
+                column: "GameId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Reviews_UserId",
@@ -409,9 +407,9 @@ namespace Vidb_Games.Migrations
                 column: "GameId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserGameEntries_GameId1",
+                name: "IX_UserGameEntries_GameId",
                 table: "UserGameEntries",
-                column: "GameId1");
+                column: "GameId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserGameEntries_UserId",

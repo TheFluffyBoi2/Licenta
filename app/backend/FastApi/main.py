@@ -48,7 +48,7 @@ class UserGamesRequest(BaseModel):
 class RecommendationResponse(BaseModel):
     id: int
     name: str
-    score: float
+    recommendation_score: float
 
 @app.post("/recommendations", response_model=list[RecommendationResponse])
 async def get_games_from_description(request: SearchRequest):

@@ -1,7 +1,10 @@
 --extra-index-url https://download.pytorch.org/whl/cpu
+numpy<2.0.0
 torch==2.2.1+cpu
-sentence-transformers
+torchvision==0.17.1+cpu
+sentence-transformers==5.2.3
+transformers==4.41.0
 fastapi
-pydantic
 uvicorn
 pandas
+pydantic

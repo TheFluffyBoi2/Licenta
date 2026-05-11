@@ -12,14 +12,14 @@ namespace Vidb_Games.Services
         private readonly AppDbContext _context;
         private readonly IConfiguration _configuration;
         private readonly IIGDBService _igdbService;
-        private readonly HttpClient _httpClinet;
+        private readonly HttpClient _httpClient;
 
         public RecommendService(AppDbContext context, IConfiguration configuration, IIGDBService igdbService, HttpClient httpClient)
         {
             _configuration = configuration;
             _context = context;
             _igdbService = igdbService;
-            _httpClinet = httpClient;
+            _httpClient = httpClient;
         }
 
         public async Task<GameDto[]?> GetUserRecommendations(Guid userId)
@@ -29,9 +29,14 @@ namespace Vidb_Games.Services
                 .Select(ug => ug.GameId)
                 .ToListAsync();
 
-            var response = await _httpClinet.PostAsJsonAsync(
-                "http://localhost:8000/recommendations/user",
-                new { gameIds }
+            var requestBody = new UserRecommendationRequest
+            {
+                GameIds = gameIds
+            };
+
+            var response = await _httpClient.PostAsJsonAsync(
+                "http://fastapi_recommender:8000/recommendations/user",
+                requestBody
             );
 
             if (!response.IsSuccessStatusCode)
@@ -41,7 +46,71 @@ namespace Vidb_Games.Services
 
             GameDto[]? result = await response.Content.ReadFromJsonAsync<GameDto[]>();
 
-            return result;
+            if (result == null || result.Length == 0)
+            {
+                return Array.Empty<GameDto>();
+            }
+
+            var ids = result.Select(g => g.IgdbId).ToList();
+            string idString = string.Join(",", ids);
+
+            string queryParams = $"fields name, slug, summary, cover.url, first_release_date, genres.name, platforms.name; " +
+                                 $"where id = ({idString}); " +
+                                 $"limit {ids.Count};";
+
+            var finalGames = await _igdbService.SendRequestAsync(queryParams);
+
+            return finalGames ?? Array.Empty<GameDto>();
+        }
+
+        public async Task<GameDto[]?> GetDescriptionRecommendations(string description)
+        {
+            var requestBody = new TextRecommendationRequest
+            {
+                Description = description
+            };
+
+            var response = await _httpClient.PostAsJsonAsync(
+                "http://fastapi_recommender:8000/recommendations",
+                requestBody
+            );
+
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new Exception("FastAPI request failed.");
+            }
+
+            GameDto[]? result = await response.Content.ReadFromJsonAsync<GameDto[]>();
+
+            if (result == null || result.Length == 0)
+            {
+                return Array.Empty<GameDto>();
+            }
+
+            var ids = result.Select(g => g.IgdbId).ToList();
+            string idString = string.Join(",", ids);
+
+            string queryParams = $"fields name, slug, summary, cover.url, first_release_date, genres.name, platforms.name; " +
+                                 $"where id = ({idString}); " +
+                                 $"limit {ids.Count};";
+
+            var finalGames = await _igdbService.SendRequestAsync(queryParams);
+
+            return finalGames ?? Array.Empty<GameDto>();
+        }
+
+        public async Task<GameDto[]?> GetGameRecommendations(long gameId)
+        {
+            var response = await _httpClient.GetFromJsonAsync<GameDto[]>(
+                $"http://fastapi_recommender:8000/recommendations/game/{gameId}"
+            );
+
+            if (response == null || response.Length == 0)
+            {
+                return null;
+            }
+
+            return response ?? Array.Empty<GameDto>();
         }
     }
 }

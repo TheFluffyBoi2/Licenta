@@ -63,8 +63,12 @@ services:
     container_name: fastapi_recommender
     ports:
       - "8000:8000"
+    environment:
+      - HF_HOME=/root/.cache/huggingface
     volumes:
-      - ./recommender:/app
+      - ./backend/FastApi:/app
+      - hf_model_cache:/root/.cache/huggingface
 
 volumes:
   postgres_data:
+  hf_model_cache:

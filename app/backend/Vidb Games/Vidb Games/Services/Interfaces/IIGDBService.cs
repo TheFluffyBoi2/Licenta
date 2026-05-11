@@ -8,6 +8,6 @@ namespace Vidb_Games.Services.Interfaces
         Task<GameDto[]> GetTopGames();
         Task<GameDto[]> GetTopUpcoming();
         Task<GameDto[]> GetTopRecent();
-        Task PopulateDatabase();
+        // Task PopulateDatabase();
     }
 }
