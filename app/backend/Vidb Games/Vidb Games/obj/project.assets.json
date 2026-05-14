@@ -7775,12 +7775,6 @@
   },
   "logs": [
     {
-      "code": "Undefined",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "An invalid cache entry was found for URL 'https://api.nuget.org/v3-flatcontainer/mailkit/4.9.0/mailkit.4.9.0.nupkg' and will be replaced.\r\nThe nupkg at 'https://api.nuget.org/v3-flatcontainer/mailkit/4.9.0/mailkit.4.9.0.nupkg' is not valid.\r\n  End of Central Directory record could not be found."
-    },
-    {
       "code": "NU1902",
       "level": "Warning",
       "warningLevel": 1,

@@ -16,7 +16,7 @@ const SmallGameCard = ({ game, rank, isUpcoming = false }) => (
         alt={game.name}
         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
       />
-      <div className="absolute inset-0 bg-linear-to from-gray-50 dark:from-[#1a1a1a] via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-gray-50 dark:from-[#1a1a1a] via-transparent to-transparent" />
     </div>
 
     <div className="p-4">

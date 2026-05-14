@@ -80,6 +80,7 @@ builder.Services.AddScoped<IUsersService, UsersService>();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<IIGDBService, IGDBService>();
 builder.Services.AddScoped<IGameService, GameService>();
+builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddHttpClient<IRecommendService, RecommendService>();
 builder.Services.AddSingleton(_ => IGDBClient.CreateWithDefaults(
     builder.Configuration["IGDB:ClientId"]!,

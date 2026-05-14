@@ -8,6 +8,7 @@ namespace Vidb_Games.Services.Interfaces
         Task<GameDto[]> GetTopGames();
         Task<GameDto[]> GetTopUpcoming();
         Task<GameDto[]> GetTopRecent();
+        Task<GameDto[]> SearchGames(string query, int limit = 15);
         // Task PopulateDatabase();
     }
 }

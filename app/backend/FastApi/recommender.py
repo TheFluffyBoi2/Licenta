@@ -7,13 +7,23 @@ import pickle
 def get_recommendations(game_id, df, top_games):
     blacklist_terms = ['edition', 'psp', 'game boy', 'remastered', 'version', 'demo', 'gbc']
 
-    source_game = df[df['id'] == game_id].iloc[0]
+    matches = df[df['id'] == game_id]
+    if matches.empty or game_id not in top_games:
+        return []
+
+    source_game = matches.iloc[0]
     source_game_name = source_game['name'] if pd.notna(source_game['name']) else None
     source_franchise = source_game['franchise'] if pd.notna(source_game['franchise']) else None
     source_series = source_game['series'] if pd.notna(source_game['series']) else None
 
+    if not source_game_name:
+        return []
+
     source_name_words = source_game_name.lower().split()
     source_name_words = {word for word in source_name_words if len(word) > 2}
+
+    if not source_name_words:
+        return []
 
     recommendations = top_games[game_id]
 
@@ -36,7 +46,7 @@ def get_recommendations(game_id, df, top_games):
             if rec_category != 'main_game':
                 continue
 
-            if len(common_words) / len(source_name_words) >= 0.5:
+            if len(source_name_words) > 0 and len(common_words) / len(source_name_words) > 0.25:
                 continue
 
             if (source_franchise is not None and source_franchise == rec_franchise) or (source_series is not None and source_series == rec_series):
@@ -65,10 +75,10 @@ def get_recommendations(game_id, df, top_games):
     potential_rec.sort(key=lambda x: x["recommendation_score"], reverse=True)
 
     print(f"\n--- Recomandări Sortate pentru: {source_game_name.upper()} ---")
-    for rec in potential_rec[:10]:
+    for rec in potential_rec[:6]:
         print(f"{rec['name']:<45} | {rec['id']} | Scorul Final: {rec['recommendation_score']*100:>6.2f}%")
 
-    return potential_rec[:10]
+    return potential_rec[:6]
 
 def get_description_recommendations(description, df, model, embeddings):
     user_vector = model.encode(description).reshape(1, -1)
@@ -129,20 +139,3 @@ def get_recommendations_from_user(game_ids, df, top_games):
 #              "Portal 2", "Overwatch 2", "Hollow Knight", "Undertale",
 #              "Resident Evil 4", "Terraria"]
 
-# DATA_PATH: str = 'working.csv'
-# EMBEDDINGS_PATH: str = 'embeddings.pkl'
-# TOP_GAMES_PATH: str = 'top_games.pkl'
-# MODEL_PATH: str = './mpnet_model'
-
-# df = pd.read_csv(DATA_PATH, usecols=['id', 'series', 'franchise', 'name', 'total_score', 'category'])
-
-# with open(TOP_GAMES_PATH, 'rb') as f:
-#     top_games = pickle.load(f)
-
-# with open(EMBEDDINGS_PATH, 'rb') as f:
-#     embeddings = pickle.load(f)
-
-# model = SentenceTransformer(MODEL_PATH)
-
-# get_description_recommendations("Hard platformer game precision platformer hard climb mountain", df, model, embeddings)
-# get_recommendations(312638, df, top_games)

@@ -12,8 +12,8 @@ using Vidb_Games.Data;
 namespace Vidb_Games.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260510142210_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20260514155053_Initial migration")]
+    partial class Initialmigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -250,6 +250,9 @@ namespace Vidb_Games.Migrations
                     b.Property<string>("Comment")
                         .HasColumnType("text");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<int>("Dislikes")
                         .HasColumnType("integer");
 
@@ -389,8 +392,14 @@ namespace Vidb_Games.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<DateTime>("FirstTimeAdded")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<long>("GameId")
                         .HasColumnType("bigint");
+
+                    b.Property<DateTime>("LastTimeModified")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("Status")
                         .HasColumnType("integer");
@@ -399,10 +408,6 @@ namespace Vidb_Games.Migrations
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("GameId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("UserGameEntries");
                 });
@@ -503,7 +508,7 @@ namespace Vidb_Games.Migrations
 
             modelBuilder.Entity("Vidb_Games.Models.Entities.Review", b =>
                 {
-                    b.HasOne("Vidb_Games.Models.Entities.Game", "Game")
+                    b.HasOne("Vidb_Games.Models.Entities.Game", null)
                         .WithMany("Reviews")
                         .HasForeignKey("GameId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -514,8 +519,6 @@ namespace Vidb_Games.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Game");
 
                     b.Navigation("User");
                 });
@@ -529,25 +532,6 @@ namespace Vidb_Games.Migrations
                         .IsRequired();
 
                     b.Navigation("Game");
-                });
-
-            modelBuilder.Entity("Vidb_Games.Models.Entities.UserGameEntry", b =>
-                {
-                    b.HasOne("Vidb_Games.Models.Entities.Game", "Game")
-                        .WithMany()
-                        .HasForeignKey("GameId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Vidb_Games.Models.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Game");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Vidb_Games.Models.Entities.Game", b =>

@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Vidb_Games.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class Initialmigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -104,6 +104,22 @@ namespace Vidb_Games.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Themes", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserGameEntries",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    GameId = table.Column<long>(type: "bigint", nullable: false),
+                    Status = table.Column<int>(type: "integer", nullable: false),
+                    FirstTimeAdded = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LastTimeModified = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserGameEntries", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -311,45 +327,14 @@ namespace Vidb_Games.Migrations
                     GameId = table.Column<long>(type: "bigint", nullable: false),
                     Likes = table.Column<int>(type: "integer", nullable: false),
                     Dislikes = table.Column<int>(type: "integer", nullable: false),
-                    UserId = table.Column<Guid>(type: "uuid", nullable: false)
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Reviews", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Reviews_Games_GameId",
-                        column: x => x.GameId,
-                        principalTable: "Games",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
                         name: "FK_Reviews_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "UserGameEntries",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    GameId = table.Column<long>(type: "bigint", nullable: false),
-                    Status = table.Column<int>(type: "integer", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UserGameEntries", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_UserGameEntries_Games_GameId",
-                        column: x => x.GameId,
-                        principalTable: "Games",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_UserGameEntries_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -405,16 +390,6 @@ namespace Vidb_Games.Migrations
                 name: "IX_Stores_GameId",
                 table: "Stores",
                 column: "GameId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserGameEntries_GameId",
-                table: "UserGameEntries",
-                column: "GameId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserGameEntries_UserId",
-                table: "UserGameEntries",
-                column: "UserId");
         }
 
         /// <inheritdoc />
@@ -466,10 +441,10 @@ namespace Vidb_Games.Migrations
                 name: "Companies");
 
             migrationBuilder.DropTable(
-                name: "Games");
+                name: "Users");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "Games");
         }
     }
 }

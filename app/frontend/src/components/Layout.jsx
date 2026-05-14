@@ -7,7 +7,7 @@ const Layout = ({ children }) => {
       <header>
         <Navbar />
       </header>
-      <main className="grow px-2 py-4 max-w-7xl mx-auto w-full">
+      <main className="grow w-full px-4 sm:px-6 py-4">
         {children}
       </main>
       <footer className="bg-gray-100 dark:bg-[#1a1a1a] border-t border-gray-200 dark:border-white/5 py-8 text-center text-gray-600 dark:text-gray-500 transition-colors duration-500">

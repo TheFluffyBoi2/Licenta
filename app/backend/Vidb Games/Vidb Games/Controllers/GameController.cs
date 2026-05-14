@@ -19,19 +19,51 @@ namespace Vidb_Games.Controllers
             _gameService = gameService;
         }
 
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchGames([FromQuery] string q, [FromQuery] int limit = 15)
+        {
+            var games = await _gameService.SearchGames(q ?? "", limit);
+            return Ok(games);
+        }
+
         [HttpGet("game_data/{gameId}")]
         public async Task<IActionResult> GetGameData([FromRoute] long gameId)
         {
-            var gameDataTask = _gameService.GetGameData(gameId);
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!Guid.TryParse(userIdString, out var userId)) return Unauthorized();
+
+            var (gameInfo, userRelation) = await _gameService.GetGameData(gameId, userId);
             var recommendationsTask = _gameService.GetGameRecommendations(gameId);
 
-            await Task.WhenAll(gameDataTask, recommendationsTask);
+            if (gameInfo == null || string.IsNullOrWhiteSpace(gameInfo.Name))
+            {
+                return NotFound(new { message = "Game not found." });
+            }
 
             return Ok(new GameInfoResponse
             {
-                GameInfo = await gameDataTask,
-                gameDtos = await recommendationsTask
+                GameInfo = gameInfo,
+                gameDtos = await recommendationsTask,
+                userRelationDto = userRelation
             });
+        }
+
+        [HttpPost("update_status")]
+        public async Task<IActionResult> UpdateStatus(StatusChangeRequest request)
+        {
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!Guid.TryParse(userIdString, out var userId)) return Unauthorized();
+
+            var ok = await _gameService.ChangeStatus(request.GameId, userId, request.Status);
+            if (!ok)
+            {
+                return BadRequest(new {
+                    success = false,
+                    message = "Update failed",
+                    timestamp = DateTime.UtcNow
+                });
+            }
+            return Ok(new { success = true, message = "Status updated successfully" });
         }
     }
 }

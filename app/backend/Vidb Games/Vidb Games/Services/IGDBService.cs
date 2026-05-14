@@ -1,4 +1,4 @@
-﻿using IGDB;
+using IGDB;
 using IGDB.Models;
 using System.Text.Json;
 using Vidb_Games.Data;
@@ -76,6 +76,30 @@ namespace Vidb_Games.Services
                          $"where first_release_date < {currentUnixTime} & aggregated_rating != null & total_rating_count > 10 & cover != null; " +
                          $"sort first_release_date desc; " +
                          $"limit 10;";
+
+            return await SendRequestAsync(queryParams);
+        }
+
+        public async Task<GameDto[]> SearchGames(string query, int limit = 15)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                return Array.Empty<GameDto>();
+            }
+
+            var trimmed = query.Trim();
+            if (trimmed.Length < 2)
+            {
+                return Array.Empty<GameDto>();
+            }
+
+            var safe = trimmed.Replace("\\", "\\\\").Replace("\"", "\\\"");
+            limit = Math.Clamp(limit, 1, 50);
+
+            string queryParams =
+                $"search \"{safe}\"; " +
+                "fields id, name, slug, summary, cover.url, first_release_date, aggregated_rating, genres.name, platforms.name; " +
+                $"limit {limit};";
 
             return await SendRequestAsync(queryParams);
         }

@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 
 namespace Vidb_Games.Models.DTOs
 {
@@ -19,6 +19,12 @@ namespace Vidb_Games.Models.DTOs
         [JsonPropertyName("aggregated_rating")]
         [Newtonsoft.Json.JsonProperty("aggregated_rating")]
         public double? IGDBRating { get; set; }
+        [JsonPropertyName("aggregated_rating_count")]
+        public int? AggregatedRatingCount { get; set; }
+        [JsonPropertyName("rating")]
+        public double? UserRating { get; set; }
+        [JsonPropertyName("rating_count")]
+        public int? UserRatingCount { get; set; }
         [JsonPropertyName("total_rating_count")]
         [Newtonsoft.Json.JsonProperty("total_rating_count")]
         public int RatingCounts { get; set; }

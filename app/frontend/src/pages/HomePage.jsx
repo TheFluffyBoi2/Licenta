@@ -137,17 +137,13 @@ const HomePage = () => {
           </div>
         </div>
 
-        <div className="absolute top-2 right-2 z-10">
-          <StatusButton gameId={game.id} />
-        </div>
-
         <div className="relative h-48 group-hover:scale-105 transition-transform duration-300">
           <img
-            src={game.cover.url}
+            src={game.cover?.url || "/placeholder.jpg"}
             alt={game.name}
             className="w-full h-full object-cover "
           />
-          <div className="absolute inset-0 bg-linear-to-t from-gray-50 dark:from-[#1a1a1a] via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-gray-50 dark:from-[#1a1a1a] via-transparent to-transparent" />
         </div>
 
         <div className="p-4">
@@ -168,7 +164,7 @@ const HomePage = () => {
               </span>
             )}
 
-            {game.aggregated_rating && (
+            {game.aggregated_rating != null && (
               <div className="flex items-center gap-1 text-sm">
                 <Star className="w-4 h-4 fill-[#FFD700] text-[#FFD700]" />
                 <span className="font-semibold text-gray-900 dark:text-white">
@@ -189,17 +185,13 @@ const HomePage = () => {
           <LargeRank rank={rank} />
         </div>
 
-        <div className="absolute top-4 right-4 z-10">
-          <StatusButton gameId={game.id} />
-        </div>
-
         <div className="relative h-60 group-hover:scale-105 transition-transform duration-300">
           <img
-            src={game.cover.url}
+            src={game.cover?.url || "/placeholder.jpg"}
             alt={game.name}
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-linear-to-t from-gray-50 dark:from-[#1a1a1a] via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-gray-50 dark:from-[#1a1a1a] via-transparent to-transparent" />
         </div>
 
         <div className="p-6">
@@ -231,7 +223,7 @@ const HomePage = () => {
               </div>
             </div>
 
-            {game.aggregated_rating && (
+            {game.aggregated_rating != null && (
               <div className="flex items-center gap-2 bg-gray-200 dark:bg-[#2a2a2a] px-3 py-2 rounded-lg">
                 <Star className="w-5 h-5 fill-[#FFD700] text-[#FFD700]" />
                 <span className="text-xl font-bold text-gray-900 dark:text-white">
@@ -283,7 +275,7 @@ const HomePage = () => {
           </div>
           <section>
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
-              {recommendations.map((game, idx) => (
+              {recommendations.slice(0, 7).map((game, idx) => (
                 <SmallGameCard
                   key={`recommendation-${game.id}`}
                   game={game}

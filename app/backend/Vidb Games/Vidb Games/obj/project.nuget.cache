@@ -138,15 +138,6 @@
   ],
   "logs": [
     {
-      "code": "Undefined",
-      "level": "Warning",
-      "message": "An invalid cache entry was found for URL 'https://api.nuget.org/v3-flatcontainer/mailkit/4.9.0/mailkit.4.9.0.nupkg' and will be replaced.\r\nThe nupkg at 'https://api.nuget.org/v3-flatcontainer/mailkit/4.9.0/mailkit.4.9.0.nupkg' is not valid.\r\n  End of Central Directory record could not be found.",
-      "projectPath": "C:\\Users\\dumit\\Desktop\\Licenta\\app\\backend\\Vidb Games\\Vidb Games\\Vidb Games.csproj",
-      "warningLevel": 1,
-      "filePath": "C:\\Users\\dumit\\Desktop\\Licenta\\app\\backend\\Vidb Games\\Vidb Games\\Vidb Games.csproj",
-      "targetGraphs": []
-    },
-    {
       "code": "NU1902",
       "level": "Warning",
       "message": "Package 'MailKit' 4.9.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-9j88-vvj5-vhgr",

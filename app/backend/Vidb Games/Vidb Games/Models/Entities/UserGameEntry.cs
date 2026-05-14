@@ -4,10 +4,10 @@ namespace Vidb_Games.Models.Entities
 {
     public enum GameStatus
     {
-        Wishlist,
-        PlanToPlay,
+        Wishlist = 0,
         CurrentlyPlaying,
         Completed,
+        Dropped,
     }
     public class UserGameEntry
     {
@@ -16,13 +16,14 @@ namespace Vidb_Games.Models.Entities
 
         [Required]
         public Guid UserId { get; set; }
-        public User? User { get; set; }
 
         [Required]
         public long GameId { get; set; }
-        public Game? Game { get; set; }
 
         [Required]
         public GameStatus Status { get; set; }
+
+        public DateTime FirstTimeAdded { get; set; }
+        public DateTime LastTimeModified { get; set; }
     }
 }

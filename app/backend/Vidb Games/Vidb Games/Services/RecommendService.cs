@@ -51,10 +51,15 @@ namespace Vidb_Games.Services
                 return Array.Empty<GameDto>();
             }
 
-            var ids = result.Select(g => g.IgdbId).ToList();
+            var ids = result.Select(g => g.IgdbId).Where(id => id > 0).Distinct().ToList();
+            if (ids.Count == 0)
+            {
+                return Array.Empty<GameDto>();
+            }
+
             string idString = string.Join(",", ids);
 
-            string queryParams = $"fields name, slug, summary, cover.url, first_release_date, genres.name, platforms.name; " +
+            string queryParams = $"fields name, slug, summary, cover.url, first_release_date, aggregated_rating, genres.name, platforms.name; " +
                                  $"where id = ({idString}); " +
                                  $"limit {ids.Count};";
 
@@ -87,10 +92,15 @@ namespace Vidb_Games.Services
                 return Array.Empty<GameDto>();
             }
 
-            var ids = result.Select(g => g.IgdbId).ToList();
+            var ids = result.Select(g => g.IgdbId).Where(id => id > 0).Distinct().ToList();
+            if (ids.Count == 0)
+            {
+                return Array.Empty<GameDto>();
+            }
+
             string idString = string.Join(",", ids);
 
-            string queryParams = $"fields name, slug, summary, cover.url, first_release_date, genres.name, platforms.name; " +
+            string queryParams = $"fields name, slug, summary, cover.url, first_release_date, aggregated_rating,  genres.name, platforms.name; " +
                                  $"where id = ({idString}); " +
                                  $"limit {ids.Count};";
 
@@ -107,10 +117,24 @@ namespace Vidb_Games.Services
 
             if (response == null || response.Length == 0)
             {
-                return null;
+                return Array.Empty<GameDto>();
             }
 
-            return response ?? Array.Empty<GameDto>();
+            var ids = response.Select(g => g.IgdbId).Where(id => id > 0).Distinct().ToList();
+            if (ids.Count == 0)
+            {
+                return Array.Empty<GameDto>();
+            }
+
+            string idString = string.Join(",", ids);
+
+            string queryParams = $"fields name, slug, summary, cover.url, first_release_date, aggregated_rating,  genres.name, platforms.name; " +
+                                 $"where id = ({idString}); " +
+                                 $"limit {ids.Count};";
+
+            var finalGames = await _igdbService.SendRequestAsync(queryParams);
+
+            return finalGames ?? Array.Empty<GameDto>();
         }
     }
 }
