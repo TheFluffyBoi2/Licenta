@@ -95,14 +95,13 @@ builder.Services.AddCors(options =>
             {
                 policy.WithOrigins("http://localhost:5173")
                 .AllowAnyHeader()
-                .AllowAnyMethod();
+                .AllowAnyMethod()
+                .AllowCredentials();
             });
     }
 );
 
 var app = builder.Build();
-
-app.UseStaticFiles();
 
 using (var scope = app.Services.CreateScope())
 {
@@ -110,9 +109,11 @@ using (var scope = app.Services.CreateScope())
     db.Database.Migrate();
 }
 
+app.UseStaticFiles();
+app.UseCors("AllowFrontend");
+
 app.UseRouting();
 
-app.UseCors("AllowFrontend");
 
 app.UseSwagger();
 app.UseSwaggerUI();

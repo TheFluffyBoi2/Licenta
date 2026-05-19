@@ -25,8 +25,8 @@ namespace Vidb_Games.Controllers
             var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (!Guid.TryParse(userIdString, out var userId)) return Unauthorized();
 
-            var ok = await _reviewService.AddReview(request, userId);
-            if (!ok)
+            var newReview = await _reviewService.AddReview(request, userId);
+            if (newReview == null)
             {
                 return BadRequest(new {
                     success = false,
@@ -34,8 +34,50 @@ namespace Vidb_Games.Controllers
                     timestamp = DateTime.UtcNow
                 });
             }
-            return Ok(new { success = true, message = "Review added successfully" });
+            return Ok(newReview);
+        }
 
+        [HttpDelete("delete/{reviewId}")]
+        public async Task<IActionResult> DeleteReview([FromRoute] Guid reviewId)
+        {
+            var ok = await _reviewService.DeleteReview(reviewId);
+            if (!ok)
+            {
+                return BadRequest(new {
+                    success = false,
+                    message = "Delete failed",
+                    timestamp = DateTime.UtcNow
+                });
+            }
+            return Ok(new { success = true, message = "Review deleted successfully" });
+        }
+
+        [HttpPut("update/{reviewId}")]
+        public async Task<IActionResult> UpdateReview([FromRoute] Guid reviewId, UpdateReviewRequest request)
+        {
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!Guid.TryParse(userIdString, out var userId)) return Unauthorized();
+
+            var reviewDto = await _reviewService.UpdateReview(reviewId, request, userId);
+            if (reviewDto == null)
+            {
+                return BadRequest(new {
+                    success = false,
+                    message = "Update failed",
+                    timestamp = DateTime.UtcNow
+                });
+            }
+            return Ok(reviewDto);
+        }
+
+        [HttpPost("reaction/{reviewId}/{isLike}")]
+        public async Task<IActionResult> AddReaction([FromRoute] Guid reviewId, [FromRoute] bool isLike)
+        {
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!Guid.TryParse(userIdString, out var userId)) return Unauthorized();
+
+            var ReactionResponse = await _reviewService.AddReaction(reviewId, userId, isLike);
+            return Ok(ReactionResponse);
         }
     }
 }

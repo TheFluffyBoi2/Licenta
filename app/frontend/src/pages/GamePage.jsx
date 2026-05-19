@@ -17,6 +17,7 @@ import {
   Award,
 } from "lucide-react";
 import api from "../api/axios";
+// import ColorThief from "colorthief";
 
 const GamePage = () => {
   const { id } = useParams();
@@ -24,6 +25,7 @@ const GamePage = () => {
   const [userRelation, setUserRelation] = useState({});
   const [similarGames, setSimilarGames] = useState([]);
   const [reviews, setReviews] = useState([]);
+  const [userReview, setUserReview] = useState(null);
   const [loading, setLoading] = useState(true);
   const [gameStatus, setGameStatus] = useState(null);
   const [reviewSortBy, setReviewSortBy] = useState("likes");
@@ -32,10 +34,32 @@ const GamePage = () => {
   const [score, setScore] = useState(60);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isChanging, setIsChanging] = useState(false);
+  const [accentColors, setAccentColors] = useState(["#50FCBC", "#9333ea"]);
+  const API_URL = "http://localhost:8080";
+  const getUserAvatar = () => {
+    try {
+      const userData = JSON.parse(localStorage.getItem("user"));
+      if (userData?.profilePictureUrl) {
+        const avatarPath = userData.profilePictureUrl.startsWith("/")
+          ? userData.profilePictureUrl
+          : `/${userData.profilePictureUrl}`;
+        return `${API_URL}${avatarPath}`;
+      }
+    } catch (error) {
+      console.error("Error reading user data:", error);
+    }
+    return `${API_URL}/default_avatar.png`;
+  };
+
+  const [imgUrl, setImgUrl] = useState(getUserAvatar());
 
   useEffect(() => {
+    const abortController = new AbortController();
     const fetchGame = async () => {
       try {
+        const userData = JSON.parse(localStorage.getItem("user"));
+        const userId = userData?.userId;
+
         setLoading(true);
         setLoadError(null);
         setGameInfo({});
@@ -46,7 +70,9 @@ const GamePage = () => {
           return;
         }
 
-        const response = await api.get(`api/game/game_data/${numericId}`);
+        const response = await api.get(`api/game/game_data/${numericId}`, {
+          signal: abortController.signal,
+        });
         const data = response.data;
         const game_info =
           data.game_info ?? data.gameInfo ?? data.GameInfo ?? null;
@@ -56,6 +82,7 @@ const GamePage = () => {
           data.GameRecommendations ??
           [];
         const user_relation = data.user_relation;
+        const revs = data.reviews;
 
         setGameInfo(game_info || {});
         setSimilarGames(
@@ -64,43 +91,26 @@ const GamePage = () => {
         setUserRelation(user_relation);
         setGameStatus(user_relation?.status);
 
-        // Mock reviews - replace with actual API call
-        setReviews([
-          {
-            id: 1,
-            user: "GamerPro123",
-            userKarma: 1250,
-            rating: 95,
-            content:
-              "An absolute masterpiece! The story, gameplay, and visuals all come together perfectly. This is what gaming should be about.",
-            likes: 342,
-            dislikes: 12,
-            date: "2024-03-15",
-          },
-          {
-            id: 2,
-            user: "CasualPlayer",
-            userKarma: 450,
-            rating: 78,
-            content:
-              "Great game overall, but had some pacing issues in the middle section. Still worth playing for the amazing ending.",
-            likes: 128,
-            dislikes: 45,
-            date: "2024-03-10",
-          },
-          {
-            id: 3,
-            user: "HardcoreGamer",
-            userKarma: 2890,
-            rating: 88,
-            content:
-              "Challenging and rewarding. The mechanics are deep and satisfying once you master them.",
-            likes: 567,
-            dislikes: 23,
-            date: "2024-03-08",
-          },
-        ]);
+        if (Array.isArray(revs) && userId) {
+          const myReview = revs.find(
+            (r) => r.user_id === userId || r.username === userData.username,
+          );
+          if (myReview) {
+            setUserReview(myReview);
+            setReviewText(myReview.comment);
+            setScore(Math.round(myReview.rating * 20));
+            setReviews(revs.filter((r) => r.id != myReview.id));
+          } else {
+            setReviews(revs);
+          }
+        } else {
+          setReviews(Array.isArray(revs) ? revs : []);
+        }
       } catch (error) {
+        if (error.name === "CanceledError" || error.code === "ERR_CANCELED") {
+          console.log("Request for game data was aborted.");
+          return;
+        }
         console.error("Failed to fetch game info:", error);
         if (error.response?.status === 404) {
           setLoadError("not_found");
@@ -110,11 +120,17 @@ const GamePage = () => {
         setGameInfo({});
         setSimilarGames([]);
       } finally {
-        setLoading(false);
+        if (!abortController.signal.aborted) {
+          setLoading(false);
+        }
       }
     };
 
     fetchGame();
+
+    return () => {
+      abortController.abort();
+    };
   }, [id]);
 
   const handleStatusChange = async (status) => {
@@ -144,14 +160,21 @@ const GamePage = () => {
     }
     try {
       setIsSubmitting(true);
-      const response = await api.post(`api/review/add`, {
-        game_id: Number(id),
-        rating: Math.round(score / 20),
-        comment: reviewText,
-      });
-      setReviewText("");
-      setScore(60);
-      alert("Review submitted successfully!");
+      if (userReview) {
+        const RESPONSE = await api.put(`api/review/update/${userReview.id}`, {
+          rating: Math.round(score / 20),
+          comment: reviewText,
+        });
+        setUserReview(response.data);
+      } else {
+        const response = await api.post(`api/review/add`, {
+          game_id: Number(id),
+          rating: Math.round(score / 20),
+          comment: reviewText,
+        });
+        setUserReview(response.data);
+        setReviews((prev) => prev.filter((r) => r.id !== response.data.id));
+      }
     } catch (error) {
       console.error("Failed to submit review:", error);
     } finally {
@@ -166,12 +189,87 @@ const GamePage = () => {
         return sorted.sort((a, b) => b.likes - a.likes);
       case "dislikes":
         return sorted.sort((a, b) => b.dislikes - a.dislikes);
-      case "karma":
-        return sorted.sort((a, b) => b.userKarma - a.userKarma);
+      case "reputation":
+        return sorted.sort((a, b) => b.reputation - a.reputation);
       default:
         return sorted;
     }
   };
+
+  const handleDeleteReview = async () => {
+    if (!window.confirm("Are you sure you want to delete your review?")) return;
+
+    try {
+      setIsSubmitting(true);
+      const result = await api.delete(`api/review/delete/${userReview.id}`);
+      setUserReview(null);
+      setReviewText("");
+      setScore(60);
+    } catch (error) {
+      console.error("Failed to delete review: ", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleReaction = async (reviewId, isLike) => {
+    try {
+      const result = await api.post(
+        `api/review/reaction/${reviewId}/${isLike}`,
+      );
+
+      const data = result.data;
+
+      if (data) {
+        setReviews((prev) =>
+          prev.map((r) => {
+            if (r.id === reviewId) {
+              return {
+                ...r,
+                likes: data.likes,
+                dislikes: data.dislikes,
+              };
+            }
+            return r;
+          }),
+        );
+      }
+    } catch (error) {
+      console.error("Failed to handle reaction:", error);
+    }
+  };
+
+  // const handleGetColors = (e) => {
+  //   const img = e.target;
+
+  //   if (!img.src || img.src.include("logo.png")) return;
+
+  //   const colorThief = new ColorThief();
+
+  //   if (img.complete) {
+  //     try {
+  //       const palette = colorThief.getPalette(img, 2);
+  //       const hexPalette = palette.map(
+  //         (rgb) => `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`,
+  //       );
+  //       setAccentColors(hexPalette);
+  //     } catch (error) {
+  //       console.error("Could not extract accent colors:", error);
+  //     }
+  //   } else {
+  //     img.addEventListener("load", function () {
+  //       try {
+  //         const palette = colorThief.getPalette(img, 2);
+  //         const hexPalette = palette.map(
+  //           (rgb) => `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`,
+  //         );
+  //         setAccentColors(hexPalette);
+  //       } catch (e) {
+  //         console.error(e);
+  //       }
+  //     });
+  //   }
+  // };
 
   const StatusButton = () => (
     <div className="relative group">
@@ -296,17 +394,22 @@ const GamePage = () => {
     <div className="bg-gray-50 dark:bg-[#1a1a1a] rounded-lg p-6 mb-4">
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold">
-            {review.user.charAt(0).toUpperCase()}
+          <div className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold overflow-hidden">
+            <img
+              src={`${API_URL}/${review.profile_picture_url}`}
+              alt={
+                review.username ? review.username.charAt(0).toUpperCase() : "?"
+              }
+            />
           </div>
           <div>
             <div className="flex items-center gap-2">
               <h4 className="font-bold text-gray-900 dark:text-white">
-                {review.user}
+                {review.username}
               </h4>
               <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
                 <TrendingUp className="w-3 h-3" />
-                {review.userKarma} karma
+                {review.reputation} reputation
               </span>
             </div>
             <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -318,22 +421,30 @@ const GamePage = () => {
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-blue-500 px-4 py-2 rounded-lg">
+        <div className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-green-500 px-4 py-2 rounded-lg">
           <Award className="w-5 h-5 text-white" />
-          <span className="text-2xl font-bold text-white">{review.rating}</span>
+          <span className="text-2xl font-bold text-white">
+            {review.rating * 20}
+          </span>
         </div>
       </div>
 
       <p className="text-gray-700 dark:text-gray-300 mb-4 leading-relaxed">
-        {review.content}
+        {review.comment}
       </p>
 
       <div className="flex items-center gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-        <button className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-green-500 dark:hover:text-green-400 transition-colors">
+        <button
+          onClick={() => handleReaction(review.id, true)}
+          className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-green-500 dark:hover:text-green-400 transition-colors"
+        >
           <ThumbsUp className="w-4 h-4" />
           <span className="font-semibold">{review.likes}</span>
         </button>
-        <button className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors">
+        <button
+          onClick={() => handleReaction(review.id, false)}
+          className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors"
+        >
           <ThumbsDown className="w-4 h-4" />
           <span className="font-semibold">{review.dislikes}</span>
         </button>
@@ -385,9 +496,11 @@ const GamePage = () => {
           {/* Left Side - Cover Image */}
           <div className="flex-shrink-0">
             <img
+              crossOrigin="anonymous"
               src={gameInfo.cover?.url || "/logo.png"}
               alt={gameInfo.name}
               className="w-full md:w-64 h-auto rounded-lg shadow-xl"
+              // onLoad={handleGetColors}
             />
             {/* Container dedicat pentru buton, cu aliniere centrată */}
             <div className="mt-4 flex justify-center">
@@ -569,82 +682,98 @@ const GamePage = () => {
       )}
       {/* Add Comment */}
       {gameStatus != null && (
-        <div className="bg-white dark:bg-[#1C1C1C] rounded-2xl shadow-lg p-6 mb-6">
-          {/* Titlu */}
-          <div className="mb-6">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-              Tell The World What You Think
-            </h2>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">
-              Write a review for{" "}
-              <span className="font-semibold">{gameInfo.name}</span>
-            </p>
-          </div>
-
-          {/* Container principal: Poza + Câmp recenzie + Scor */}
-          <div className="flex flex-col md:flex-row gap-6">
-            {/* Poza utilizatorului (stânga) */}
-            <div className="flex-shrink-0 flex flex-col items-center">
-              <img
-                src={"/logo.png"} // Poza implicită dacă nu există
-                alt="User Avatar"
-                className="w-20 h-20 rounded-lg object-cover border-2 border-gray-300 dark:border-gray-600"
-              />
-              <p className="mt-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-                Your Review
+        <div className="bg-white dark:bg-[#1C1C1C] rounded-2xl shadow-lg p-6 mb-6 border-l-4 border-[#50FCBC]">
+          <div className="mb-6 flex justify-between items-start">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                {userReview ? "Your Review" : "Tell The World What You Think"}
+              </h2>
+              <p className="text-gray-600 dark:text-gray-400 mt-1">
+                {userReview
+                  ? "You have already reviewed "
+                  : "Write a review for "}
+                <span className="font-semibold text-[#50FCBC]">
+                  {gameInfo.name}
+                </span>
               </p>
             </div>
 
-            {/* Câmp recenzie + Scor (dreapta) */}
+            {/* Afișăm Like/Dislike dacă recenzia există */}
+            {userReview && (
+              <div className="flex items-center gap-4 bg-gray-100 dark:bg-[#2a2a2a] px-4 py-2 rounded-xl">
+                <div className="flex items-center gap-1 text-green-500">
+                  <ThumbsUp className="w-4 h-4" />
+                  <span className="font-bold">{userReview.likes || 0}</span>
+                </div>
+                <div className="flex items-center gap-1 text-red-500">
+                  <ThumbsDown className="w-4 h-4" />
+                  <span className="font-bold">{userReview.dislikes || 0}</span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="flex flex-col md:flex-row gap-6">
+            <div className="flex-shrink-0 flex flex-col items-center">
+              <img
+                src={imgUrl}
+                alt="User Avatar"
+                className="w-20 h-20 rounded-lg object-cover border-2 border-[#50FCBC]"
+              />
+            </div>
+
             <div className="flex-grow">
-              {/* Câmp text pentru recenzie */}
               <textarea
                 value={reviewText}
                 onChange={(e) => setReviewText(e.target.value)}
-                placeholder="Please describe what you liked or disliked about this game and whether you recommend it to others. Be polite and follow the rules and guidelines."
-                className="w-full p-4 bg-gray-100 dark:bg-[#2a2a2a] rounded-lg border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-[#50FCBC] focus:outline-none min-h-[150px] resize-y"
+                placeholder="What did you think about the game?"
+                className="w-full p-4 bg-gray-100 dark:bg-[#2a2a2a] rounded-lg border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#50FCBC] focus:outline-none min-h-[120px]"
               />
 
-              {/* Scor (0-100) */}
-              <div className="mt-4">
-                <div className="flex items-center justify-between mb-2">
-                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Your Rating:
+              <div className="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">
+                    Rating:{" "}
+                    <span className="text-[#50FCBC] font-bold">
+                      {score}/100
+                    </span>
                   </label>
-                  <span className="text-lg font-bold text-[#50FCBC]">
-                    {score > 0 ? `${score}/100` : "No rating"}
-                  </span>
+                  <div className="flex items-center gap-1">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        onClick={() => setScore(star * 20)}
+                        className={`text-2xl ${score >= star * 20 ? "text-yellow-400" : "text-gray-400"}`}
+                      >
+                        ★
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  {[1, 2, 3, 4, 5].map((star) => (
+                <div className="flex gap-3">
+                  {userReview && (
                     <button
-                      key={star}
-                      type="button"
-                      // Dacă dai click pe steaua 4, scorul devine 4 * 20 = 80
-                      onClick={() => setScore(star * 20)}
-                      className={`text-3xl transition-colors focus:outline-none ${
-                        // Colorăm stelele în funcție de scorul actual
-                        score >= star * 20
-                          ? "text-yellow-400 hover:text-yellow-300"
-                          : "text-gray-300 dark:text-gray-600 hover:text-gray-400 dark:hover:text-gray-500"
-                      }`}
+                      onClick={handleDeleteReview}
+                      disabled={isSubmitting}
+                      className="px-6 py-2 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white font-bold rounded-lg transition-all flex items-center gap-2"
                     >
-                      ★
+                      <ArchiveX className="w-4 h-4" />
+                      Delete
                     </button>
-                  ))}
+                  )}
+                  <button
+                    onClick={handleSubmit}
+                    disabled={isSubmitting}
+                    className="px-8 py-2 bg-[#50FCBC] hover:bg-[#3dd69f] text-black font-bold rounded-lg transition-all shadow-lg shadow-[#50FCBC]/20"
+                  >
+                    {isSubmitting
+                      ? "Processing..."
+                      : userReview
+                        ? "Update Review"
+                        : "Post Review"}
+                  </button>
                 </div>
-              </div>
-
-              {/* Buton de trimitere */}
-              <div className="mt-6 flex justify-end">
-                <button
-                  onClick={handleSubmit}
-                  disabled={isSubmitting}
-                  className="px-6 py-2 bg-[#50FCBC] hover:bg-[#3dd69f] text-white font-bold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isSubmitting ? "Submitting..." : "Post Review"}
-                </button>
               </div>
             </div>
           </div>
@@ -668,7 +797,7 @@ const GamePage = () => {
             >
               <option value="likes">Most Likes</option>
               <option value="dislikes">Most Dislikes</option>
-              <option value="karma">User Karma</option>
+              <option value="karma">User Reputation</option>
             </select>
           </div>
         </div>

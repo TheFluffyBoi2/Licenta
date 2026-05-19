@@ -4,6 +4,8 @@ namespace Vidb_Games.Models.DTOs
 {
     public class ReviewDto
     {
+        [JsonPropertyName("id")]
+        public Guid Id { get; set; }
         [JsonPropertyName("game_id")]
         public long GameId { get; set; }
         [JsonPropertyName("user_id")]
@@ -22,5 +24,7 @@ namespace Vidb_Games.Models.DTOs
         public string Username { get; set; }
         [JsonPropertyName("reputation")]
         public int Reputation { get; set; }
+        [JsonPropertyName("date")]
+        public DateTime Date { get; set; }
     }
 }

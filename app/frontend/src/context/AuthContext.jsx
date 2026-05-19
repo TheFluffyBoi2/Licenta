@@ -50,13 +50,18 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("token", token);
 
       const meResponse = await api.get("api/auth/myprofile");
+      const userData = meResponse.data;
+
       setUser({
-        id: meResponse.data.userId,
-        username: meResponse.data.username,
-        email: meResponse.data.email,
-        role: meResponse.data.role,
-        profilePictureUrl: meResponse.data.profilePictureUrl,
+        id: userData.userId,
+        username: userData.username,
+        email: userData.email,
+        role: userData.role,
+        profilePictureUrl: userData.profilePictureUrl,
       });
+
+      localStorage.setItem("user", JSON.stringify(userData));
+
       return response.data;
     } catch (error) {
       throw error;
@@ -70,13 +75,17 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem("token", token);
 
     const meResponse = await api.get("api/auth/myprofile");
+    const userData = meResponse.data;
+
     setUser({
-      id: meResponse.data.userId,
-      username: meResponse.data.username,
-      email: meResponse.data.email,
-      role: meResponse.data.role,
-      profilePictureUrl: meResponse.data.profilePictureUrl,
+      id: userData.userId,
+      username: userData.username,
+      email: userData.email,
+      role: userData.role,
+      profilePictureUrl: userData.profilePictureUrl,
     });
+
+    localStorage.setItem("user", JSON.stringify(userData));
     return response.data;
   };
 

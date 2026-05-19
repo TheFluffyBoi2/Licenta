@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Vidb_Games.Data;
@@ -11,9 +12,11 @@ using Vidb_Games.Data;
 namespace Vidb_Games.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260515141836_ReviewDate")]
+    partial class ReviewDate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -277,30 +280,6 @@ namespace Vidb_Games.Migrations
                     b.ToTable("Reviews");
                 });
 
-            modelBuilder.Entity("Vidb_Games.Models.Entities.ReviewVote", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<bool>("IsLike")
-                        .HasColumnType("boolean");
-
-                    b.Property<Guid>("ReviewId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ReviewId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("ReviewVotes");
-                });
-
             modelBuilder.Entity("Vidb_Games.Models.Entities.Store", b =>
                 {
                     b.Property<Guid>("Id")
@@ -543,25 +522,6 @@ namespace Vidb_Games.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Vidb_Games.Models.Entities.ReviewVote", b =>
-                {
-                    b.HasOne("Vidb_Games.Models.Entities.Review", "Review")
-                        .WithMany()
-                        .HasForeignKey("ReviewId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Vidb_Games.Models.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Review");
 
                     b.Navigation("User");
                 });

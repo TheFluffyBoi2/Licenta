@@ -27,4 +27,8 @@ RUN dotnet publish "./Vidb Games.csproj" -c $BUILD_CONFIGURATION -o /app/publish
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+
+# Încercăm varianta scurtă. Dacă Dockerfile e în același folder cu wwwroot, asta e calea:
+COPY ["wwwroot/", "./wwwroot/"]
+
 ENTRYPOINT ["dotnet", "Vidb Games.dll"]

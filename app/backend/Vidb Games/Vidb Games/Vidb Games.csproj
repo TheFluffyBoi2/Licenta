@@ -35,5 +35,9 @@
   <ItemGroup>
     <Folder Include="Migrations\" />
   </ItemGroup>
-
+  <ItemGroup>
+  <Content Include="wwwroot\**\*">
+    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  </Content>
+  </ItemGroup>
 </Project>

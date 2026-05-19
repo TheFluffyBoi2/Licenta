@@ -24,6 +24,7 @@ namespace Vidb_Games.Models.Entities
         public User User { get; set; } = null!;
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime ModifiedAt { get; set; }
 
     }
 }

@@ -18,10 +18,13 @@ namespace Vidb_Games.Services
             _context = context;
         }
 
-        public async Task<bool> AddReview(ReviewRequest request, Guid userId)
+        public async Task<ReviewDto?> AddReview(ReviewRequest request, Guid userId)
         {
             try
             {
+                var user = await _context.Users.FindAsync(userId);
+                if (user == null) return null;
+
                 var review = new Review
                 {
                     GameId = request.GameId,
@@ -35,14 +38,28 @@ namespace Vidb_Games.Services
 
                 await _context.SaveChangesAsync();
 
-                return true;
+                var reviewDto = new ReviewDto
+                {
+                    Id = review.Id,
+                    Date = review.CreatedAt,
+                    UserId = review.UserId,
+                    Rating = review.Rating,
+                    Comment = review.Comment,
+                    Likes = 0,
+                    Dislikes = 0,
+                    ProfilePictureUrl = user.ProfilePictureUrl,
+                    Username = user.Username,
+                    Reputation = user.Reputation
+                };
+
+                return reviewDto;
             }
             catch (Exception ex)
             {
                 Console.WriteLine("ERROR:");
                 Console.WriteLine(ex.ToString());
 
-                return false;
+                return null;
             }
         }
 
@@ -52,6 +69,8 @@ namespace Vidb_Games.Services
                 .Where(r => r.GameId == gameId)
                 .Select(r => new ReviewDto
                 {
+                    Id = r.Id,
+                    Date = r.CreatedAt,
                     UserId = r.UserId,
                     Rating = r.Rating,
                     Comment = r.Comment,
@@ -69,6 +88,98 @@ namespace Vidb_Games.Services
             }
 
             return reviews;
+        }
+
+        public async Task<bool> DeleteReview(Guid reviewId)
+        {
+            var review = await _context.Reviews.FindAsync(reviewId);
+            if (review == null) return false;
+
+            _context.Reviews.Remove(review);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<ReviewDto?> UpdateReview(Guid reviewId, UpdateReviewRequest request, Guid userId)
+        {
+            var review = await _context.Reviews.FindAsync(reviewId);
+            if (review == null) return null;
+
+            if (request.Comment != null) review.Comment = request.Comment;
+            review.Rating = request.Rating;
+
+            await _context.SaveChangesAsync();
+
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null) return null;
+
+            var reviewDto = new ReviewDto
+            {
+                Id = review.Id,
+                Date = review.CreatedAt,
+                UserId = review.UserId,
+                Rating = review.Rating,
+                Comment = review.Comment,
+                Likes = 0,
+                Dislikes = 0,
+                ProfilePictureUrl = user.ProfilePictureUrl,
+                Username = user.Username,
+                Reputation = user.Reputation
+            };
+            return reviewDto;
+        }
+
+        public async Task<ReactionResponse?> AddReaction(Guid reviewId, Guid userId, bool isLike)
+        {
+            var reviewVote = _context.ReviewVotes.FirstOrDefault(rv => rv.ReviewId == reviewId && rv.UserId == userId);
+            var review = _context.Reviews.FirstOrDefault(rv => rv.Id == reviewId);
+            if (review == null) return null;
+
+            if (reviewVote != null)
+            {
+                if (reviewVote.IsLike == isLike)
+                {
+                    return null;
+                }
+                else
+                {
+                    reviewVote.IsLike = isLike;
+                    if (isLike)
+                    {
+                        review.Likes += 1;
+                        review.Dislikes -= 1;
+                    } else
+                    {
+                        review.Likes -= 1;
+                        review.Dislikes += 1;
+                    }
+                }
+            }
+            else
+            {
+                var newReviewVote = new ReviewVote
+                {
+                    ReviewId = reviewId,
+                    UserId = userId,
+                    IsLike = isLike
+                };
+                _context.ReviewVotes.Add(newReviewVote);
+                if (isLike)
+                {
+                    review.Likes += 1;
+                } else
+                {
+                    review.Dislikes += 1;
+                }
+                _context.ReviewVotes.Add(newReviewVote);
+            }
+
+            await _context.SaveChangesAsync();
+            return new ReactionResponse
+            {
+                Likes = review.Likes,
+                Dislikes = review.Dislikes
+            };
         }
     }
 }

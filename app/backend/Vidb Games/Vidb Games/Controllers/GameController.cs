@@ -13,10 +13,12 @@ namespace Vidb_Games.Controllers
     public class GameController : ControllerBase
     {
         private readonly IGameService _gameService;
+        private readonly IReviewService _reviewService;
 
-        public GameController(IGameService gameService)
+        public GameController(IGameService gameService, IReviewService reviewService)
         {
             _gameService = gameService;
+            _reviewService = reviewService;
         }
 
         [HttpGet("search")]
@@ -33,6 +35,7 @@ namespace Vidb_Games.Controllers
             if (!Guid.TryParse(userIdString, out var userId)) return Unauthorized();
 
             var (gameInfo, userRelation) = await _gameService.GetGameData(gameId, userId);
+            var reviews = await _reviewService.GetReviews(gameId);
             var recommendationsTask = _gameService.GetGameRecommendations(gameId);
 
             if (gameInfo == null || string.IsNullOrWhiteSpace(gameInfo.Name))
@@ -44,7 +47,8 @@ namespace Vidb_Games.Controllers
             {
                 GameInfo = gameInfo,
                 gameDtos = await recommendationsTask,
-                userRelationDto = userRelation
+                userRelationDto = userRelation,
+                Reviews = reviews
             });
         }
 

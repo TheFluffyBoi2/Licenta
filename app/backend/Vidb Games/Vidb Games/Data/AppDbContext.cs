@@ -20,5 +20,8 @@ namespace Vidb_Games.Data
         public DbSet<Store> Stores { get; set; }
         public DbSet<Review> Reviews { get; set; }
         public DbSet<UserGameEntry> UserGameEntries { get; set; }
+        public DbSet<ReviewVote> ReviewVotes { get; set; }
+
+
     }
 }

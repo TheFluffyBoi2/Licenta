@@ -10,6 +10,8 @@ namespace Vidb_Games.Models.DTOs
         public GameDto[]? gameDtos { get; set; }
         [JsonPropertyName("user_relation")]
         public GameEntryDto? userRelationDto { get; set; }
+        [JsonPropertyName("reviews")]
+        public ICollection<ReviewDto>? Reviews { get; set; }
     }
 
 }
