@@ -8,8 +8,7 @@ from contextlib import asynccontextmanager
 from recommender import get_description_recommendations, get_recommendations, get_recommendations_from_user
 
 DATA_PATH: str = 'working.csv'
-EMBEDDINGS_PATH: str = 'embeddings.pkl'
-TOP_GAMES_PATH: str = 'top_games.pkl'
+EMBEDDINGS_DATA_PATH: str = 'data.pkl'
 MODEL_PATH: str = './mpnet_model'
 
 app_data = {}
@@ -18,11 +17,16 @@ app_data = {}
 async def lifespan(app: FastAPI):
     app_data['df'] = pd.read_csv(DATA_PATH, usecols=['id', 'series', 'franchise', 'name', 'total_score', 'category'])
 
-    with open(TOP_GAMES_PATH, 'rb') as f:
-        app_data['top_games'] = pickle.load(f)
-
-    with open(EMBEDDINGS_PATH, 'rb') as f:
-        app_data['embeddings'] = pickle.load(f)
+    with open(EMBEDDINGS_DATA_PATH, 'rb') as f:
+        data = pickle.load(f)
+        app_data['embeddings'] = data["main"]
+        app_data['top_games'] = data["top_sim_dict"]
+        app_data['game_to_index'] = data["game_to_index"]
+        app_data['index_to_game'] = data["index_to_game"]
+        app_data['genres'] = data["genres"]
+        app_data['themes'] = data["themes"]
+        app_data['keywords'] = data["keywords"]
+        app_data['summary'] = data["summary"]
 
     app_data['model'] = SentenceTransformer(MODEL_PATH)
 
@@ -49,12 +53,15 @@ class RecommendationResponse(BaseModel):
     id: int
     name: str
     recommendation_score: float
+    explanation: dict[str, float]
 
 @app.post("/recommendations", response_model=list[RecommendationResponse])
 async def get_games_from_description(request: SearchRequest):
     try:
         return get_description_recommendations(request.description, app_data['df'],
-                                               app_data['model'], app_data['embeddings'])
+                                               app_data['model'], app_data['embeddings'],
+                                               app_data['genres'], app_data['themes'], app_data['keywords'],
+                                               app_data['summary'], app_data['game_to_index'])
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -63,7 +70,9 @@ async def get_games_from_id(game_id: int):
     try:
         return get_recommendations(game_id,
                                    app_data['df'],
-                                   app_data['top_games'])
+                                   app_data['top_games'],
+                                   app_data['game_to_index'], app_data['genres'], app_data['themes'],
+                                   app_data['keywords'], app_data['summary'])
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -73,7 +82,8 @@ async def get_games_from_user(request: UserGamesRequest):
         return get_recommendations_from_user(
             request.game_ids,
             app_data['df'],
-            app_data['top_games']
+            app_data['top_games'], app_data['game_to_index'], app_data['genres'],
+            app_data['themes'], app_data['keywords'], app_data['summary']
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

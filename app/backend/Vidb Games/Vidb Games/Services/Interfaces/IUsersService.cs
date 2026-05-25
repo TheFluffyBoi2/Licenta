@@ -8,6 +8,9 @@ namespace Vidb_Games.Services.Interfaces
         Task<UserDto?> GetUserByIdAsync(Guid id);
         Task<UserDto?> UpdateUserAsync(Guid id, UpdateUserDto dto);
         Task<bool> DeleteUserAsync(Guid id);
+        Task<GameDto[]?> GetUserGames(Guid userId);
+        Task<ICollection<ReviewDto>?> GetReviews(Guid userId);
+        Task<ICollection<UGEntryDto>?> GetUserGameEntries(Guid userId);
     }
 }
 

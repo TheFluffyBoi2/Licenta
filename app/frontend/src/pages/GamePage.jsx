@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import {
   Star,
   Plus,
@@ -15,26 +15,79 @@ import {
   Gamepad2,
   Users,
   Award,
+  CircleX,
 } from "lucide-react";
+import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
+import "react-circular-progressbar/dist/styles.css";
 import api from "../api/axios";
-// import ColorThief from "colorthief";
+
+// O componentă care pornește de la 0 și se animă până la valoarea finală
+const AnimatedCircle = ({ targetValue, color, label }) => {
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    // Un mic delay ca DOM-ul să randeze cercul la 0 mai întâi
+    const timer = setTimeout(() => {
+      setProgress(targetValue);
+    }, 150); // Începe după 150ms
+
+    return () => clearTimeout(timer);
+  }, [targetValue]);
+
+  return (
+    <div className="flex flex-col items-center gap-4">
+      <div className="w-24 h-24 md:w-28 md:h-28">
+        <CircularProgressbar
+          value={progress}
+          text={`${targetValue}%`} // Afișăm mereu textul țintă cu '%'
+          strokeWidth={8}
+          styles={buildStyles({
+            pathColor: color,
+            textColor: document.documentElement.classList.contains("dark")
+              ? "#ffffff"
+              : "#111827",
+            trailColor: document.documentElement.classList.contains("dark")
+              ? "#262626"
+              : "#d1d5db",
+            strokeLinecap: "round",
+            // Setăm o durată faină pentru animație (1.5s)
+            pathTransitionDuration: 1.5,
+          })}
+        />
+      </div>
+
+      <span className="text-sm font-bold tracking-widest uppercase text-gray-600 dark:text-gray-400 drop-shadow-sm">
+        {label === "summary" ? "Story" : label}
+      </span>
+    </div>
+  );
+};
 
 const GamePage = () => {
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
+  const fromGameId = searchParams.get("fromGame");
   const [gameInfo, setGameInfo] = useState({});
+  const [recommendationInfo, setRecommendationInfo] = useState(null);
   const [userRelation, setUserRelation] = useState({});
   const [similarGames, setSimilarGames] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [userReview, setUserReview] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [recommendationsLoading, setRecommendationsLoading] = useState(true);
   const [gameStatus, setGameStatus] = useState(null);
+  const [userRating, setUserRating] = useState(null);
+  const [ratingCount, setRatingCount] = useState(null);
+  const [totalRating, setTotalRating] = useState(null);
   const [reviewSortBy, setReviewSortBy] = useState("likes");
   const [loadError, setLoadError] = useState(null);
   const [reviewText, setReviewText] = useState("");
   const [score, setScore] = useState(60);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isChanging, setIsChanging] = useState(false);
-  const [accentColors, setAccentColors] = useState(["#50FCBC", "#9333ea"]);
+  const [errors, setErrors] = useState({});
+  const [fromName, setFromName] = useState("");
+
   const API_URL = "http://localhost:8080";
   const getUserAvatar = () => {
     try {
@@ -54,6 +107,7 @@ const GamePage = () => {
   const [imgUrl, setImgUrl] = useState(getUserAvatar());
 
   useEffect(() => {
+    console.log(fromGameId);
     const abortController = new AbortController();
     const fetchGame = async () => {
       try {
@@ -64,32 +118,43 @@ const GamePage = () => {
         setLoadError(null);
         setGameInfo({});
         setUserRelation({});
-        const numericId = Number(id);
-        if (!id || Number.isNaN(numericId) || numericId <= 0) {
+        setRecommendationInfo(null);
+        setFromName("");
+
+        const gameId = Number(id);
+        if (!id || Number.isNaN(gameId) || gameId <= 0) {
           setLoadError("not_found");
           return;
         }
 
-        const response = await api.get(`api/game/game_data/${numericId}`, {
+        const url = fromGameId
+          ? `api/game/game_data/${gameId}?fromGameId=${fromGameId}`
+          : `api/game/game_data/${gameId}`;
+
+        const response = await api.get(url, {
           signal: abortController.signal,
         });
+
         const data = response.data;
         const game_info =
           data.game_info ?? data.gameInfo ?? data.GameInfo ?? null;
-        const game_recommendations =
-          data.game_recommendations ??
-          data.gameRecommendations ??
-          data.GameRecommendations ??
-          [];
         const user_relation = data.user_relation;
         const revs = data.reviews;
 
         setGameInfo(game_info || {});
-        setSimilarGames(
-          Array.isArray(game_recommendations) ? game_recommendations : [],
-        );
-        setUserRelation(user_relation);
+        setUserRelation(data.user_relation);
         setGameStatus(user_relation?.status);
+        setUserRating(data.user_rating);
+        setRatingCount(data.rating_count);
+        setTotalRating(data.total_rating);
+
+        if (data.recommendation_score || data.explanation) {
+          setRecommendationInfo({
+            score: data.recommendation_score,
+            explanation: data.explanation,
+          });
+          setFromName(data.from_name);
+        }
 
         if (Array.isArray(revs) && userId) {
           const myReview = revs.find(
@@ -126,17 +191,58 @@ const GamePage = () => {
       }
     };
 
-    fetchGame();
+    const fetchRecommendations = async () => {
+      try {
+        setRecommendationsLoading(true);
+
+        const gameId = Number(id);
+        if (!id || Number.isNaN(gameId) || gameId <= 0) {
+          setLoadError("not_found");
+          return;
+        }
+
+        const recommendations_response = await api.get(
+          `api/game/game_data/recommendations/${gameId}`,
+          {
+            signal: abortController.signal,
+          },
+        );
+
+        const game_recommendations =
+          recommendations_response.data?.game_recommendations || [];
+
+        setSimilarGames(
+          Array.isArray(game_recommendations) ? game_recommendations : [],
+        );
+      } catch (error) {
+        if (error.name !== "CanceledError") {
+          console.error("Failed to fetch recommendations:", error);
+          setSimilarGames([]);
+        }
+      } finally {
+        if (!abortController.signal.aborted) setRecommendationsLoading(false);
+      }
+    };
+
+    const loadData = async () => {
+      await fetchGame();
+
+      if (!abortController.signal.aborted) {
+        await fetchRecommendations();
+      }
+    };
+
+    loadData();
 
     return () => {
       abortController.abort();
     };
-  }, [id]);
+  }, [id, fromGameId]);
 
   const handleStatusChange = async (status) => {
     try {
       setIsChanging(true);
-      setGameStatus(status);
+      setGameStatus(status == 4 ? null : status);
       const response = await api.post(`api/game/update_status`, {
         game_id: id,
         status: status,
@@ -149,29 +255,61 @@ const GamePage = () => {
   };
 
   const handleSubmit = async () => {
-    if (!reviewText.trim()) {
-      alert("Please write a review before submitting.");
+    const newErrors = {};
+
+    const trimmedText = reviewText.trim();
+    if (!trimmedText) {
+      newErrors.comment = "Comment is required.";
+    } else if (trimmedText.length < 10) {
+      newErrors.comment = "Comment must be at least 10 characters long.";
+    } else if (trimmedText.length > 2000) {
+      newErrors.comment = "Comment cannot exceed 2000 characters.";
+    }
+
+    if (!score || score === 0) {
+      newErrors.rating = "Rating is required.";
       return;
     }
 
-    if (score === 0) {
-      alert("Please select a rating before submitting.");
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
       return;
     }
+
     try {
       setIsSubmitting(true);
+      setErrors({});
+      const numericRatingForBackend = Math.round(score / 20);
+
       if (userReview) {
-        const RESPONSE = await api.put(`api/review/update/${userReview.id}`, {
-          rating: Math.round(score / 20),
+        const response = await api.put(`api/review/update/${userReview.id}`, {
+          rating: numericRatingForBackend,
           comment: reviewText,
         });
+
+        const newTotalRating =
+          totalRating + numericRatingForBackend - userReview.rating;
+        const newUserRating =
+          ratingCount > 0 ? newTotalRating / ratingCount : 0;
+
+        setTotalRating(newTotalRating);
+        setUserRating(newUserRating);
         setUserReview(response.data);
       } else {
         const response = await api.post(`api/review/add`, {
           game_id: Number(id),
-          rating: Math.round(score / 20),
+          rating: numericRatingForBackend,
           comment: reviewText,
         });
+
+        const newTotalRating = totalRating + numericRatingForBackend;
+        const newRatingCount = ratingCount + 1;
+        const newUserRating = newTotalRating / newRatingCount;
+
+        setTotalRating(newTotalRating);
+        setRatingCount(newRatingCount);
+        setUserRating(newUserRating);
+
         setUserReview(response.data);
         setReviews((prev) => prev.filter((r) => r.id !== response.data.id));
       }
@@ -197,11 +335,18 @@ const GamePage = () => {
   };
 
   const handleDeleteReview = async () => {
-    if (!window.confirm("Are you sure you want to delete your review?")) return;
-
     try {
       setIsSubmitting(true);
       const result = await api.delete(`api/review/delete/${userReview.id}`);
+
+      const newTotalRating = totalRating - userReview.rating * 20;
+      const newRatingCount = ratingCount - 1;
+      const newUserRating =
+        newRatingCount != 0 ? newTotalRating / newRatingCount : 0;
+      setTotalRating(newTotalRating);
+      setRatingCount(newRatingCount);
+      setUserRating(newUserRating);
+
       setUserReview(null);
       setReviewText("");
       setScore(60);
@@ -238,38 +383,6 @@ const GamePage = () => {
       console.error("Failed to handle reaction:", error);
     }
   };
-
-  // const handleGetColors = (e) => {
-  //   const img = e.target;
-
-  //   if (!img.src || img.src.include("logo.png")) return;
-
-  //   const colorThief = new ColorThief();
-
-  //   if (img.complete) {
-  //     try {
-  //       const palette = colorThief.getPalette(img, 2);
-  //       const hexPalette = palette.map(
-  //         (rgb) => `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`,
-  //       );
-  //       setAccentColors(hexPalette);
-  //     } catch (error) {
-  //       console.error("Could not extract accent colors:", error);
-  //     }
-  //   } else {
-  //     img.addEventListener("load", function () {
-  //       try {
-  //         const palette = colorThief.getPalette(img, 2);
-  //         const hexPalette = palette.map(
-  //           (rgb) => `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`,
-  //         );
-  //         setAccentColors(hexPalette);
-  //       } catch (e) {
-  //         console.error(e);
-  //       }
-  //     });
-  //   }
-  // };
 
   const StatusButton = () => (
     <div className="relative group">
@@ -336,12 +449,24 @@ const GamePage = () => {
           <ArchiveX className="w-4 h-4 text-red-500" />
           Dropped
         </button>
+        {gameStatus != null && (
+          <button
+            onClick={() => handleStatusChange(4)}
+            className="w-full px-4 py-2 text-left text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-[#3a3a3a] rounded-b-lg flex items-center gap-2 transition-colors"
+          >
+            <CircleX className="w-4 h-4" />
+            Remove
+          </button>
+        )}
       </div>
     </div>
   );
 
-  const SmallGameCard = ({ game, rank }) => (
-    <Link to={`/game/${game.id}`} className="cursor-pointer">
+  const SmallGameCard = ({ game, rank, sourceGameId }) => (
+    <Link
+      to={`/game/${game.id}${sourceGameId ? `?fromGame=${sourceGameId}` : ""}`}
+      className="cursor-pointer"
+    >
       <div className="relative bg-gray-50 dark:bg-[#1a1a1a] cursor-pointer rounded-lg overflow-hidden hover:ring-2 hover:ring-[#50FCBC] transition-all group">
         <div className="absolute top-2 left-2 z-10">
           <div className="bg-gray-300 dark:bg-[#343434] text-gray-900 dark:text-white px-3 py-1 rounded-md font-bold text-sm shadow-md">
@@ -577,10 +702,10 @@ const GamePage = () => {
                   <span className="text-sm font-medium">User Score</span>
                 </div>
                 <div className="text-3xl font-bold">
-                  {gameInfo.rating ? Math.round(gameInfo.rating) : "N/A"}
+                  {userRating != 0 ? Math.round(userRating * 20) : "N/A"}
                 </div>
                 <div className="text-xs opacity-90 mt-1">
-                  Based on {gameInfo.rating_count || 0} ratings
+                  Based on {ratingCount || 0} ratings
                 </div>
               </div>
             </div>
@@ -598,6 +723,43 @@ const GamePage = () => {
           </div>
         </div>
       </div>
+
+      {recommendationInfo && (
+        <div className="bg-gradient-to-r from-[#50FCBC]/10 to-blue-500/10 dark:from-[#50FCBC]/20 dark:to-blue-500/20 rounded-2xl shadow-lg p-6 mb-6 border-l-4 border-[#50FCBC]">
+          <div className="flex items-center gap-3 mb-8">
+            <div className="bg-[#50FCBC] text-black px-4 py-2 rounded-lg font-bold shadow-md">
+              {Math.round(recommendationInfo.score * 100)}% Match
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+              Why we recommend this for {fromName || "this game"}
+            </h3>
+          </div>
+
+          {recommendationInfo.explanation && (
+            <div className="flex flex-wrap justify-center gap-8 md:gap-12 mt-4">
+              {["genres", "themes", "keywords", "summary"].map((key) => {
+                const value = Math.round(
+                  recommendationInfo.explanation[key] || 0,
+                );
+
+                // Logica de culori
+                let barColor = "#50FCBC";
+                if (value <= 32) barColor = "#ef4444";
+                else if (value <= 62) barColor = "#f59e0b";
+
+                return (
+                  <AnimatedCircle
+                    key={key}
+                    targetValue={value}
+                    color={barColor}
+                    label={key}
+                  />
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Additional Information */}
       {(gameInfo.storyline ||
@@ -661,7 +823,7 @@ const GamePage = () => {
       )}
 
       {/* Recommendations */}
-      {similarGames && similarGames.length > 0 && (
+      {similarGames && similarGames.length > 0 && !recommendationsLoading ? (
         <div className="bg-white dark:bg-[#1C1C1C] rounded-2xl shadow-lg p-6 mb-6">
           <div className="flex items-center gap-3 mb-6">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -669,16 +831,26 @@ const GamePage = () => {
             </h2>
             <div className="h-1 flex-grow bg-gradient-to-r from-[#50FCBC] to-transparent rounded" />
           </div>
+
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
             {similarGames.map((game, idx) => (
               <SmallGameCard
                 key={`recommendation-${game.id}`}
                 game={game}
                 rank={idx + 1}
+                sourceGameId={id}
               />
             ))}
           </div>
         </div>
+      ) : recommendationsLoading ? (
+        <div className="bg-white dark:bg-[#1C1C1C] rounded-2xl shadow-lg p-6 mb-6">
+          <div className="animate-pulse flex flex-col items-center md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <span>Loading Recommendations</span>
+          </div>
+        </div>
+      ) : (
+        <></>
       )}
       {/* Add Comment */}
       {gameStatus != null && (
@@ -727,8 +899,14 @@ const GamePage = () => {
                 value={reviewText}
                 onChange={(e) => setReviewText(e.target.value)}
                 placeholder="What did you think about the game?"
-                className="w-full p-4 bg-gray-100 dark:bg-[#2a2a2a] rounded-lg border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#50FCBC] focus:outline-none min-h-[120px]"
+                className={`w-full p-4 bg-gray-100 dark:bg-[#2a2a2a] rounded-lg border text-gray-900 dark:text-white focus:ring-2 focus:ring-[#50FCBC] focus:outline-none min-h-[120px] transition-all
+            ${errors.comment ? "border-red-500 focus:ring-red-500" : "border-gray-300 dark:border-gray-600"}`}
               />
+              {errors.comment && (
+                <p className="text-red-500 text-xs mt-1 font-semibold flex items-center gap-1 animate-fadeIn">
+                  {errors.comment}
+                </p>
+              )}
 
               <div className="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
@@ -742,13 +920,22 @@ const GamePage = () => {
                     {[1, 2, 3, 4, 5].map((star) => (
                       <button
                         key={star}
-                        onClick={() => setScore(star * 20)}
+                        onClick={() => {
+                          setScore(star * 20);
+                          if (errors.rating)
+                            setErrors((prev) => ({ ...prev, rating: null }));
+                        }}
                         className={`text-2xl ${score >= star * 20 ? "text-yellow-400" : "text-gray-400"}`}
                       >
                         ★
                       </button>
                     ))}
                   </div>
+                  {errors.rating && (
+                    <p className="text-red-500 text-xs mt-1 font-semibold">
+                      {errors.rating}
+                    </p>
+                  )}
                 </div>
 
                 <div className="flex gap-3">
@@ -793,7 +980,7 @@ const GamePage = () => {
             <select
               value={reviewSortBy}
               onChange={(e) => setReviewSortBy(e.target.value)}
-              className="px-3 py-2 bg-gray-100 dark:bg-[#2a2a2a] text-gray-900 dark:text-white rounded-lg border-none focus:ring-2 focus:ring-[#FFD700] transition-all"
+              className="px-3 py-2 bg-gray-100 dark:bg-[#2a2a2a] text-gray-900 dark:text-white rounded-lg border-none focus:ring-2 focus:ring-[#50FCBC] transition-all"
             >
               <option value="likes">Most Likes</option>
               <option value="dislikes">Most Dislikes</option>

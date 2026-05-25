@@ -6,12 +6,13 @@ import api from "../api/axios";
 const HomePage = () => {
   const [gameStatuses, setGameStatuses] = useState({});
   const [homeFeed, setHomeFeed] = useState({
-    recommendations: [],
     topAllTime: [],
     topUpcoming: [],
     topRecent: [],
   });
+  const [recommendations, setRecommendations] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingRecommendations, setLoadingRecommendations] = useState(true);
 
   useEffect(() => {
     const fetchGames = async () => {
@@ -20,7 +21,6 @@ const HomePage = () => {
         const data = response.data;
 
         setHomeFeed({
-          recommendations: data.recommendations || data.Recommendations || [],
           topAllTime: data.topAllTime || data.TopAllTime || [],
           topUpcoming: data.topUpcoming || data.TopUpcoming || [],
           topRecent: data.topRecent || data.TopRecent || [],
@@ -32,7 +32,27 @@ const HomePage = () => {
       }
     };
 
-    fetchGames();
+    const fetchRecommendations = async () => {
+      try {
+        const response = await api.get("api/home/feed/recommendations");
+        const recommendations = response.data?.recommendations || [];
+
+        setRecommendations(
+          Array.isArray(recommendations) ? recommendations : [],
+        );
+      } catch (error) {
+        console.error("Failed to fetch recommendations:", error);
+      } finally {
+        setLoadingRecommendations(false);
+      }
+    };
+
+    const loadData = async () => {
+      await fetchGames();
+      await fetchRecommendations();
+    };
+
+    loadData();
   }, []);
 
   const handleStatusChange = (gameId, status) => {
@@ -42,9 +62,6 @@ const HomePage = () => {
     }));
   };
 
-  const recommendations = Array.isArray(homeFeed.recommendations)
-    ? homeFeed.recommendations
-    : [];
   const topAllTime = Array.isArray(homeFeed.topAllTime)
     ? homeFeed.topAllTime
     : [];
@@ -267,15 +284,17 @@ const HomePage = () => {
 
   return (
     <div className="pb-12 flex flex-col gap-6 max-w-7xl mx-auto">
-      {recommendations && recommendations.length > 0 && (
+      {!loadingRecommendations &&
+      recommendations &&
+      recommendations.length > 0 ? (
         <div className="bg-white dark:bg-[#1C1C1C] rounded-2xl text-black dark:text-white px-6 py-6 shadow-lg transition-all duration-500 ease-in-out">
           <div className="flex items-center gap-3 mb-6">
             <h2 className="text-3xl font-bold">Recommended for You</h2>
             <div className="h-1 flex-grow bg-gradient-to-r from-[#50FCBC] to-transparent rounded" />
           </div>
           <section>
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
-              {recommendations.slice(0, 7).map((game, idx) => (
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+              {recommendations.slice(0, 6).map((game, idx) => (
                 <SmallGameCard
                   key={`recommendation-${game.id}`}
                   game={game}
@@ -285,6 +304,14 @@ const HomePage = () => {
             </div>
           </section>
         </div>
+      ) : (
+        loadingRecommendations && (
+          <div className="bg-white dark:bg-[#1C1C1C] rounded-2xl text-black dark:text-white px-6 py-6 shadow-lg transition-all duration-500 ease-in-out">
+            <div className="animate-pulse flex flex-col items-center  grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+              Loading Recommendations
+            </div>
+          </div>
+        )
       )}
 
       <div className="bg-white dark:bg-[#1C1C1C] rounded-2xl text-black dark:text-white px-6 py-6 shadow-lg transition-all duration-500 ease-in-out">

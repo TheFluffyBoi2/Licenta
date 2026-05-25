@@ -7,9 +7,7 @@ const Layout = ({ children }) => {
       <header>
         <Navbar />
       </header>
-      <main className="grow w-full px-4 sm:px-6 py-4">
-        {children}
-      </main>
+      <main className="grow w-full px-4 sm:px-6 py-4">{children}</main>
       <footer className="bg-gray-100 dark:bg-[#1a1a1a] border-t border-gray-200 dark:border-white/5 py-8 text-center text-gray-600 dark:text-gray-500 transition-colors duration-500">
         <p>&copy; 2026 Vidb Games. All rights reserved.</p>
       </footer>

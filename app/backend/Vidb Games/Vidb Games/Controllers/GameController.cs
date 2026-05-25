@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using Vidb_Games.Data;
 using Vidb_Games.Models.DTOs;
 using Vidb_Games.Services;
 using Vidb_Games.Services.Interfaces;
@@ -14,11 +15,13 @@ namespace Vidb_Games.Controllers
     {
         private readonly IGameService _gameService;
         private readonly IReviewService _reviewService;
+        private readonly AppDbContext _context;
 
-        public GameController(IGameService gameService, IReviewService reviewService)
+        public GameController(IGameService gameService, IReviewService reviewService, AppDbContext context)
         {
             _gameService = gameService;
             _reviewService = reviewService;
+            _context = context;
         }
 
         [HttpGet("search")]
@@ -29,26 +32,54 @@ namespace Vidb_Games.Controllers
         }
 
         [HttpGet("game_data/{gameId}")]
-        public async Task<IActionResult> GetGameData([FromRoute] long gameId)
+        public async Task<IActionResult> GetGameData([FromRoute] long gameId, [FromQuery] long? fromGameId = null)
         {
             var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (!Guid.TryParse(userIdString, out var userId)) return Unauthorized();
 
-            var (gameInfo, userRelation) = await _gameService.GetGameData(gameId, userId);
+            var (gameInfo, userRelation, totalRating, ratingCount) = await _gameService.GetGameData(gameId, userId);
             var reviews = await _reviewService.GetReviews(gameId);
-            var recommendationsTask = _gameService.GetGameRecommendations(gameId);
 
             if (gameInfo == null || string.IsNullOrWhiteSpace(gameInfo.Name))
             {
                 return NotFound(new { message = "Game not found." });
             }
 
+            GameDto? recommendationInfo = null;
+            string FromName = "-";
+            if (fromGameId.HasValue)
+            {
+                var recommendations = await _gameService.GetGameRecommendations(fromGameId.Value);
+                recommendationInfo = recommendations?.FirstOrDefault(g => g.IgdbId == gameId);
+                FromName = _context.Games.FirstOrDefault(g => g.Id == fromGameId.Value)?.Name;
+            }
+
+            if (FromName == null)
+            {
+                FromName = "-";
+            }
+
             return Ok(new GameInfoResponse
             {
                 GameInfo = gameInfo,
-                gameDtos = await recommendationsTask,
                 userRelationDto = userRelation,
-                Reviews = reviews
+                Reviews = reviews,
+                Rating = ratingCount > 0 ? totalRating / ratingCount : 0,
+                RatingCount = ratingCount,
+                TotalRating = totalRating,
+                RecommendationScore = recommendationInfo?.RecommendationScore,
+                Explanation = recommendationInfo?.Explanation,
+                FromName = FromName,
+            });
+        }
+
+        [HttpGet("game_data/recommendations/{gameId}")]
+        public async Task<IActionResult> GetGameRecommendations([FromRoute] long gameId)
+        {
+            var recommendations = await _gameService.GetGameRecommendations(gameId);
+            return Ok(new
+            {
+                game_recommendations = recommendations ?? Array.Empty<GameDto>()
             });
         }
 

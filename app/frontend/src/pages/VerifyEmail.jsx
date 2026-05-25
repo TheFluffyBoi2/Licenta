@@ -37,12 +37,12 @@ const VerifyEmail = () => {
   }, [token]);
 
   return (
-    <div class="min-h-screen flex items-center justify-center bg-linear-to-tr from-[#FF4D4D] via-[#FFD700] to-[#4DFFBC] p-6">
-      <div class="w-full max-w-md bg-white/90 backdrop-blur-md p-8 rounded-2xl shadow-xl text-center space-y-6">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-tr from-[#FF4D4D] via-[#FFD700] to-[#4DFFBC] p-6">
+      <div className="w-full max-w-md bg-white/90 backdrop-blur-md p-8 rounded-2xl shadow-xl text-center space-y-6">
         {status === "verifying" && (
           <>
-            <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-[#FFD700] border-solid mx-auto"></div>
-            <h2 class="text-2xl font-bold text-gray-800">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-[#FFD700] border-solid mx-auto"></div>
+            <h2 className="text-2xl font-bold text-gray-800">
               Verifying your email...
             </h2>
           </>
@@ -50,14 +50,16 @@ const VerifyEmail = () => {
 
         {status === "success" && (
           <>
-            <div class="text-6xl">🎉</div>
-            <h2 class="text-2xl font-bold text-gray-800">Email Verified!</h2>
-            <p class="text-gray-600">
+            <div className="text-6xl">🎉</div>
+            <h2 className="text-2xl font-bold text-gray-800">
+              Email Verified!
+            </h2>
+            <p className="text-gray-600">
               Your account has been successfully verified.
             </p>
             <Link
               to="/login"
-              class="inline-block w-full py-3 rounded-xl text-white font-bold bg-[#444] hover:bg-black transition-all mt-4"
+              className="inline-block w-full py-3 rounded-xl text-white font-bold bg-[#444] hover:bg-black transition-all mt-4"
             >
               Login Now
             </Link>
@@ -66,12 +68,14 @@ const VerifyEmail = () => {
 
         {status === "error" && (
           <>
-            <div class="text-6xl">⚠️</div>
-            <h2 class="text-2xl font-bold text-red-600">Verification Failed</h2>
-            <p class="text-gray-600">{message}</p>
+            <div className="text-6xl">⚠️</div>
+            <h2 className="text-2xl font-bold text-red-600">
+              Verification Failed
+            </h2>
+            <p className="text-gray-600">{message}</p>
             <Link
               to="/register"
-              class="inline-block text-[#FF4D4D] font-bold hover:underline mt-4"
+              className="inline-block text-[#FF4D4D] font-bold hover:underline mt-4"
             >
               Back to Register
             </Link>

@@ -9,12 +9,12 @@ from sklearn.metrics.pairwise import cosine_similarity
 from sentence_transformers import SentenceTransformer
 
 
-DATA_PATH: str = 'game_dataset_cleaned.csv'
+DATA_PATH: str = '/kaggle/input/datasets/emirshn/igdb-dataset-for-data-mining-projects/game_dataset_cleaned.csv'
 WORKING_CSV_PATH: str = 'working.csv'
 SIMILARITY_MATRIX_PATH: str = 'top_games.pkl'
 GAMEINDEX_DFINDEX_PATH: str = 'gameindex_dfindex.pkl'
 DFINDEX_GAMEINDEX_PATH: str = 'dfindex_gameindex.pkl'
-EMBEDDINGS_PATH: str = 'embeddings.pkl'
+SAVED_DATA_PATH: str = 'data.pkl'
 
 def clean_keywords(keywords_str: str) -> str:
     keywords_list = ast.literal_eval(keywords_str)
@@ -72,7 +72,6 @@ def process_data(df: pd.DataFrame) -> pd.DataFrame:
         pattern = re.compile(re.escape(game_name), re.IGNORECASE)
         summary = pattern.sub("the game", summary)
 
-        summary = re.sub(r'\d+', '', summary)
         summary = re.sub(r'[^a-z\s]', '', summary)
 
         clean_summary = " ".join(summary.split())
@@ -82,14 +81,13 @@ def process_data(df: pd.DataFrame) -> pd.DataFrame:
     working_df = df.dropna(subset=['genres', 'themes', 'keywords', 'summary', "player_perspectives"]).copy()
     working_df["total_score"] = working_df["aggregated_rating"].fillna(working_df["rating"]).fillna(0)
     working_df = working_df.sort_values(by="total_score", ascending=False)
-    working_df = working_df.head(55_000).copy()
+    working_df = working_df.head(30_000).copy()
     working_df = working_df.reset_index(drop=True)
 
     print("Size", working_df.count())
 
     working_df["genres_str"] = working_df["genres"].apply(parse_string)
     working_df["themes_str"] = working_df["themes"].apply(parse_string)
-    working_df["player_perspectives_str"] = working_df["player_perspectives"].apply(parse_string)
     working_df["keywords_str"] = working_df["keywords"].apply(clean_keywords)
     working_df["summary_clean"] = working_df.apply(
         lambda row: clean_summary(row['summary'], row['name']),
@@ -98,7 +96,6 @@ def process_data(df: pd.DataFrame) -> pd.DataFrame:
 
     genres = working_df["genres_str"].fillna("Unknown")
     themes = working_df["themes_str"].fillna("Unknown")
-    player_prespectives = working_df["player_perspectives_str"].fillna("Unknown")
     keywords = working_df["keywords_str"].fillna("")
     summary = working_df["summary_clean"].fillna("")
 
@@ -115,21 +112,43 @@ def process_data(df: pd.DataFrame) -> pd.DataFrame:
     print("Finished processing")
     return working_df
 
-def fit(df: pd.DataFrame) -> np.ndarray:
+def fit(df: pd.DataFrame):
     sentences = df["content"].fillna("").astype(str).tolist()
+    genres = df["genres_str"].fillna("").astype(str).tolist()
+    themes = df["themes_str"].fillna("").astype(str).tolist()
+    keywords = df["keywords_str"].fillna("").astype(str).tolist()
+    summary = df["summary_clean"].fillna("").astype(str).tolist()
 
     model = SentenceTransformer("all-mpnet-base-v2")
 
     print("Generating embeddings")
-    embeddings = model.encode(sentences)
+    main_embeddings = model.encode(sentences,
+                                  convert_to_numpy=True,
+                                  normalize_embeddings=True).astype(np.float32)
+    genres_embeddings = model.encode(genres,
+                                  convert_to_numpy=True,
+                                  normalize_embeddings=True).astype(np.float32)
+    themes_embeddings = model.encode(themes,
+                                  convert_to_numpy=True,
+                                  normalize_embeddings=True).astype(np.float32)
+    keywords_embeddings = model.encode(keywords,
+                                  convert_to_numpy=True,
+                                  normalize_embeddings=True).astype(np.float32)
+    summary_embeddings = model.encode(summary,
+                                  convert_to_numpy=True,
+                                  normalize_embeddings=True).astype(np.float32)
 
     model.save('mpnet_model')
     shutil.make_archive('mpnet_model', 'zip', '/kaggle/working/mpnet_model')
 
-    return embeddings.astype(np.float32)
+    return (main_embeddings, genres_embeddings, themes_embeddings,
+            keywords_embeddings, summary_embeddings)
 
 
-def save_data(df: pd.DataFrame, lsa_matrix: np.ndarray, top_n: int = 50) -> None:
+def save_data(df: pd.DataFrame, main_embeddings: np.ndarray,
+              genres_embeddings: np.ndarray, themes_embeddings: np.ndarray,
+              keywords_embeddings: np.ndarray, summary_embeddings: np.ndarray,
+              top_n: int = 100) -> None:
     print("Started saving")
 
     top_sim_dict = {}
@@ -137,10 +156,21 @@ def save_data(df: pd.DataFrame, lsa_matrix: np.ndarray, top_n: int = 50) -> None
 
     df = df.reset_index(drop=True)
 
-    for i in range(0, len(lsa_matrix), batch_size):
-        end = min(i + batch_size, len(lsa_matrix))
+    w_genres = 0.20
+    w_themes = 0.20
+    w_keywords = 0.30
+    w_summary = 0.30
 
-        chunk_sim = cosine_similarity(lsa_matrix[i:end], lsa_matrix).astype(np.float32)
+    for i in range(0, len(main_embeddings), batch_size):
+        end = min(i + batch_size, len(main_embeddings))
+
+        sim_genres = genres_embeddings[i:end] @ genres_embeddings.T
+        sim_themes = themes_embeddings[i:end] @ themes_embeddings.T
+        sim_keywords = keywords_embeddings[i:end] @ keywords_embeddings.T
+        sim_summary = summary_embeddings[i:end] @ summary_embeddings.T
+
+        chunk_sim = (w_genres * sim_genres) + (w_themes * sim_themes) + \
+                    (w_keywords * sim_keywords) + (w_summary * sim_summary)
 
         for chunk_row in range(chunk_sim.shape[0]):
             global_idx = i + chunk_row
@@ -153,9 +183,6 @@ def save_data(df: pd.DataFrame, lsa_matrix: np.ndarray, top_n: int = 50) -> None
                 for idx in similar_indices
             ]
 
-    with open(SIMILARITY_MATRIX_PATH, 'wb') as f:
-        pickle.dump(top_sim_dict, f)
-
     game_id_to_index = {
         int(game_id) : index
         for index, game_id in enumerate(df["id"])
@@ -166,18 +193,23 @@ def save_data(df: pd.DataFrame, lsa_matrix: np.ndarray, top_n: int = 50) -> None
         for index, game_id in enumerate(df["id"])
     }
 
-    with open(GAMEINDEX_DFINDEX_PATH, 'wb') as f:
-        pickle.dump(game_id_to_index, f)
-    with open(DFINDEX_GAMEINDEX_PATH, 'wb') as f:
-        pickle.dump(index_to_game_id, f)
-    with open(EMBEDDINGS_PATH, 'wb') as f:
-        pickle.dump(lsa_matrix, f)
+    with open(SAVED_DATA_PATH, 'wb') as f:
+        pickle.dump({
+            "top_sim_dict": top_sim_dict,
+            "game_to_index": game_id_to_index,
+            "index_to_game": index_to_game_id,
+            "main": main_embeddings,
+            "genres": genres_embeddings,
+            "themes": themes_embeddings,
+            "keywords": keywords_embeddings,
+            "summary": summary_embeddings
+        }, f)
     print("Finished saving")
 
 def train_model():
     df: pd.DataFrame = load_data()
     processed_df: pd.DataFrame = process_data(df)
-    result: np.ndarray = fit(processed_df)
-    save_data(processed_df, result)
+    (me, ge, te, ke, se) = fit(processed_df)
+    save_data(processed_df, me, ge, te, ke, se)
 
 train_model()

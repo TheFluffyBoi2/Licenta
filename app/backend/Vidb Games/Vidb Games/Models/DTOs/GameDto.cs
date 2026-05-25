@@ -37,6 +37,9 @@ namespace Vidb_Games.Models.DTOs
         [JsonPropertyName("recommendation_score")]
         [Newtonsoft.Json.JsonProperty("recommendation_score")]
         public float RecommendationScore { get; set; }
+        [JsonPropertyName("explanation")]
+        [Newtonsoft.Json.JsonProperty("explanation")]
+        public ExplanationDto? Explanation { get; set; }
         [JsonPropertyName("genres")]
         public ICollection<NamedGamePropertyDto> Genres { get; set; } = new List<NamedGamePropertyDto>();
         [JsonPropertyName("themes")]

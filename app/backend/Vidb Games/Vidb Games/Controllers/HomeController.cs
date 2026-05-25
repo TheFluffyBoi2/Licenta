@@ -26,10 +26,6 @@ namespace Vidb_Games.Controllers
         {
             try
             {
-                var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                if (!Guid.TryParse(userIdString, out var userId)) return Unauthorized();
-
-                var recommendedTasks = _recommendService.GetUserRecommendations(userId);
                 var allTimeTasks = _IGDBService.GetTopGames();
                 var upcomingTasks = _IGDBService.GetTopUpcoming();
                 var recentTasks = _IGDBService.GetTopRecent();
@@ -38,7 +34,6 @@ namespace Vidb_Games.Controllers
 
                 return Ok(new
                 {
-                Recommendations = await recommendedTasks,
                 TopAllTime = await allTimeTasks,
                 TopUpcoming = await upcomingTasks,
                 TopRecent = await recentTasks
@@ -48,6 +43,17 @@ namespace Vidb_Games.Controllers
             {
                 return StatusCode(500, $"Internal server error: {e.Message}");
             }
+        }
+
+        [HttpGet("feed/recommendations")]
+        public async Task<IActionResult> GetHomeRecommendations()
+        {
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!Guid.TryParse(userIdString, out var userId)) return Unauthorized();
+
+            var recommendations = await _recommendService.GetUserRecommendations(userId);
+
+            return Ok(new {recommendations = recommendations ?? Array.Empty<GameDto>()});
         }
 
 

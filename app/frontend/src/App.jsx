@@ -19,6 +19,7 @@ import "nprogress/nprogress.css";
 import LoadingScreen from "./components/LoadingScreen";
 import RecommendPage from "./pages/RecommendPage";
 import GamePage from "./pages/GamePage";
+import ListPage from "./pages/ListPage";
 
 const NavigationTracker = () => {
   const location = useLocation();
@@ -77,6 +78,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <GamePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/mylist"
+            element={
+              <ProtectedRoute>
+                <ListPage />
               </ProtectedRoute>
             }
           />

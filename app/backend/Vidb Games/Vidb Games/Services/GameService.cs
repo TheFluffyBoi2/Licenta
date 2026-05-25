@@ -4,6 +4,8 @@ using Vidb_Games.Models.DTOs;
 using Vidb_Games.Models.Entities;
 using Vidb_Games.Services.Interfaces;
 using System.Net.Http;
+using System.Text.Json;
+
 
 namespace Vidb_Games.Services
 {
@@ -22,20 +24,52 @@ namespace Vidb_Games.Services
             _recommendService = recommendService;
         }
 
-        public async Task<(GameDto?, GameEntryDto?)> GetGameData(long gameId, Guid userId)
+        public async Task<(GameDto?, GameEntryDto?, int, int)> GetGameData(long gameId, Guid userId)
         {
-            string queryParams =
-                "fields name, slug, summary, storyline, cover.url, first_release_date, " +
-                "aggregated_rating, aggregated_rating_count, rating, rating_count, " +
-                "genres.name, platforms.name, game_modes.name, involved_companies.company.name, involved_companies.developer, involved_companies.publisher; " +
-                $"where id = {gameId}; " +
-                "limit 1;";
+            var game = _context.Games.FirstOrDefault(g => g.Id == gameId);
 
-            var result = await _igdbService.SendRequestAsync(queryParams);
+            int totalRating = 0;
+            int reviewCount = 0;
 
-            if (result == null || result.Length == 0)
+            if (game == null)
             {
-                return (null, null);
+                string queryParams =
+                    "fields name, slug, summary, storyline, cover.url, first_release_date, " +
+                    "aggregated_rating, aggregated_rating_count, " +
+                    "genres.name, platforms.name, game_modes.name, involved_companies.company.name, involved_companies.developer, involved_companies.publisher; " +
+                    $"where id = {gameId}; " +
+                    "limit 1;";
+
+                var result = await _igdbService.SendRequestAsync(queryParams);
+                if (result == null || result.Length == 0)
+                {
+                    return (null, null, 0, 0);
+                }
+                var gameResult = result[0];
+
+                game = new Game
+                {
+                    Id = gameId,
+                    Name = gameResult.Name,
+                    Slug = gameResult.Slug,
+                    FirstReleaseDate = gameResult.ReleaseDate.HasValue
+                        ? DateTimeOffset.FromUnixTimeSeconds(gameResult.ReleaseDate.Value).UtcDateTime
+                        : null,
+                    IGDBRating = gameResult.IGDBRating,
+                    Cover = gameResult.Cover,
+                    Genres = gameResult.Genres,
+                    Platforms = gameResult.Platforms,
+                    Themes = gameResult.Themes,
+                    RawJsonData = JsonSerializer.Serialize(gameResult),
+                    CachedAt = DateTime.UtcNow
+                };
+
+                _context.Games.Add(game);
+                await _context.SaveChangesAsync();
+            } else
+            {
+                totalRating = game.UserTotalRating;
+                reviewCount = game.ReviewCount;
             }
 
             var relationship = _context.UserGameEntries.Where(ug => ug.GameId == gameId && ug.UserId == userId)
@@ -46,7 +80,7 @@ namespace Vidb_Games.Services
                     LastTimeModified = ug.LastTimeModified
                 }).FirstOrDefault();
 
-            return (result[0] ?? null, relationship ?? null);
+            return (JsonSerializer.Deserialize<GameDto>(game.RawJsonData) ?? null, relationship ?? null, totalRating, reviewCount);
         }
 
         public Task<GameDto[]> SearchGames(string query, int limit = 15)
@@ -85,8 +119,13 @@ namespace Vidb_Games.Services
             }
             else
             {
-                entry.Status = (GameStatus)status;
-                entry.LastTimeModified = DateTime.UtcNow;
+                if (status == 4)
+                    _context.UserGameEntries.Remove(entry);
+                else
+                {
+                    entry.Status = (GameStatus)status;
+                    entry.LastTimeModified = DateTime.UtcNow;
+                }
             }
 
             var result = await _context.SaveChangesAsync();

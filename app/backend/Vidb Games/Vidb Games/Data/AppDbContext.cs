@@ -10,18 +10,16 @@ namespace Vidb_Games.Data
 
         public DbSet<User> Users { get; set; }
         public DbSet<Game> Games { get; set; }
-        public DbSet<Genre> Genres { get; set; }
-        public DbSet<Platform> Platforms { get; set; }
-        public DbSet<Theme> Themes { get; set; }
-        public DbSet<Mode> Developers { get; set; }
-        public DbSet<Keyword> Keywords { get; set; }
-        public DbSet<Company> Companies { get; set; }
-        public DbSet<InvolvedCompany> InvolvedCompanies { get; set; }
-        public DbSet<Store> Stores { get; set; }
         public DbSet<Review> Reviews { get; set; }
         public DbSet<UserGameEntry> UserGameEntries { get; set; }
         public DbSet<ReviewVote> ReviewVotes { get; set; }
 
-
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Game>().OwnsOne(g => g.Cover, c => c.ToJson());
+            modelBuilder.Entity<Game>().OwnsMany(g => g.Genres, gen => gen.ToJson());
+            modelBuilder.Entity<Game>().OwnsMany(g => g.Themes, t => t.ToJson());
+            modelBuilder.Entity<Game>().OwnsMany(g => g.Platforms, p => p.ToJson());
+        }
     }
 }

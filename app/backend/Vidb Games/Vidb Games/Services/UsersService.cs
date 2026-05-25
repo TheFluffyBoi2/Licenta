@@ -4,6 +4,8 @@ using Vidb_Games.Models.DTOs;
 using Microsoft.EntityFrameworkCore;
 using System.Collections;
 using Vidb_Games.Models.Entities;
+using System.Text.Json;
+
 
 namespace Vidb_Games.Services
 {
@@ -89,5 +91,58 @@ namespace Vidb_Games.Services
             await _context.SaveChangesAsync();
             return true;
         }
+
+        public async Task<GameDto[]?> GetUserGames(Guid userId)
+        {
+            var gamesIds = await _context.UserGameEntries.Where(ug => ug.UserId == userId).Select(ug => ug.GameId).ToListAsync();
+            if (gamesIds.Count == 0)
+            {
+                return Array.Empty<GameDto>();
+            }
+
+            var gamesJson = await _context.Games.Where(g => gamesIds.Contains(g.Id)).Select(g => g.RawJsonData).ToListAsync();
+            var games = gamesJson.Select(json => JsonSerializer.Deserialize<GameDto>(json)).Where(g => g != null).ToArray()!;
+
+            return games;
+        }
+
+        public async Task<ICollection<ReviewDto>?> GetReviews(Guid userId)
+        {
+            var reviews = await _context.Reviews.Where(r => r.UserId == userId).Select(r =>
+                new ReviewDto
+                {
+                    Id = r.Id,
+                    UserId = r.UserId,
+                    GameId = r.GameId,
+                    Rating = r.Rating
+                }
+            ).ToListAsync();
+            if (reviews.Count == 0)
+            {
+                return Array.Empty<ReviewDto>();
+            }
+
+            return reviews;
+        }
+
+        public async Task<ICollection<UGEntryDto>?> GetUserGameEntries(Guid userId)
+        {
+            var relations = await _context.UserGameEntries.Where(ug => ug.UserId == userId).Select(ug =>
+                new UGEntryDto
+                {
+                    UserId = ug.UserId,
+                    GameId = ug.GameId,
+                    Status = ug.Status
+                }
+            ).ToListAsync();
+
+            if (relations.Count == 0)
+            {
+                return Array.Empty<UGEntryDto>();
+            }
+
+            return relations;
+        }
+
     }
 }

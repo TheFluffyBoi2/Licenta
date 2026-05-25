@@ -29,6 +29,11 @@ namespace Vidb_Games.Services
                 .Select(ug => ug.GameId)
                 .ToListAsync();
 
+            if (gameIds.Count == 0)
+            {
+                return Array.Empty<GameDto>();
+            }
+
             var requestBody = new UserRecommendationRequest
             {
                 GameIds = gameIds
@@ -87,10 +92,13 @@ namespace Vidb_Games.Services
 
             GameDto[]? result = await response.Content.ReadFromJsonAsync<GameDto[]>();
 
+
             if (result == null || result.Length == 0)
             {
                 return Array.Empty<GameDto>();
             }
+
+            var recommendationMap = result.ToDictionary(g => g.IgdbId);
 
             var ids = result.Select(g => g.IgdbId).Where(id => id > 0).Distinct().ToList();
             if (ids.Count == 0)
@@ -106,6 +114,20 @@ namespace Vidb_Games.Services
 
             var finalGames = await _igdbService.SendRequestAsync(queryParams);
 
+            if (finalGames == null)
+            {
+                return Array.Empty<GameDto>();
+            }
+
+            foreach (var game in finalGames)
+            {
+                if (recommendationMap.TryGetValue(game.IgdbId, out var recommendation))
+                {
+                    game.RecommendationScore = recommendation.RecommendationScore;
+                    game.Explanation = recommendation.Explanation;
+                }
+            }
+
             return finalGames ?? Array.Empty<GameDto>();
         }
 
@@ -120,6 +142,8 @@ namespace Vidb_Games.Services
                 return Array.Empty<GameDto>();
             }
 
+            var recommendationMap = response.ToDictionary(g => g.IgdbId);
+
             var ids = response.Select(g => g.IgdbId).Where(id => id > 0).Distinct().ToList();
             if (ids.Count == 0)
             {
@@ -133,6 +157,20 @@ namespace Vidb_Games.Services
                                  $"limit {ids.Count};";
 
             var finalGames = await _igdbService.SendRequestAsync(queryParams);
+
+            if (finalGames == null)
+            {
+                return Array.Empty<GameDto>();
+            }
+
+            foreach (var game in finalGames)
+            {
+                if (recommendationMap.TryGetValue(game.IgdbId, out var recommendation))
+                {
+                    game.RecommendationScore = recommendation.RecommendationScore;
+                    game.Explanation = recommendation.Explanation;
+                }
+            }
 
             return finalGames ?? Array.Empty<GameDto>();
         }

@@ -49,7 +49,7 @@ namespace Vidb_Games.Services
         public async Task<GameDto[]> GetTopGames()
         {
             string queryParams = "fields id, name, slug, summary, cover.url, aggregated_rating, total_rating_count, first_release_date, genres.name, platforms.name; " +
-                         "where aggregated_rating != null & total_rating_count > 300 & cover != null; " +
+                         "where platforms = (6) & aggregated_rating != null & total_rating_count > 300 & cover != null; " +
                          "sort aggregated_rating desc; " +
                          "limit 10;";
 
@@ -61,7 +61,7 @@ namespace Vidb_Games.Services
             long currentUnixTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
             string queryParams = $"fields id, name, slug, summary, cover.url, first_release_date, genres.name, platforms.name; " +
-                         $"where (first_release_date > {currentUnixTime} | first_release_date = null) & cover != null; " +
+                         $"where platforms = (6) & (first_release_date > {currentUnixTime} | first_release_date = null) & cover != null; " +
                          $"sort popularity asc; " +
                          $"limit 10;";
 
@@ -73,7 +73,7 @@ namespace Vidb_Games.Services
             long currentUnixTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
             string queryParams = $"fields id, name, slug, summary, cover.url, aggregated_rating, total_rating_count, first_release_date, genres.name, platforms.name; " +
-                         $"where first_release_date < {currentUnixTime} & aggregated_rating != null & total_rating_count > 10 & cover != null; " +
+                         $"where platforms = (6) & first_release_date < {currentUnixTime} & aggregated_rating != null & total_rating_count > 10 & cover != null; " +
                          $"sort first_release_date desc; " +
                          $"limit 10;";
 

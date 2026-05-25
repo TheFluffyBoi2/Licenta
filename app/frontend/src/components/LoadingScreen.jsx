@@ -1,7 +1,7 @@
 const LoadingScreen = () => {
   return (
-    <div class="pulse-container">
-      <img src="/logo.png" alt="Loading" class="logo-pulse" />
+    <div className="pulse-container">
+      <img src="/logo.png" alt="Loading" className="logo-pulse" />
     </div>
   );
 };
