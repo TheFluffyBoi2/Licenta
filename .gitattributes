@@ -1,3 +1,4 @@
 app/backend/FastApi/embeddings.pkl filter=lfs diff=lfs merge=lfs -text
 app/backend/FastApi/mpnet_model/model.safetensors filter=lfs diff=lfs merge=lfs -text
 app/backend/FastApi/working.csv filter=lfs diff=lfs merge=lfs -text
+app/backend/FastApi/data.pkl filter=lfs diff=lfs merge=lfs -text
