@@ -15,13 +15,16 @@ namespace Vidb_Games.Controllers
     {
         private readonly IGameService _gameService;
         private readonly IReviewService _reviewService;
+        private readonly IRecommendService _recommendService;
         private readonly AppDbContext _context;
 
-        public GameController(IGameService gameService, IReviewService reviewService, AppDbContext context)
+        public GameController(IGameService gameService, IReviewService reviewService, IRecommendService recommendService,
+            AppDbContext context)
         {
             _gameService = gameService;
             _reviewService = reviewService;
             _context = context;
+            _recommendService = recommendService;
         }
 
         [HttpGet("search")]
@@ -32,7 +35,7 @@ namespace Vidb_Games.Controllers
         }
 
         [HttpGet("game_data/{gameId}")]
-        public async Task<IActionResult> GetGameData([FromRoute] long gameId, [FromQuery] long? fromGameId = null)
+        public async Task<IActionResult> GetGameData([FromRoute] long gameId)
         {
             var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (!Guid.TryParse(userIdString, out var userId)) return Unauthorized();
@@ -45,20 +48,6 @@ namespace Vidb_Games.Controllers
                 return NotFound(new { message = "Game not found." });
             }
 
-            GameDto? recommendationInfo = null;
-            string FromName = "-";
-            if (fromGameId.HasValue)
-            {
-                var recommendations = await _gameService.GetGameRecommendations(fromGameId.Value);
-                recommendationInfo = recommendations?.FirstOrDefault(g => g.IgdbId == gameId);
-                FromName = _context.Games.FirstOrDefault(g => g.Id == fromGameId.Value)?.Name;
-            }
-
-            if (FromName == null)
-            {
-                FromName = "-";
-            }
-
             return Ok(new GameInfoResponse
             {
                 GameInfo = gameInfo,
@@ -67,9 +56,6 @@ namespace Vidb_Games.Controllers
                 Rating = ratingCount > 0 ? totalRating / ratingCount : 0,
                 RatingCount = ratingCount,
                 TotalRating = totalRating,
-                RecommendationScore = recommendationInfo?.RecommendationScore,
-                Explanation = recommendationInfo?.Explanation,
-                FromName = FromName,
             });
         }
 

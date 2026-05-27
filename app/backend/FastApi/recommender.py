@@ -71,6 +71,8 @@ def get_recommendations(game_id, df, top_games, game_to_index, genres_emb, theme
             explanation['themes'] = sim_themes * 100
             explanation['keywords'] = sim_keywords * 100
             explanation['summary'] = sim_summary * 100
+            explanation['rec_for_id'] = game_id
+            explanation['rec_for_name'] = source_game_name
 
             score = (sim_genres * 0.20) + (sim_themes * 0.20) + (sim_keywords * 0.30) + (sim_summary * 0.30)
 
@@ -138,9 +140,15 @@ def get_description_recommendations(description, df, model, embeddings, genres_e
 
     return final_top
 
-def get_recommendations_from_user(game_ids, df, top_games, games_to_index, genres_emb, themes_emb, keywords_emb, summary_emb):
+def get_recommendations_from_user(games_tuple, df, top_games, games_to_index, genres_emb, themes_emb, keywords_emb, summary_emb):
     scores = {}
-    for game_id in game_ids:
+    game_ids = {game_tuple[0] for game_tuple in games_tuple}
+
+    total_weight = 0
+    for game_tuple in games_tuple:
+        game_id, rating = game_tuple
+        weight = rating if rating > 0 else 2.5
+
         recs = get_recommendations(game_id, df, top_games, games_to_index, genres_emb, themes_emb, keywords_emb, summary_emb)
 
         for rec in recs:
@@ -150,17 +158,28 @@ def get_recommendations_from_user(game_ids, df, top_games, games_to_index, genre
             if rec_id in game_ids:
                 continue
 
+            new_explanation = {"rec_for_id" : rec["explanation"]["rec_for_id"],
+                                "rec_for_name": rec["explanation"]["rec_for_name"],
+                                "score": rec["recommendation_score"]}
             if rec_id not in scores:
                 scores[rec_id] = {
                     "id": rec_id,
                     "name": rec["name"],
-                    "recommendation_score": score,
-                    "explanation": rec["explanations"]
+                    "recommendation_score": score * weight,
+                    "user_explanation": [new_explanation],
+                    "count": 1
                 }
             else:
-                scores[rec_id]["recommendation_score"] = (score + scores[rec_id]["recommendation_score"]) / 2
+                scores[rec_id]["recommendation_score"] += score * weight
+                scores[rec_id]["count"] += 1
+                scores[rec_id]["user_explanation"].append(new_explanation)
 
-    final_recs = list(scores.values())
+    final_recs = []
+    for rec_id, rec_data in scores.items():
+        rec_data["recommendation_score"] = rec_data["recommendation_score"] / rec_data["count"]
+        del rec_data["count"]
+        final_recs.append(rec_data)
+
     final_recs.sort(key=lambda x: x["recommendation_score"], reverse=True)
 
     return final_recs[:10]

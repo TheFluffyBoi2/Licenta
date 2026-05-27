@@ -4,8 +4,8 @@ namespace Vidb_Games.Models.DTOs
 {
     public class UserRecommendationRequest
     {
-        [JsonPropertyName("game_ids")]
-        public List<long> GameIds { get; set; } = new List<long>();
+        [JsonPropertyName("games_tuple")]
+        public List<long[]> GamesTuple { get; set; } = new List<long[]>();
     }
 
 }

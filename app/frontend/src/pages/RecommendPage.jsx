@@ -90,7 +90,11 @@ const RecommendPage = () => {
   };
 
   const SmallGameCard = ({ game, rank, isUpcoming = false }) => (
-    <Link to={`/game/${game.id}`} className="cursor-pointer">
+    <Link
+      to={`/game/${game.id}`}
+      state={{ descriptionExplanation: game.explanation }}
+      className="cursor-pointer"
+    >
       <div className="relative bg-gray-50 dark:bg-[#1a1a1a] cursor-pointer rounded-lg overflow-hidden hover:ring-2 hover:ring-[#50FCBC] transition-all group">
         <div className="absolute top-2 left-2 z-10">
           <div className="bg-gray-300 dark:bg-[#343434] text-gray-900 dark:text-white px-3 py-1 rounded-md font-bold text-sm shadow-md">

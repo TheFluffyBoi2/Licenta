@@ -36,7 +36,7 @@ namespace Vidb_Games.Services
                 string queryParams =
                     "fields name, slug, summary, storyline, cover.url, first_release_date, " +
                     "aggregated_rating, aggregated_rating_count, " +
-                    "genres.name, platforms.name, game_modes.name, involved_companies.company.name, involved_companies.developer, involved_companies.publisher; " +
+                    "genres.name, platforms.name, game_modes.name, themes.name, keywords.name, involved_companies.company.name, involved_companies.developer, involved_companies.publisher; " +
                     $"where id = {gameId}; " +
                     "limit 1;";
 

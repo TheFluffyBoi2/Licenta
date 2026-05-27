@@ -1,15 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import {
-  Filter,
-  ArrowUpDown,
-  Star,
-  Search,
-  Trophy,
-  Clock,
-  X,
-} from "lucide-react";
+import { Filter, ArrowUpDown, Search, X } from "lucide-react";
 import api from "../api/axios";
+import { CircularProgressbar, buildStyles } from "react-circular-progressbar"; // Presupunând că le importai din pachetul lor
 
 const ListPage = () => {
   const [games, setGames] = useState([]);
@@ -24,7 +17,6 @@ const ListPage = () => {
     genres: [],
     platforms: [],
   });
-  const API_URL = "http://localhost:8080";
 
   useEffect(() => {
     fetchUserGames();
@@ -74,7 +66,6 @@ const ListPage = () => {
       );
     }
 
-    // Filter by score range (remember userScore is 0-5 scale)
     if (filters.minScore > 0 || filters.maxScore < 5) {
       filtered = filtered.filter((game) => {
         const score = game.userScore || 0;
@@ -82,14 +73,12 @@ const ListPage = () => {
       });
     }
 
-    // Filter by genres
     if (filters.genres.length > 0) {
       filtered = filtered.filter((game) =>
         game.genres?.some((genre) => filters.genres.includes(genre.name)),
       );
     }
 
-    // Filter by platforms
     if (filters.platforms.length > 0) {
       filtered = filtered.filter((game) =>
         game.platforms?.some((platform) =>
@@ -129,7 +118,6 @@ const ListPage = () => {
     });
   };
 
-  // Extract unique genres and platforms from games
   const availableGenres = [
     ...new Set(games.flatMap((game) => game.genres?.map((g) => g.name) || [])),
   ].sort();
@@ -162,13 +150,20 @@ const ListPage = () => {
     <div className="relative mt-4">
       <Link
         to={`/game/${game.gameId || game.id}`}
-        className={`group block bg-[#1a1a1a] rounded-lg overflow-hidden hover:ring-2 hover:ring-[#50FCBC] transition-all
-      ${game.userScore >= 5 ? "border-t-4 border-[#EFBF04]" : game.userScore >= 4 ? "border-t-4 border-[#A7A7AD]" : "border-t-4 border-transparent"}`}
+        className={`group block bg-white dark:bg-[#1a1a1a] rounded-lg overflow-hidden hover:ring-2 hover:ring-[#50FCBC] transition-all shadow-sm dark:shadow-none
+      border border-x-gray-200 border-b-gray-200 dark:border-x-transparent dark:border-b-transparent
+      ${
+        game.userScore >= 5
+          ? "border-t-4 border-t-[#EFBF04]"
+          : game.userScore >= 4
+            ? "border-t-4 border-t-[#A7A7AD]"
+            : "border-t-4 border-t-transparent"
+      }`}
       >
         {game.userScore >= 4 && (
           <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-20">
             <div
-              className={`${game.userScore >= 5 ? "bg-[#EFBF04]" : "bg-[#A7A7AD]"} text-gray-900 px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider rounded-md show-md whitespace-nowrap`}
+              className={`${game.userScore >= 5 ? "bg-[#EFBF04]" : "bg-[#A7A7AD]"} text-gray-900 px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider rounded-md shadow-md whitespace-nowrap`}
             >
               Top Rated
             </div>
@@ -176,7 +171,7 @@ const ListPage = () => {
         )}
 
         <div className="absolute top-2 left-2 z-10">
-          <div className="text-white bg-[#343434] px-3 py-1 rounded-md font-bold text-sm shadow-lg">
+          <div className="text-gray-700 dark:text-white bg-gray-200/90 dark:bg-[#343434] px-3 py-1 rounded-md font-bold text-sm shadow-md backdrop-blur-sm">
             #{index + 1}
           </div>
         </div>
@@ -187,18 +182,18 @@ const ListPage = () => {
             alt={game.name}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1a] via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-white dark:from-[#1a1a1a] via-transparent to-transparent" />
         </div>
 
         {/* Game Info */}
         <div className="p-4">
-          <h3 className="font-bold text-white mb-2 line-clamp-2 min-h-[3rem]">
+          <h3 className="font-bold text-gray-900 dark:text-white mb-2 line-clamp-2 min-h-[3rem]">
             {game.name}
           </h3>
 
           <div className="flex items-center justify-between text-sm">
             <div className="flex items-center gap-1">
-              <span className="text-white">
+              <span className="text-gray-600 dark:text-gray-400">
                 {game.status == 0
                   ? "Wishlisted"
                   : game.status == 1
@@ -208,10 +203,10 @@ const ListPage = () => {
                       : game.status == 3
                         ? "Dropped"
                         : "Unknown"}{" "}
-                |
+                |{" "}
               </span>
-              <span className="text-white">Scored</span>
-              <span className="font-bold text-white">
+              <span className="text-gray-600 dark:text-gray-400">Scored</span>
+              <span className="font-bold text-gray-900 dark:text-white">
                 {Math.round(game.userScore * 20) || "-"}
               </span>
             </div>
@@ -224,7 +219,9 @@ const ListPage = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="text-gray-400 text-lg">Loading your games...</div>
+        <div className="text-gray-500 dark:text-gray-400 text-lg">
+          Loading your games...
+        </div>
       </div>
     );
   }
@@ -232,12 +229,12 @@ const ListPage = () => {
   const filteredGames = getFilteredGames();
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] rounded-lg">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a] rounded-lg transition-colors duration-200">
       {/* Header */}
-      <div className="bg-[#1a1a1a] rounded-lg top-0 z-20">
+      <div className="bg-white dark:bg-[#1a1a1a] rounded-lg top-0 z-20 shadow-sm dark:shadow-none border-b border-gray-200 dark:border-transparent">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-3xl font-bold text-gray-300">
+            <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-300">
               Viewing Your Game List
             </h1>
           </div>
@@ -247,7 +244,11 @@ const ListPage = () => {
             {/* Filters Button */}
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className={`px-4 py-2 ${showFilters ? "bg-[#50FCBC] text-black" : "bg-[#2a2a2a] text-white"} hover:bg-[#3a3a3a] hover:text-white rounded-lg transition-colors flex items-center gap-2`}
+              className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2 ${
+                showFilters
+                  ? "bg-[#50FCBC] text-black"
+                  : "bg-gray-100 dark:bg-[#2a2a2a] text-gray-800 dark:text-white hover:bg-gray-200 dark:hover:bg-[#3a3a3a]"
+              }`}
             >
               <Filter className="w-4 h-4" />
               Filters
@@ -263,44 +264,47 @@ const ListPage = () => {
               )}
             </button>
 
+            {/* Order Button */}
             <button
               onClick={() =>
                 setSortBy((prev) => (prev === "score" ? "title" : "score"))
               }
-              className="px-4 py-2 bg-[#2a2a2a] hover:bg-[#3a3a3a] text-white rounded-lg transition-colors flex items-center gap-2"
+              className="px-4 py-2 bg-gray-100 dark:bg-[#2a2a2a] hover:bg-gray-200 dark:hover:bg-[#3a3a3a] text-gray-800 dark:text-white rounded-lg transition-colors flex items-center gap-2"
             >
               <ArrowUpDown className="w-4 h-4" />
               Order: {sortBy === "score" ? "Score" : "Title"}
             </button>
 
+            {/* Search Input */}
             <div className="flex-grow max-w-md ml-auto font-bold">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
                 <input
                   type="text"
                   placeholder="Search games..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 bg-[#2a2a2a] text-white rounded-lg focus:ring-2 focus:ring-[#50FCBC] outline-none transition-all"
+                  className="w-full pl-10 pr-4 py-2 bg-gray-100 dark:bg-[#2a2a2a] text-gray-900 dark:text-white border border-gray-200 dark:border-transparent rounded-lg focus:ring-2 focus:ring-[#50FCBC] outline-none transition-all placeholder-gray-400 dark:placeholder-gray-500"
                 />
               </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-6 overflow-x-auto ">
+          {/* Tabs */}
+          <div className="flex items-center gap-6 overflow-x-auto">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`pb-3 px-2 text-sm font-bold whitespace-nowrap transition-colors relative ${
                   activeTab === tab.id
-                    ? "text-white"
-                    : "text-gray-500 hover:text-gray-300"
+                    ? "text-gray-900 dark:text-white"
+                    : "text-gray-500 hover:text-gray-800 dark:hover:text-gray-300"
                 }`}
               >
                 {tab.label}
                 {activeTab === tab.id && (
-                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-white" />
+                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-900 dark:bg-white" />
                 )}
               </button>
             ))}
@@ -309,22 +313,24 @@ const ListPage = () => {
 
         {/* Filter Panel */}
         {showFilters && (
-          <div className="border-t border-gray-800 bg-[#0f0f0f]">
+          <div className="border-t border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-[#0f0f0f]">
             <div className="max-w-7xl mx-auto px-4 py-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-bold text-white">Filters</h3>
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                  Filters
+                </h3>
                 <button
                   onClick={clearFilters}
-                  className="text-sm text-[#50FCBC] hover:text-[#3dd69f] transition-colors"
+                  className="text-sm text-emerald-600 dark:text-[#50FCBC] hover:text-emerald-700 dark:hover:text-[#3dd69f] transition-colors font-semibold"
                 >
                   Clear All
                 </button>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {/* Score Range (0-5 scale for your app) */}
+                {/* Score Range */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Score Range (Your Rating)
                   </label>
                   <div className="flex items-center gap-3">
@@ -339,9 +345,9 @@ const ListPage = () => {
                           minScore: parseInt(e.target.value) || 0,
                         }))
                       }
-                      className="w-20 px-3 py-2 bg-[#2a2a2a] text-white rounded-lg focus:ring-2 focus:ring-[#50FCBC] outline-none"
+                      className="w-20 px-3 py-2 bg-white dark:bg-[#2a2a2a] text-gray-900 dark:text-white border border-gray-300 dark:border-transparent rounded-lg focus:ring-2 focus:ring-[#50FCBC] outline-none"
                     />
-                    <span className="text-gray-400">to</span>
+                    <span className="text-gray-500 dark:text-gray-400">to</span>
                     <input
                       type="number"
                       min="0"
@@ -353,10 +359,10 @@ const ListPage = () => {
                           maxScore: parseInt(e.target.value) || 5,
                         }))
                       }
-                      className="w-20 px-3 py-2 bg-[#2a2a2a] text-white rounded-lg focus:ring-2 focus:ring-[#50FCBC] outline-none"
+                      className="w-20 px-3 py-2 bg-white dark:bg-[#2a2a2a] text-gray-900 dark:text-white border border-gray-300 dark:border-transparent rounded-lg focus:ring-2 focus:ring-[#50FCBC] outline-none"
                     />
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     Scale: 0 (worst) to 5 (best)
                   </p>
                 </div>
@@ -364,14 +370,14 @@ const ListPage = () => {
                 {/* Genres */}
                 {availableGenres.length > 0 && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Genres ({filters.genres.length} selected)
                     </label>
-                    <div className="max-h-32 overflow-y-auto bg-[#2a2a2a] rounded-lg p-2">
+                    <div className="max-h-32 overflow-y-auto bg-white dark:bg-[#2a2a2a] border border-gray-200 dark:border-transparent rounded-lg p-2">
                       {availableGenres.slice(0, 15).map((genre) => (
                         <label
                           key={genre}
-                          className="flex items-center gap-2 py-1 px-2 hover:bg-[#3a3a3a] rounded cursor-pointer"
+                          className="flex items-center gap-2 py-1 px-2 hover:bg-gray-100 dark:hover:bg-[#3a3a3a] rounded cursor-pointer"
                         >
                           <input
                             type="checkbox"
@@ -379,7 +385,9 @@ const ListPage = () => {
                             onChange={() => toggleGenre(genre)}
                             className="w-4 h-4 accent-[#50FCBC]"
                           />
-                          <span className="text-sm text-gray-300">{genre}</span>
+                          <span className="text-sm text-gray-700 dark:text-gray-300">
+                            {genre}
+                          </span>
                         </label>
                       ))}
                     </div>
@@ -389,14 +397,14 @@ const ListPage = () => {
                 {/* Platforms */}
                 {availablePlatforms.length > 0 && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Platforms ({filters.platforms.length} selected)
                     </label>
-                    <div className="max-h-32 overflow-y-auto bg-[#2a2a2a] rounded-lg p-2">
+                    <div className="max-h-32 overflow-y-auto bg-white dark:bg-[#2a2a2a] border border-gray-200 dark:border-transparent rounded-lg p-2">
                       {availablePlatforms.slice(0, 15).map((platform) => (
                         <label
                           key={platform}
-                          className="flex items-center gap-2 py-1 px-2 hover:bg-[#3a3a3a] rounded cursor-pointer"
+                          className="flex items-center gap-2 py-1 px-2 hover:bg-gray-100 dark:hover:bg-[#3a3a3a] rounded cursor-pointer"
                         >
                           <input
                             type="checkbox"
@@ -404,7 +412,7 @@ const ListPage = () => {
                             onChange={() => togglePlatform(platform)}
                             className="w-4 h-4 accent-[#50FCBC]"
                           />
-                          <span className="text-sm text-gray-300">
+                          <span className="text-sm text-gray-700 dark:text-gray-300">
                             {platform}
                           </span>
                         </label>
@@ -419,7 +427,7 @@ const ListPage = () => {
                 filters.platforms.length > 0 ||
                 filters.minScore > 0 ||
                 filters.maxScore < 5) && (
-                <div className="mt-4 pt-4 border-t border-gray-800">
+                <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-800">
                   <div className="flex flex-wrap gap-2">
                     {filters.minScore > 0 || filters.maxScore < 5 ? (
                       <span className="px-3 py-1 bg-[#50FCBC] text-black text-sm rounded-full font-medium flex items-center gap-1">
@@ -441,7 +449,7 @@ const ListPage = () => {
                     {filters.genres.map((genre) => (
                       <span
                         key={genre}
-                        className="px-3 py-1 bg-blue-500/20 text-blue-400 text-sm rounded-full font-medium flex items-center gap-1"
+                        className="px-3 py-1 bg-blue-500/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400 text-sm rounded-full font-medium flex items-center gap-1"
                       >
                         {genre}
                         <button
@@ -455,7 +463,7 @@ const ListPage = () => {
                     {filters.platforms.map((platform) => (
                       <span
                         key={platform}
-                        className="px-3 py-1 bg-purple-500/20 text-purple-400 text-sm rounded-full font-medium flex items-center gap-1"
+                        className="px-3 py-1 bg-purple-500/10 text-purple-600 dark:bg-purple-500/20 dark:text-purple-400 text-sm rounded-full font-medium flex items-center gap-1"
                       >
                         {platform}
                         <button
@@ -474,13 +482,14 @@ const ListPage = () => {
         )}
       </div>
 
+      {/* Main Content Area */}
       <div className="max-w-7xl mx-auto px-4 py-8">
         {filteredGames.length === 0 ? (
           <div className="text-center py-20">
-            <div className="text-gray-500 text-lg mb-2">
+            <div className="text-gray-400 dark:text-gray-500 text-lg mb-2">
               No games found in this category
             </div>
-            <p className="text-gray-600 text-sm">
+            <p className="text-gray-500 dark:text-gray-600 text-sm">
               {searchQuery
                 ? "Try adjusting your search"
                 : "Add some games to your list!"}

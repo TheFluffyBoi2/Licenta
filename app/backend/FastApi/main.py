@@ -6,6 +6,7 @@ from pydantic import BaseModel
 from sentence_transformers import SentenceTransformer
 from contextlib import asynccontextmanager
 from recommender import get_description_recommendations, get_recommendations, get_recommendations_from_user
+from typing import Any
 
 DATA_PATH: str = 'working.csv'
 EMBEDDINGS_DATA_PATH: str = 'data.pkl'
@@ -47,13 +48,20 @@ class SearchRequest(BaseModel):
     description: str
 
 class UserGamesRequest(BaseModel):
-    game_ids: list[int]
+    games_tuple: list[tuple[int, int]]
 
 class RecommendationResponse(BaseModel):
     id: int
     name: str
     recommendation_score: float
-    explanation: dict[str, float]
+    explanation: dict[str, Any]
+
+class UserRecommendationResponse(BaseModel):
+    id: int
+    name: str
+    recommendation_score: float
+    user_explanation: list[dict[str, Any]]
+
 
 @app.post("/recommendations", response_model=list[RecommendationResponse])
 async def get_games_from_description(request: SearchRequest):
@@ -76,11 +84,11 @@ async def get_games_from_id(game_id: int):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/recommendations/user", response_model=list[RecommendationResponse])
+@app.post("/recommendations/user", response_model=list[UserRecommendationResponse])
 async def get_games_from_user(request: UserGamesRequest):
     try:
         return get_recommendations_from_user(
-            request.game_ids,
+            request.games_tuple,
             app_data['df'],
             app_data['top_games'], app_data['game_to_index'], app_data['genres'],
             app_data['themes'], app_data['keywords'], app_data['summary']

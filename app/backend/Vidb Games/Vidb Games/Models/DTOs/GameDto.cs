@@ -40,6 +40,9 @@ namespace Vidb_Games.Models.DTOs
         [JsonPropertyName("explanation")]
         [Newtonsoft.Json.JsonProperty("explanation")]
         public ExplanationDto? Explanation { get; set; }
+        [JsonPropertyName("user_explanation")]
+        [Newtonsoft.Json.JsonProperty("user_explanation")]
+        public ICollection<ExplanationUserDto>? UserExplanation { get; set; }
         [JsonPropertyName("genres")]
         public ICollection<NamedGamePropertyDto> Genres { get; set; } = new List<NamedGamePropertyDto>();
         [JsonPropertyName("themes")]

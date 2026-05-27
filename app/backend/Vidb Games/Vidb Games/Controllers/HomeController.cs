@@ -55,14 +55,5 @@ namespace Vidb_Games.Controllers
 
             return Ok(new {recommendations = recommendations ?? Array.Empty<GameDto>()});
         }
-
-
-        // [HttpPost("populate-database")]
-        // [Authorize(Roles="Admin")]
-        // public async Task<IActionResult> PopulateDatabase()
-        // {
-        //     await Task.Run(async () => await _IGDBService.PopulateDatabase());
-        //     return Ok("Database population started.");
-        // }
     }
 }

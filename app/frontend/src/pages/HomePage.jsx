@@ -35,11 +35,13 @@ const HomePage = () => {
     const fetchRecommendations = async () => {
       try {
         const response = await api.get("api/home/feed/recommendations");
-        const recommendations = response.data?.recommendations || [];
+        const data = Array.isArray(response.data)
+          ? response.data
+          : response.data?.recommendations ||
+            response.data?.Recommendations ||
+            [];
 
-        setRecommendations(
-          Array.isArray(recommendations) ? recommendations : [],
-        );
+        setRecommendations(data);
       } catch (error) {
         console.error("Failed to fetch recommendations:", error);
       } finally {
@@ -145,8 +147,17 @@ const HomePage = () => {
     );
   };
 
-  const SmallGameCard = ({ game, rank, isUpcoming = false }) => (
-    <Link to={`/game/${game.id}`} className="cursor-pointer">
+  const SmallGameCard = ({
+    game,
+    rank,
+    isUpcoming = false,
+    recommended = false,
+  }) => (
+    <Link
+      to={`/game/${game.id}`}
+      state={recommended ? { userRecommendation: game.user_explanation } : null}
+      className="cursor-pointer"
+    >
       <div className="relative bg-gray-50 dark:bg-[#1a1a1a] cursor-pointer rounded-lg overflow-hidden hover:ring-2 hover:ring-[#50FCBC] transition-all group">
         <div className="absolute top-2 left-2 z-10">
           <div className="bg-gray-300 dark:bg-[#343434] text-gray-900 dark:text-white px-3 py-1 rounded-md font-bold text-sm shadow-md">
@@ -299,6 +310,7 @@ const HomePage = () => {
                   key={`recommendation-${game.id}`}
                   game={game}
                   rank={idx + 1}
+                  recommended={true}
                 />
               ))}
             </div>

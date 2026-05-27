@@ -156,10 +156,10 @@ def save_data(df: pd.DataFrame, main_embeddings: np.ndarray,
 
     df = df.reset_index(drop=True)
 
-    w_genres = 0.20
-    w_themes = 0.20
+    w_genres = 0.30
+    w_themes = 0.30
     w_keywords = 0.30
-    w_summary = 0.30
+    w_summary = 0.10
 
     for i in range(0, len(main_embeddings), batch_size):
         end = min(i + batch_size, len(main_embeddings))

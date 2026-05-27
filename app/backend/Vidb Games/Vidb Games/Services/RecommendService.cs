@@ -25,7 +25,7 @@ namespace Vidb_Games.Services
         public async Task<GameDto[]?> GetUserRecommendations(Guid userId)
         {
             List<long> gameIds = await _context.UserGameEntries
-                .Where(ug => ug.UserId == userId)
+                .Where(ug => ug.UserId == userId && ug.Status != 0)
                 .Select(ug => ug.GameId)
                 .ToListAsync();
 
@@ -34,9 +34,21 @@ namespace Vidb_Games.Services
                 return Array.Empty<GameDto>();
             }
 
+            var reviewedGames = await _context.Reviews
+                .Where(r => gameIds.Contains(r.GameId) && r.UserId == userId)
+                .Select(r => new long[] {r.GameId, r.Rating})
+                .ToListAsync();
+
+            var reviewedGameIds = reviewedGames.Select(r => r[0]).ToHashSet();
+            var unreviewedGames = gameIds
+                .Where(id => !reviewedGameIds.Contains(id))
+                .Select(id => new long[] {id, 2});
+
+            var gamesTuple = reviewedGames.Concat(unreviewedGames).ToList();
+
             var requestBody = new UserRecommendationRequest
             {
-                GameIds = gameIds
+                GamesTuple = gamesTuple,
             };
 
             var response = await _httpClient.PostAsJsonAsync(
@@ -69,6 +81,17 @@ namespace Vidb_Games.Services
                                  $"limit {ids.Count};";
 
             var finalGames = await _igdbService.SendRequestAsync(queryParams);
+            if (finalGames == null) return Array.Empty<GameDto>();
+
+            var resultLookup = result.ToDictionary(g => g.IgdbId);
+            foreach (var game in finalGames)
+            {
+                if (resultLookup.TryGetValue(game.IgdbId, out var recData))
+                {
+                    game.RecommendationScore = recData.RecommendationScore;
+                    game.UserExplanation = recData.UserExplanation;
+                }
+            }
 
             return finalGames ?? Array.Empty<GameDto>();
         }
