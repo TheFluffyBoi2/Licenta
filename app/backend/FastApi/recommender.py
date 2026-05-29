@@ -3,6 +3,7 @@ import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 from sentence_transformers import SentenceTransformer
 import pickle
+import umap
 
 def get_recommendations(game_id, df, top_games, game_to_index, genres_emb, themes_emb, keywords_emb, summary_emb):
     blacklist_terms = ['edition', 'psp', 'game boy', 'remastered', 'version', 'demo', 'gbc']
@@ -184,6 +185,22 @@ def get_recommendations_from_user(games_tuple, df, top_games, games_to_index, ge
 
     return final_recs[:10]
 
+
+def umap_visualization(game_ids, embeddings, games_to_index):
+    game_idxs = [games_to_index[id] for id in game_ids]
+    user_embeddings = np.array([embeddings[idx] for idx in game_idxs])
+    games_number = len(game_idxs)
+    near_neighbors = max(2, min(5, games_number - 1))
+
+    reducer = umap.UMAP(
+        n_neighbors=near_neighbors,
+        min_dist=0.1,
+        metric='cosine',
+    )
+
+    points = reducer.fit_transform(user_embeddings)
+    print(points)
+    return points, game_ids
 
 # game_names = ["The Legend of Zelda: Breath of the Wild", "Dark Souls III",
 #              "Sid Meier's Civilization VI", "Factorio", "The Witcher 3: Wild Hunt",

@@ -20,6 +20,7 @@ import LoadingScreen from "./components/LoadingScreen";
 import RecommendPage from "./pages/RecommendPage";
 import GamePage from "./pages/GamePage";
 import ListPage from "./pages/ListPage";
+import ProfilePage from "./pages/ProfilePage";
 
 const NavigationTracker = () => {
   const location = useLocation();
@@ -86,6 +87,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <ListPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
               </ProtectedRoute>
             }
           />

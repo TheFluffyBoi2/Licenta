@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Filter, ArrowUpDown, Search, X } from "lucide-react";
 import api from "../api/axios";
-import { CircularProgressbar, buildStyles } from "react-circular-progressbar"; // Presupunând că le importai din pachetul lor
-
+import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 const ListPage = () => {
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -182,12 +181,12 @@ const ListPage = () => {
             alt={game.name}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-white dark:from-[#1a1a1a] via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-t from-white dark:from-[#1a1a1a] via-transparent to-transparent" />
         </div>
 
         {/* Game Info */}
         <div className="p-4">
-          <h3 className="font-bold text-gray-900 dark:text-white mb-2 line-clamp-2 min-h-[3rem]">
+          <h3 className="font-bold text-gray-900 dark:text-white mb-2 line-clamp-2 min-h-12">
             {game.name}
           </h3>
 
@@ -276,7 +275,7 @@ const ListPage = () => {
             </button>
 
             {/* Search Input */}
-            <div className="flex-grow max-w-md ml-auto font-bold">
+            <div className="grow max-w-md ml-auto font-bold">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
                 <input

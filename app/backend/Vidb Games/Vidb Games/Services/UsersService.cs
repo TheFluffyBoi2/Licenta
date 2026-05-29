@@ -144,5 +144,90 @@ namespace Vidb_Games.Services
             return relations;
         }
 
+        public async Task<User[]?> SearchUsers(string query, int limit = 15)
+        {
+            if (string.IsNullOrEmpty(query))
+            {
+                return Array.Empty<User>();
+            }
+
+            var trimmed = query.Trim();
+            if (trimmed.Length < 2)
+            {
+                return Array.Empty<User>();
+            }
+
+            var safe = trimmed.Replace("\\", "\\\\").Replace("\"", "\\\"");
+            limit = Math.Clamp(limit, 1, 50);
+
+            User[] users = _context.Users.Where(u => u.Username.Contains(safe)).Take(limit).ToArray()!;
+
+            if (users.Count() == 0)
+            {
+                return Array.Empty<User>();
+            }
+
+            return users;
+        }
+
+        public async Task<UserStatsDto> GetUserStats(Guid userId)
+        {
+            int gamesCount = await _context.UserGameEntries.Where(ug => ug.UserId == userId).CountAsync();
+            float meanScore = await _context.Reviews.Where(r => r.UserId == userId).AverageAsync(r => (float?)r.Rating) ?? 0.0f;
+            int completed = await _context.UserGameEntries.Where(ug => ug.UserId == userId && ug.Status == GameStatus.Completed).CountAsync();
+            int reviewsCount = await _context.Reviews.Where(r => r.UserId == userId).CountAsync();
+
+            return new UserStatsDto
+            {
+                TotalGames = gamesCount,
+                MeanScore = meanScore,
+                Completed = completed,
+                TotalReviews = reviewsCount
+            };
+        }
+
+        public async Task<Dictionary<string, int>> GetUserGenres(Guid userId)
+        {
+            var userGames = await _context.UserGameEntries.Where(ug => ug.UserId == userId).Select(ug => ug.GameId).ToListAsync();
+            if (userGames.Count == 0)
+            {
+                return new Dictionary<string, int>();
+            }
+
+            var userGenres = await _context.Games
+                .AsNoTracking()
+                .Where(g => userGames.Contains(g.Id))
+                .SelectMany(g => g.Genres)
+                .Where(genre => genre.Name != null)
+                .GroupBy(genre => genre.Name!)
+                .ToDictionaryAsync(
+                    group => group.Key,
+                    group => group.Count()
+                );
+
+            return userGenres;
+        }
+
+        public async Task<Dictionary<string, int>> GetUserThemes(Guid userId)
+        {
+            var userGames = await _context.UserGameEntries.Where(ug => ug.UserId == userId).Select(ug => ug.GameId).ToListAsync();
+            if (userGames.Count == 0)
+            {
+                return new Dictionary<string, int>();
+            }
+
+            var userThemes = await _context.Games
+                .AsNoTracking()
+                .Where(g => userGames.Contains(g.Id))
+                .SelectMany(g => g.Themes)
+                .Where(theme => theme.Name != null)
+                .GroupBy(theme => theme.Name!)
+                .ToDictionaryAsync(
+                    group => group.Key,
+                    group => group.Count()
+                );
+
+            return userThemes;
+        }
     }
 }

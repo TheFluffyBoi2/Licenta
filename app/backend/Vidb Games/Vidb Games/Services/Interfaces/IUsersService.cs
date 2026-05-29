@@ -1,4 +1,5 @@
 ﻿using Vidb_Games.Models.DTOs;
+using Vidb_Games.Models.Entities;
 
 namespace Vidb_Games.Services.Interfaces
 {
@@ -11,6 +12,10 @@ namespace Vidb_Games.Services.Interfaces
         Task<GameDto[]?> GetUserGames(Guid userId);
         Task<ICollection<ReviewDto>?> GetReviews(Guid userId);
         Task<ICollection<UGEntryDto>?> GetUserGameEntries(Guid userId);
+        Task<User[]?> SearchUsers(string query, int limit = 15);
+        Task<UserStatsDto> GetUserStats(Guid userId);
+        Task<Dictionary<string, int>> GetUserGenres(Guid userId);
+        Task<Dictionary<string, int>> GetUserThemes(Guid userId);
     }
 }
 

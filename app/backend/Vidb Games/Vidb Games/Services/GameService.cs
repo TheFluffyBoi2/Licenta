@@ -24,7 +24,7 @@ namespace Vidb_Games.Services
             _recommendService = recommendService;
         }
 
-        public async Task<(GameDto?, GameEntryDto?, int, int)> GetGameData(long gameId, Guid userId)
+        public async Task<(GameDto?, GameEntryDto?, RelationshipsDto?, int, int)> GetGameData(long gameId, Guid userId)
         {
             var game = _context.Games.FirstOrDefault(g => g.Id == gameId);
 
@@ -43,7 +43,7 @@ namespace Vidb_Games.Services
                 var result = await _igdbService.SendRequestAsync(queryParams);
                 if (result == null || result.Length == 0)
                 {
-                    return (null, null, 0, 0);
+                    return (null, null, null, 0, 0);
                 }
                 var gameResult = result[0];
 
@@ -80,7 +80,25 @@ namespace Vidb_Games.Services
                     LastTimeModified = ug.LastTimeModified
                 }).FirstOrDefault();
 
-            return (JsonSerializer.Deserialize<GameDto>(game.RawJsonData) ?? null, relationship ?? null, totalRating, reviewCount);
+            var wishlistRelations = _context.UserGameEntries.Where(ug => ug.GameId == gameId && ug.Status == GameStatus.Wishlist)
+                .Select(ug => ug.Status).Count();
+            var playingRelations = _context.UserGameEntries.Where(ug => ug.GameId == gameId && ug.Status == GameStatus.CurrentlyPlaying)
+                .Select(ug => ug.Status).Count();
+            var completedRelations = _context.UserGameEntries.Where(ug => ug.GameId == gameId && ug.Status == GameStatus.Completed)
+                .Select(ug => ug.Status).Count();
+            var droppedRelations = _context.UserGameEntries.Where(ug => ug.GameId == gameId && ug.Status == GameStatus.Dropped)
+                .Select(ug => ug.Status).Count();
+
+            var Stats = new RelationshipsDto
+            {
+              Wishlists = wishlistRelations,
+              Playing = playingRelations,
+              Completed = completedRelations,
+              Dropped = droppedRelations
+            };
+
+            return (JsonSerializer.Deserialize<GameDto>(game.RawJsonData) ?? null, relationship ?? null,
+                Stats ?? null, totalRating, reviewCount);
         }
 
         public Task<GameDto[]> SearchGames(string query, int limit = 15)

@@ -37,5 +37,29 @@ namespace Vidb_Games.Controllers
                 relations = relations
             });
         }
+
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchUsers([FromQuery] string q, [FromQuery] int limit = 15)
+        {
+            var users = await _usersService.SearchUsers(q ?? "", limit);
+            return Ok(users);
+        }
+
+        [HttpGet("profile")]
+        public async Task<IActionResult> GetProfile()
+        {
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!Guid.TryParse(userIdString, out var userId)) return Unauthorized();
+
+            var stats = await _usersService.GetUserStats(userId);
+            var genres = await _usersService.GetUserGenres(userId);
+            var themes = await _usersService.GetUserThemes(userId);
+
+            return Ok(new {
+                stats = stats,
+                genre_distribution = genres,
+                theme_distribution = themes
+                });
+        }
     }
 }

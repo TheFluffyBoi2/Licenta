@@ -24,8 +24,8 @@ namespace Vidb_Games.Models.DTOs
         public ExplanationDto? Explanation { get; set;}
         [JsonPropertyName("user_explanation")]
         public ICollection<ExplanationUserDto>? ExplanationUser { get; set; }
-        [JsonPropertyName("from_name")]
-        public string? FromName { get; set; }
+        [JsonPropertyName("stats")]
+        public RelationshipsDto? Stats { get; set; }
     }
 
 }

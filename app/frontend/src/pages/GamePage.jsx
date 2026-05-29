@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { StatusDistribution } from "../components/StatusDistribution";
+import { ScoreDistribution } from "../components/ScoreDistribution";
 import {
   Link,
   useParams,
@@ -81,8 +83,10 @@ const GamePage = () => {
   const [userRelation, setUserRelation] = useState({});
   const [similarGames, setSimilarGames] = useState([]);
   const [reviews, setReviews] = useState([]);
+  const [allReviews, setAllReviews] = useState([]);
   const [userReview, setUserReview] = useState(null);
   const [totalReviews, setTotalReviews] = useState(null);
+  const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [recommendationsLoading, setRecommendationsLoading] = useState(true);
   const [gameStatus, setGameStatus] = useState(null);
@@ -127,9 +131,8 @@ const GamePage = () => {
         setLoadError(null);
         setGameInfo({});
         setUserRelation({});
-        // setRecommendationInfo(null);
-        // setUserRecommendationInfo(null);
-        // setFromName("");
+        setAllReviews(null);
+        setStats(null);
 
         const gameId = Number(id);
         if (!id || Number.isNaN(gameId) || gameId <= 0) {
@@ -155,19 +158,7 @@ const GamePage = () => {
         setUserRating(data.user_rating);
         setRatingCount(data.rating_count);
         setTotalRating(data.total_rating);
-
-        // if (data.recommendation_score || data.explanation) {
-        //   setRecommendationInfo({
-        //     score: data.recommendation_score,
-        //     explanation: data.explanation,
-        //   });
-        //   setFromName(data.from_name);
-        // }
-
-        // if (data.user_explanation) {
-        //   setUserRecommendationInfo(data.user_explanation);
-        //   console.log(data.user_explanation);
-        // }
+        setStats(data.stats);
 
         if (Array.isArray(revs) && userId) {
           const myReview = revs.find(
@@ -177,8 +168,10 @@ const GamePage = () => {
             setUserReview(myReview);
             setReviewText(myReview.comment);
             setScore(Math.round(myReview.rating * 20));
+            setAllReviews(revs);
             setReviews(revs.filter((r) => r.id != myReview.id));
           } else {
+            setAllReviews(revs);
             setReviews(revs);
           }
         } else {
@@ -571,7 +564,7 @@ const GamePage = () => {
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-green-500 px-4 py-2 rounded-lg">
+        <div className="flex items-center gap-2 bg-linear-to-r from-blue-500 to-green-500 px-4 py-2 rounded-lg">
           <Award className="w-5 h-5 text-white" />
           <span className="text-2xl font-bold text-white">
             {review.rating * 20}
@@ -639,18 +632,17 @@ const GamePage = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto pb-12">
+    <div className="max-w-7xl mx-auto pb-12 sm:px-2">
       {/* Header Section with Cover and Info */}
-      <div className="bg-white dark:bg-[#1C1C1C] rounded-2xl shadow-lg p-6 mb-6">
+      <div className="bg-white dark:bg-[#222222] rounded-2xl shadow-lg p-6 mb-6 transition-colors">
         <div className="flex flex-col md:flex-row gap-6">
           {/* Left Side - Cover Image */}
-          <div className="flex-shrink-0">
+          <div className="shrink-0">
             <img
               crossOrigin="anonymous"
-              src={gameInfo.cover?.url || "/logo.png"}
-              alt={gameInfo.name}
+              src={gameInfo?.cover?.url || "/logo.png"}
+              alt={gameInfo?.name}
               className="w-full md:w-64 h-auto rounded-lg shadow-xl"
-              // onLoad={handleGetColors}
             />
             {/* Container dedicat pentru buton, cu aliniere centrată */}
             <div className="mt-4 flex justify-center">
@@ -659,14 +651,14 @@ const GamePage = () => {
           </div>
 
           {/* Right Side - Game Info */}
-          <div className="flex-grow">
+          <div className="grow">
             {/* Titlu + Data + Platforme */}
             <div className="mb-4">
               <h1 className="text-4xl font-bold mb-2 text-gray-900 dark:text-white">
-                {gameInfo.name}
+                {gameInfo?.name}
               </h1>
               <div className="flex flex-wrap items-center gap-4 mb-4 text-gray-600 dark:text-gray-400">
-                {gameInfo.first_release_date && (
+                {gameInfo?.first_release_date && (
                   <div className="flex items-center gap-2">
                     <Calendar className="w-4 h-4" />
                     <span>
@@ -680,10 +672,10 @@ const GamePage = () => {
                     </span>
                   </div>
                 )}
-                {gameInfo.platforms && gameInfo.platforms.length > 0 && (
+                {gameInfo?.platforms && gameInfo.platforms.length > 0 && (
                   <div className="flex items-center gap-2">
                     <Gamepad2 className="w-4 h-4" />
-                    <span>
+                    <span className="text-sm">
                       {gameInfo.platforms.map((p) => p.name).join(", ")}
                     </span>
                   </div>
@@ -692,9 +684,11 @@ const GamePage = () => {
             </div>
 
             {/* Genres */}
-            {gameInfo.genres && gameInfo.genres.length > 0 && (
+            {gameInfo?.genres && gameInfo.genres.length > 0 && (
               <div className="flex flex-wrap gap-2 mb-4">
-                <div className="text-gray-700 dark:text-gray-300">Genres:</div>
+                <div className="text-gray-700 dark:text-gray-300 font-medium">
+                  Genres:
+                </div>
                 {gameInfo.genres.map((genre) => (
                   <span
                     key={genre.id || genre.name}
@@ -706,9 +700,11 @@ const GamePage = () => {
               </div>
             )}
 
-            {gameInfo.themes && gameInfo.themes.length > 0 && (
+            {gameInfo?.themes && gameInfo.themes.length > 0 && (
               <div className="flex flex-wrap gap-2 mb-4">
-                <div className="text-gray-700 dark:text-gray-300">Themes:</div>
+                <div className="text-gray-700 dark:text-gray-300 font-medium">
+                  Themes:
+                </div>
                 {gameInfo.themes.map((theme) => (
                   <span
                     key={theme.id || theme.name}
@@ -722,21 +718,23 @@ const GamePage = () => {
 
             {/* Ratings */}
             <div className="grid grid-cols-2 gap-4 mb-6">
-              <div className="bg-linear-to-br from-yellow-500 to-orange-500 rounded-lg p-4 text-white">
+              {/* REPARAT: bg-linear-to-br schimbat in bg-gradient-to-br pentru compatibilitate Tailwind v3 */}
+              <div className="bg-linear-to-br from-yellow-500 to-orange-500 rounded-lg p-4 text-white shadow-md">
                 <div className="flex items-center gap-2 mb-2">
                   <Star className="w-5 h-5 fill-white" />
                   <span className="text-sm font-medium">Critics Score</span>
                 </div>
                 <div className="text-3xl font-bold">
-                  {gameInfo.aggregated_rating
+                  {gameInfo?.aggregated_rating
                     ? Math.round(gameInfo.aggregated_rating)
                     : "N/A"}
                 </div>
                 <div className="text-xs opacity-90 mt-1">
-                  Based on {gameInfo.aggregated_rating_count || 0} reviews
+                  Based on {gameInfo?.aggregated_rating_count || 0} reviews
                 </div>
               </div>
-              <div className="bg-gradient-to-br from-[#50FCBC] to-yellow-500 rounded-lg p-4 text-white">
+
+              <div className="bg-linear-to-br from-[#50FCBC] to-emerald-600 rounded-lg p-4 text-white shadow-md">
                 <div className="flex items-center gap-2 mb-2">
                   <Users className="w-5 h-5" />
                   <span className="text-sm font-medium">User Score</span>
@@ -750,12 +748,12 @@ const GamePage = () => {
               </div>
             </div>
 
-            {gameInfo.summary && (
-              <div className="bg-gray-50 dark:bg-[#0a0a0a] rounded-lg p-4">
+            {gameInfo?.summary && (
+              <div className="bg-gray-50 dark:bg-[#1a1a1a] rounded-lg p-4">
                 <h3 className="text-lg font-bold mb-2 text-gray-900 dark:text-white">
                   Synopsis
                 </h3>
-                <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                <p className="text-gray-700 dark:text-gray-300 leading-relaxed text-sm">
                   {gameInfo.summary}
                 </p>
               </div>
@@ -765,7 +763,7 @@ const GamePage = () => {
       </div>
 
       {similarExplanation && (
-        <div className="bg-[#FFFFFF] dark:bg-[#1C1C1C] rounded-2xl shadow-lg p-6 mb-6 border-l-4 border-[#50FCBC]">
+        <div className="bg-white dark:bg-[#222222] rounded-2xl shadow-lg p-6 mb-6 border-l-4 border-[#50FCBC]">
           <div className="flex items-center gap-3 mb-8">
             <div className="bg-[#50FCBC] text-black px-4 py-2 rounded-lg font-bold shadow-md">
               {Math.round(similarScore * 100)}% Match
@@ -775,31 +773,30 @@ const GamePage = () => {
             </h3>
           </div>
 
-          {similarExplanation && (
-            <div className="flex flex-wrap justify-center gap-8 md:gap-12 mt-4">
-              {["genres", "themes", "keywords", "summary"].map((key) => {
-                const value = Math.round(similarExplanation[key] || 0);
+          <div className="flex flex-wrap justify-center gap-8 md:gap-12 mt-4">
+            {["genres", "themes", "keywords", "summary"].map((key) => {
+              const value = Math.round(similarExplanation[key] || 0);
 
-                let barColor = "#238823";
-                if (value <= 32) barColor = "#ef4444";
-                else if (value <= 62) barColor = "#ffbf00";
+              let barColor = "#238823";
+              if (value <= 32) barColor = "#ef4444";
+              else if (value <= 62) barColor = "#ffbf00";
 
-                return (
-                  <AnimatedCircle
-                    key={key}
-                    targetValue={value}
-                    color={barColor}
-                    label={key}
-                  />
-                );
-              })}
-            </div>
-          )}
+              return (
+                <AnimatedCircle
+                  key={key}
+                  targetValue={value}
+                  color={barColor}
+                  label={key}
+                />
+              );
+            })}
+          </div>
         </div>
       )}
 
+      {/* SECURIZAT: Prevenim crash-ul prin verificarea structurii structurii obiectului */}
       {userRecommendation && (
-        <div className="bg-[#FFFFFF] dark:bg-[#1C1C1C] rounded-2xl shadow-lg p-6 mb-6 border-l-4 border-purple-500">
+        <div className="bg-white dark:bg-[#222222] rounded-2xl shadow-lg p-6 mb-6 border-l-4 border-purple-500">
           <div className="flex items-center gap-3 mb-8">
             <div className="bg-purple-500 text-white px-4 py-2 rounded-lg font-bold shadow-md">
               Library Match
@@ -810,8 +807,11 @@ const GamePage = () => {
           </div>
 
           <div className="flex flex-wrap justify-center gap-8 md:gap-12 mt-4">
-            {userRecommendation.map((item, index) => {
-              const value = Math.round((item.score || 0) * 100);
+            {(Array.isArray(userRecommendation)
+              ? userRecommendation
+              : userRecommendation?.user_explanation || []
+            ).map((item, index) => {
+              const value = Math.round((item?.score || 0) * 100);
 
               let barColor = "#238823";
               if (value <= 32) barColor = "#ef4444";
@@ -819,15 +819,13 @@ const GamePage = () => {
 
               return (
                 <div
-                  key={item.rec_for_id || index}
-                  className="flex flex-col items-center text-center gap-3 min-w-[120px]"
+                  key={item?.rec_for_id || index}
+                  className="flex flex-col items-center text-center gap-3 min-w-30"
                 >
-                  {/* Numele jocului sus */}
-                  <span className="text-sm font-bold text-gray-800 dark:text-gray-200 max-w-[160px] line-clamp-2 min-h-[40px] flex items-center justify-center">
-                    {item.rec_for_name}
+                  <span className="text-sm font-bold text-gray-800 dark:text-gray-200 max-w-40 line-clamp-2 min-h-10 flex items-center justify-center">
+                    {item?.rec_for_name}
                   </span>
 
-                  {/* Cercul cu scorul dedesubt */}
                   <AnimatedCircle
                     targetValue={value}
                     color={barColor}
@@ -841,7 +839,7 @@ const GamePage = () => {
       )}
 
       {descriptionExplanation && (
-        <div className="bg-[#FFFFFF] dark:bg-[#1C1C1C] rounded-2xl shadow-lg p-6 mb-6 border-l-4 border-orange-500">
+        <div className="bg-white dark:bg-[#222222] rounded-2xl shadow-lg p-6 mb-6 border-l-4 border-orange-500">
           <div className="flex items-center gap-3 mb-8">
             <div className="bg-orange-500 text-black px-4 py-2 rounded-lg font-bold shadow-md">
               Description Match
@@ -851,65 +849,55 @@ const GamePage = () => {
             </h3>
           </div>
 
-          {descriptionExplanation && (
-            <div className="flex flex-wrap justify-center gap-8 md:gap-12 mt-4">
-              {["genres", "themes", "keywords", "summary"].map((key) => {
-                const value = Math.round(descriptionExplanation[key] || 0);
+          <div className="flex flex-wrap justify-center gap-8 md:gap-12 mt-4">
+            {["genres", "themes", "keywords", "summary"].map((key) => {
+              const value = Math.round(descriptionExplanation[key] || 0);
 
-                let barColor = "#238823";
-                if (value <= 32) barColor = "#ef4444";
-                else if (value <= 62) barColor = "#ffbf00";
+              let barColor = "#238823";
+              if (value <= 32) barColor = "#ef4444";
+              else if (value <= 62) barColor = "#ffbf00";
 
-                return (
-                  <AnimatedCircle
-                    key={key}
-                    targetValue={value}
-                    color={barColor}
-                    label={key}
-                  />
-                );
-              })}
-            </div>
-          )}
+              return (
+                <AnimatedCircle
+                  key={key}
+                  targetValue={value}
+                  color={barColor}
+                  label={key}
+                />
+              );
+            })}
+          </div>
         </div>
       )}
 
       <div className="bg-transparent rounded-2xl mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-white dark:bg-[#1C1C1C] rounded-2xl shadow-lg p-6 mb-6">
-          Status Distribution
-        </div>
-        <div className="bg-white dark:bg-[#1C1C1C] rounded-2xl shadow-lg p-6 mb-6">
-          Score Distribution
-          {reviews.map((review) => (
-            <div>test</div>
-          ))}
-          {userReview ? "test" : ""}
-        </div>
+        <StatusDistribution stats={stats} />
+        <ScoreDistribution reviews={allReviews} />
       </div>
 
       {/* Additional Information */}
-      {(gameInfo.storyline ||
-        gameInfo.involved_companies ||
-        gameInfo.game_modes ||
-        gameInfo.keywords) && (
-        <div className="bg-white dark:bg-[#1C1C1C] rounded-2xl shadow-lg p-6 mb-6">
+      {(gameInfo?.storyline ||
+        gameInfo?.involved_companies ||
+        gameInfo?.game_modes ||
+        gameInfo?.keywords) && (
+        <div className="bg-white dark:bg-[#222222] rounded-2xl shadow-lg p-6 mb-6">
           <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
             Additional Information
           </h2>
 
-          {gameInfo.storyline && (
+          {gameInfo?.storyline && (
             <div className="mb-4">
               <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-white">
                 Storyline
               </h3>
-              <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed text-sm">
                 {gameInfo.storyline}
               </p>
             </div>
           )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {gameInfo.involved_companies &&
+            {gameInfo?.involved_companies &&
               gameInfo.involved_companies.length > 0 && (
                 <div>
                   <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-white">
@@ -918,17 +906,17 @@ const GamePage = () => {
                   <div className="flex flex-wrap gap-2">
                     {gameInfo.involved_companies.map((company) => (
                       <span
-                        key={company.company?.id || company.company?.name}
+                        key={company?.company?.id || company?.company?.name}
                         className="px-3 py-1 bg-gray-200 dark:bg-[#2a2a2a] rounded-full text-sm text-gray-700 dark:text-gray-300"
                       >
-                        {company.company?.name}
+                        {company?.company?.name}
                       </span>
                     ))}
                   </div>
                 </div>
               )}
 
-            {gameInfo.keywords && gameInfo.keywords.length > 0 && (
+            {gameInfo?.keywords && gameInfo.keywords.length > 0 && (
               <div>
                 <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-white">
                   Keywords
@@ -936,10 +924,10 @@ const GamePage = () => {
                 <div className="flex flex-wrap gap-2">
                   {gameInfo.keywords.map((keyword) => (
                     <span
-                      key={keyword.id || keyword.name}
+                      key={keyword?.id || keyword?.name}
                       className="px-3 py-1 bg-gray-200 dark:bg-[#2a2a2a] rounded-full text-sm text-gray-700 dark:text-gray-300"
                     >
-                      {keyword.name}
+                      {keyword?.name}
                     </span>
                   ))}
                 </div>
@@ -951,18 +939,18 @@ const GamePage = () => {
 
       {/* Recommendations */}
       {similarGames && similarGames.length > 0 && !recommendationsLoading ? (
-        <div className="bg-white dark:bg-[#1C1C1C] rounded-2xl shadow-lg p-6 mb-6">
+        <div className="bg-white dark:bg-[#222222] rounded-2xl shadow-lg p-6 mb-6">
           <div className="flex items-center gap-3 mb-6">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
               You Might Also Like
             </h2>
-            <div className="h-1 flex-grow bg-gradient-to-r from-[#50FCBC] to-transparent rounded" />
+            <div className="h-1 grow bg-linear-to-r from-[#50FCBC] to-transparent rounded" />
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
             {similarGames.map((game, idx) => (
               <SmallGameCard
-                key={`recommendation-${game.id}`}
+                key={`recommendation-${game?.id}`}
                 game={game}
                 rank={idx + 1}
                 sourceGameId={id}
@@ -971,17 +959,16 @@ const GamePage = () => {
           </div>
         </div>
       ) : recommendationsLoading ? (
-        <div className="bg-white dark:bg-[#1C1C1C] rounded-2xl shadow-lg p-6 mb-6">
-          <div className="animate-pulse flex flex-col items-center md:grid-cols-4 lg:grid-cols-6 gap-4">
-            <span>Loading Recommendations</span>
+        <div className="bg-white dark:bg-[#222222] rounded-2xl shadow-lg p-6 mb-6">
+          <div className="animate-pulse flex flex-col items-center gap-4">
+            <span className="text-gray-500">Loading Recommendations...</span>
           </div>
         </div>
-      ) : (
-        <></>
-      )}
+      ) : null}
+
       {/* Add Comment */}
       {(gameStatus === 1 || gameStatus === 2 || gameStatus === 3) && (
-        <div className="bg-white dark:bg-[#1C1C1C] rounded-2xl shadow-lg p-6 mb-6 border-l-4 border-[#50FCBC]">
+        <div className="bg-white dark:bg-[#222222] rounded-2xl shadow-lg p-6 mb-6 border-l-4 border-[#50FCBC]">
           <div className="mb-6 flex justify-between items-start">
             <div>
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -992,28 +979,27 @@ const GamePage = () => {
                   ? "You have already reviewed "
                   : "Write a review for "}
                 <span className="font-semibold text-[#50FCBC]">
-                  {gameInfo.name}
+                  {gameInfo?.name}
                 </span>
               </p>
             </div>
 
-            {/* Afișăm Like/Dislike dacă recenzia există */}
             {userReview && (
               <div className="flex items-center gap-4 bg-gray-100 dark:bg-[#2a2a2a] px-4 py-2 rounded-xl">
                 <div className="flex items-center gap-1 text-green-500">
                   <ThumbsUp className="w-4 h-4" />
-                  <span className="font-bold">{userReview.likes || 0}</span>
+                  <span className="font-bold">{userReview?.likes || 0}</span>
                 </div>
                 <div className="flex items-center gap-1 text-red-500">
                   <ThumbsDown className="w-4 h-4" />
-                  <span className="font-bold">{userReview.dislikes || 0}</span>
+                  <span className="font-bold">{userReview?.dislikes || 0}</span>
                 </div>
               </div>
             )}
           </div>
 
           <div className="flex flex-col md:flex-row gap-6">
-            <div className="flex-shrink-0 flex flex-col items-center">
+            <div className="shrink-0 flex flex-col items-center">
               <img
                 src={imgUrl}
                 alt="User Avatar"
@@ -1021,16 +1007,16 @@ const GamePage = () => {
               />
             </div>
 
-            <div className="flex-grow">
+            <div className="grow">
               <textarea
                 value={reviewText}
                 onChange={(e) => setReviewText(e.target.value)}
                 placeholder="What did you think about the game?"
-                className={`w-full p-4 bg-gray-100 dark:bg-[#2a2a2a] rounded-lg border text-gray-900 dark:text-white focus:ring-2 focus:ring-[#50FCBC] focus:outline-none min-h-[120px] transition-all
-            ${errors.comment ? "border-red-500 focus:ring-red-500" : "border-gray-300 dark:border-gray-600"}`}
+                className={`w-full p-4 bg-gray-100 dark:bg-[#2a2a2a] rounded-lg border text-gray-900 dark:text-white focus:ring-2 focus:ring-[#50FCBC] focus:outline-none min-h-30 transition-all
+                  ${errors?.comment ? "border-red-500 focus:ring-red-500" : "border-gray-300 dark:border-gray-600"}`}
               />
-              {errors.comment && (
-                <p className="text-red-500 text-xs mt-1 font-semibold flex items-center gap-1 animate-fadeIn">
+              {errors?.comment && (
+                <p className="text-red-500 text-xs mt-1 font-semibold flex items-center gap-1">
                   {errors.comment}
                 </p>
               )}
@@ -1049,16 +1035,16 @@ const GamePage = () => {
                         key={star}
                         onClick={() => {
                           setScore(star * 20);
-                          if (errors.rating)
+                          if (errors?.rating)
                             setErrors((prev) => ({ ...prev, rating: null }));
                         }}
-                        className={`text-2xl ${score >= star * 20 ? "text-yellow-400" : "text-gray-400"}`}
+                        className={`text-2xl transition-colors ${score >= star * 20 ? "text-yellow-400" : "text-gray-400"}`}
                       >
                         ★
                       </button>
                     ))}
                   </div>
-                  {errors.rating && (
+                  {errors?.rating && (
                     <p className="text-red-500 text-xs mt-1 font-semibold">
                       {errors.rating}
                     </p>
@@ -1095,7 +1081,7 @@ const GamePage = () => {
       )}
 
       {/* Reviews Section */}
-      <div className="bg-white dark:bg-[#1C1C1C] rounded-2xl shadow-lg p-6">
+      <div className="bg-white dark:bg-[#222222] rounded-2xl shadow-lg p-6">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
             User Reviews
@@ -1117,12 +1103,12 @@ const GamePage = () => {
         </div>
 
         <div>
-          {getSortedReviews().map((review) => (
-            <ReviewCard key={review.id} review={review} />
+          {getSortedReviews?.().map((review) => (
+            <ReviewCard key={review?.id} review={review} />
           ))}
         </div>
 
-        {reviews.length === 0 && (
+        {reviews?.length === 0 && (
           <div className="text-center py-12 text-gray-500 dark:text-gray-400">
             No reviews yet. Be the first to review this game!
           </div>
@@ -1131,5 +1117,4 @@ const GamePage = () => {
     </div>
   );
 };
-
 export default GamePage;

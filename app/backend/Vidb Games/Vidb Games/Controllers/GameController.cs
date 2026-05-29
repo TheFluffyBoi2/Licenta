@@ -40,7 +40,7 @@ namespace Vidb_Games.Controllers
             var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (!Guid.TryParse(userIdString, out var userId)) return Unauthorized();
 
-            var (gameInfo, userRelation, totalRating, ratingCount) = await _gameService.GetGameData(gameId, userId);
+            var (gameInfo, userRelation, stats, totalRating, ratingCount) = await _gameService.GetGameData(gameId, userId);
             var reviews = await _reviewService.GetReviews(gameId);
 
             if (gameInfo == null || string.IsNullOrWhiteSpace(gameInfo.Name))
@@ -56,6 +56,7 @@ namespace Vidb_Games.Controllers
                 Rating = ratingCount > 0 ? totalRating / ratingCount : 0,
                 RatingCount = ratingCount,
                 TotalRating = totalRating,
+                Stats = stats
             });
         }
 

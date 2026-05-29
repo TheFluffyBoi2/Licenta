@@ -108,7 +108,7 @@ const RecommendPage = () => {
             alt={game.name}
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-gray-50 dark:from-[#1a1a1a] via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-t from-gray-50 dark:from-[#1a1a1a] via-transparent to-transparent" />
         </div>
 
         <div className="p-4">
