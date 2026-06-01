@@ -197,5 +197,53 @@ namespace Vidb_Games.Services
 
             return finalGames ?? Array.Empty<GameDto>();
         }
+
+        public async Task<UMAPPointDto[]?> GetUMAPPoints(Guid userId) {
+            List<long> gameIds = await _context.UserGameEntries
+                .Where(ug => ug.UserId == userId && ug.Status != 0)
+                .Select(ug => ug.GameId)
+                .ToListAsync();
+
+            if (gameIds.Count == 0) {
+                return Array.Empty<UMAPPointDto>();
+            }
+
+            var games = await _context.Games
+                .Where(g => gameIds.Contains(g.Id))
+                .Select(g => new
+                {
+                    g.Id,
+                    g.Name
+                }).ToListAsync();
+
+            var gameLookup = games.ToDictionary(
+                g => g.Id,
+                g => g.Name
+            );
+
+            var response = await _httpClient.PostAsJsonAsync(
+                "http://fastapi_recommender:8000/recommendations/umap",
+                new { game_ids = gameIds }
+            );
+
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new Exception("FastAPI request failed.");
+            }
+
+            var umapPoints = await response.Content.ReadFromJsonAsync<UMAPPointDto[]>();
+
+            if (umapPoints == null)
+            {
+                return Array.Empty<UMAPPointDto>();
+            }
+
+            foreach (var point in umapPoints)
+            {
+                point.Name = gameLookup.GetValueOrDefault(point.GameId, "Unknown");
+            }
+
+            return umapPoints;
+        }
     }
 }

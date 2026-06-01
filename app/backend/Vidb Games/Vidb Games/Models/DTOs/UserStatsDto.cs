@@ -7,7 +7,7 @@ namespace Vidb_Games.Models.DTOs
         [JsonPropertyName("total_games")]
         public int TotalGames { get; set; }
         [JsonPropertyName("mean_score")]
-        public float MeanScore { get; set; }
+        public double MeanScore { get; set; }
         [JsonPropertyName("completed")]
         public int Completed { get; set; }
         [JsonPropertyName("total_reviews")]

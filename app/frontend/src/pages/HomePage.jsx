@@ -171,7 +171,7 @@ const HomePage = () => {
             alt={game.name}
             className="w-full h-full object-cover "
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-gray-50 dark:from-[#1a1a1a] via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-t from-gray-50 dark:from-[#1a1a1a] via-transparent to-transparent" />
         </div>
 
         <div className="p-4">
@@ -219,7 +219,7 @@ const HomePage = () => {
             alt={game.name}
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-gray-50 dark:from-[#1a1a1a] via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-t from-gray-50 dark:from-[#1a1a1a] via-transparent to-transparent" />
         </div>
 
         <div className="p-6">
@@ -301,7 +301,7 @@ const HomePage = () => {
         <div className="bg-white dark:bg-[#1C1C1C] rounded-2xl text-black dark:text-white px-6 py-6 shadow-lg transition-all duration-500 ease-in-out">
           <div className="flex items-center gap-3 mb-6">
             <h2 className="text-3xl font-bold">Recommended for You</h2>
-            <div className="h-1 flex-grow bg-gradient-to-r from-[#50FCBC] to-transparent rounded" />
+            <div className="h-1 grow bg-linear-to-r from-[#50FCBC] to-transparent rounded" />
           </div>
           <section>
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
@@ -329,7 +329,7 @@ const HomePage = () => {
       <div className="bg-white dark:bg-[#1C1C1C] rounded-2xl text-black dark:text-white px-6 py-6 shadow-lg transition-all duration-500 ease-in-out">
         <div className="flex items-center gap-3 mb-6">
           <h2 className="text-3xl font-bold">Top 10 All Time</h2>
-          <div className="h-1 flex-grow bg-gradient-to-r from-[#50FCBC] to-transparent rounded" />
+          <div className="h-1 grow bg-linaer-to-r from-[#50FCBC] to-transparent rounded" />
         </div>
         <section>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
@@ -357,7 +357,7 @@ const HomePage = () => {
       <div className="bg-white dark:bg-[#1C1C1C] rounded-2xl text-black dark:text-white px-6 py-6 shadow-lg transition-all duration-500 ease-in-out">
         <div className="flex items-center gap-3 mb-6">
           <h2 className="text-3xl font-bold">Top 10 Most Anticipated</h2>
-          <div className="h-1 flex-grow bg-gradient-to-r from-[#50FCBC] to-transparent rounded" />
+          <div className="h-1 grow bg-linear-to-r from-[#50FCBC] to-transparent rounded" />
         </div>
         <section>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
@@ -386,7 +386,7 @@ const HomePage = () => {
       <div className="bg-white dark:bg-[#1C1C1C] rounded-2xl text-black dark:text-white px-6 py-6 shadow-lg transition-all duration-500 ease-in-out">
         <div className="flex items-center gap-3 mb-6">
           <h2 className="text-3xl font-bold">Top 10 New Releases</h2>
-          <div className="h-1 flex-grow bg-gradient-to-r from-[#50FCBC] to-transparent rounded" />
+          <div className="h-1 grow bg-linear-to-r from-[#50FCBC] to-transparent rounded" />
         </div>
         <section>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">

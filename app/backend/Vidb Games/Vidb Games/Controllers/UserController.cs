@@ -14,11 +14,13 @@ namespace Vidb_Games.Controllers
     {
         private readonly IGDBService _IGDBService;
         private readonly IUsersService _usersService;
+        private readonly IRecommendService _recommendService;
 
-        public UserController(IGDBService IGDBService, IUsersService usersService)
+        public UserController(IGDBService IGDBService, IUsersService usersService, IRecommendService recommendService)
         {
             _IGDBService = IGDBService;
             _usersService = usersService;
+            _recommendService = recommendService;
         }
 
         [HttpGet("games")]
@@ -54,11 +56,13 @@ namespace Vidb_Games.Controllers
             var stats = await _usersService.GetUserStats(userId);
             var genres = await _usersService.GetUserGenres(userId);
             var themes = await _usersService.GetUserThemes(userId);
+            var points = await _recommendService.GetUMAPPoints(userId);
 
             return Ok(new {
                 stats = stats,
                 genre_distribution = genres,
-                theme_distribution = themes
+                theme_distribution = themes,
+                umap_points = points,
                 });
         }
     }

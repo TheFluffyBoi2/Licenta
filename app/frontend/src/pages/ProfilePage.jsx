@@ -316,6 +316,7 @@ const ProfilePage = () => {
 
         // umap
         if (data.umap_points) {
+          console.log("POINTS");
           setUmapPoints(data.umap_points);
         }
       } catch (err) {
@@ -605,14 +606,16 @@ const ProfilePage = () => {
           )}
 
           {/* ── UMAP map ── */}
-          <div className="bg-white dark:bg-[#222222] rounded-2xl shadow-lg p-6 mb-6 transition-colors">
-            <SectionHeader icon={Map} title="Games Map" />
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4 -mt-2">
-              Vizualizare UMAP a embedding-urilor jocurilor din lista ta.
-              Jocurile similare apar mai aproape.
-            </p>
-            <UMAPMap points={umapPoints} />
-          </div>
+          {umapPoints.length > 2 && (
+            <div className="bg-white dark:bg-[#222222] rounded-2xl shadow-lg p-6 mb-6 transition-colors">
+              <SectionHeader icon={Map} title="Games Map" />
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4 -mt-2">
+                Vizualizare UMAP a embedding-urilor jocurilor din lista ta.
+                Jocurile similare apar mai aproape.
+              </p>
+              <UMAPMap points={umapPoints} />
+            </div>
+          )}
         </>
       )}
     </div>
