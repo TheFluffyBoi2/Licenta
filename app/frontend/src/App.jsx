@@ -83,6 +83,14 @@ function App() {
             }
           />
           <Route
+            path="/user/:userId"
+            element={
+              <ProtectedRoute>
+                <ListPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/mylist"
             element={
               <ProtectedRoute>

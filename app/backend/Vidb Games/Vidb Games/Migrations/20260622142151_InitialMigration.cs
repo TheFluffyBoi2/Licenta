@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Vidb_Games.Migrations
 {
     /// <inheritdoc />
-    public partial class Initialmigration : Migration
+    public partial class InitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -83,6 +83,39 @@ namespace Vidb_Games.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Notifications",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    GameId = table.Column<long>(type: "bigint", nullable: false),
+                    GameName = table.Column<string>(type: "text", nullable: false),
+                    StoreName = table.Column<string>(type: "text", nullable: false),
+                    SalePrice = table.Column<decimal>(type: "numeric", nullable: false),
+                    NormalPrice = table.Column<decimal>(type: "numeric", nullable: false),
+                    SavingsPercent = table.Column<int>(type: "integer", nullable: false),
+                    DealUrl = table.Column<string>(type: "text", nullable: false),
+                    IsRead = table.Column<bool>(type: "boolean", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Notifications", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Notifications_Games_GameId",
+                        column: x => x.GameId,
+                        principalTable: "Games",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Notifications_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Reviews",
                 columns: table => new
                 {
@@ -140,6 +173,16 @@ namespace Vidb_Games.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Notifications_GameId",
+                table: "Notifications",
+                column: "GameId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Notifications_UserId",
+                table: "Notifications",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Reviews_GameId",
                 table: "Reviews",
                 column: "GameId");
@@ -163,6 +206,9 @@ namespace Vidb_Games.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "Notifications");
+
             migrationBuilder.DropTable(
                 name: "ReviewVotes");
 

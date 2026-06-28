@@ -633,10 +633,8 @@ const GamePage = () => {
 
   return (
     <div className="max-w-7xl mx-auto pb-12 sm:px-2">
-      {/* Header Section with Cover and Info */}
       <div className="bg-white dark:bg-[#222222] rounded-2xl shadow-lg p-6 mb-6 transition-colors">
         <div className="flex flex-col md:flex-row gap-6">
-          {/* Left Side - Cover Image */}
           <div className="shrink-0">
             <img
               crossOrigin="anonymous"
@@ -644,15 +642,12 @@ const GamePage = () => {
               alt={gameInfo?.name}
               className="w-full md:w-64 h-auto rounded-lg shadow-xl"
             />
-            {/* Container dedicat pentru buton, cu aliniere centrată */}
             <div className="mt-4 flex justify-center">
               <StatusButton />
             </div>
           </div>
 
-          {/* Right Side - Game Info */}
           <div className="grow">
-            {/* Titlu + Data + Platforme */}
             <div className="mb-4">
               <h1 className="text-4xl font-bold mb-2 text-gray-900 dark:text-white">
                 {gameInfo?.name}
@@ -683,7 +678,6 @@ const GamePage = () => {
               </div>
             </div>
 
-            {/* Genres */}
             {gameInfo?.genres && gameInfo.genres.length > 0 && (
               <div className="flex flex-wrap gap-2 mb-4">
                 <div className="text-gray-700 dark:text-gray-300 font-medium">
@@ -716,9 +710,7 @@ const GamePage = () => {
               </div>
             )}
 
-            {/* Ratings */}
             <div className="grid grid-cols-2 gap-4 mb-6">
-              {/* REPARAT: bg-linear-to-br schimbat in bg-gradient-to-br pentru compatibilitate Tailwind v3 */}
               <div className="bg-linear-to-br from-yellow-500 to-orange-500 rounded-lg p-4 text-white shadow-md">
                 <div className="flex items-center gap-2 mb-2">
                   <Star className="w-5 h-5 fill-white" />
@@ -794,7 +786,6 @@ const GamePage = () => {
         </div>
       )}
 
-      {/* SECURIZAT: Prevenim crash-ul prin verificarea structurii structurii obiectului */}
       {userRecommendation && (
         <div className="bg-white dark:bg-[#222222] rounded-2xl shadow-lg p-6 mb-6 border-l-4 border-purple-500">
           <div className="flex items-center gap-3 mb-8">
@@ -875,7 +866,6 @@ const GamePage = () => {
         <ScoreDistribution reviews={allReviews} />
       </div>
 
-      {/* Additional Information */}
       {(gameInfo?.storyline ||
         gameInfo?.involved_companies ||
         gameInfo?.game_modes ||
@@ -937,7 +927,6 @@ const GamePage = () => {
         </div>
       )}
 
-      {/* Recommendations */}
       {similarGames && similarGames.length > 0 && !recommendationsLoading ? (
         <div className="bg-white dark:bg-[#222222] rounded-2xl shadow-lg p-6 mb-6">
           <div className="flex items-center gap-3 mb-6">
@@ -966,7 +955,6 @@ const GamePage = () => {
         </div>
       ) : null}
 
-      {/* Add Comment */}
       {(gameStatus === 1 || gameStatus === 2 || gameStatus === 3) && (
         <div className="bg-white dark:bg-[#222222] rounded-2xl shadow-lg p-6 mb-6 border-l-4 border-[#50FCBC]">
           <div className="mb-6 flex justify-between items-start">
@@ -1065,7 +1053,7 @@ const GamePage = () => {
                   <button
                     onClick={handleSubmit}
                     disabled={isSubmitting}
-                    className="px-8 py-2 bg-[#50FCBC] hover:bg-[#3dd69f] text-black font-bold rounded-lg transition-all shadow-lg shadow-[#50FCBC]/20"
+                    className="px-8 py-2 bg-[#50FCBC] hover:bg-[#3dd69f] text-black font-bold rounded-lg transition-all"
                   >
                     {isSubmitting
                       ? "Processing..."
@@ -1080,7 +1068,6 @@ const GamePage = () => {
         </div>
       )}
 
-      {/* Reviews Section */}
       <div className="bg-white dark:bg-[#222222] rounded-2xl shadow-lg p-6">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">

@@ -1,10 +1,23 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { Filter, ArrowUpDown, Search, X } from "lucide-react";
+import { Link, useParams } from "react-router-dom";
+import { Filter, ArrowUpDown, Search, X, User } from "lucide-react";
 import api from "../api/axios";
-import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
+
+const API_URL = "http://localhost:8080";
+
+const getAvatarUrl = (path) => {
+  if (!path) return `${API_URL}/default_avatar.png`;
+  if (path.startsWith("http")) return path;
+  return `${API_URL}/${path.startsWith("/") ? path.slice(1) : path}`;
+};
+
 const ListPage = () => {
+  // If there's a :userId param we're viewing someone else's list
+  const { userId } = useParams();
+  const isOwnList = !userId;
+
   const [games, setGames] = useState([]);
+  const [viewedUser, setViewedUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -18,14 +31,28 @@ const ListPage = () => {
   });
 
   useEffect(() => {
+    setGames([]);
+    setViewedUser(null);
+    setActiveTab("all");
+    setSearchQuery("");
     fetchUserGames();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId]);
 
   const fetchUserGames = async () => {
     try {
       setLoading(true);
-      const response = await api.get("api/user/games");
-      const { games, reviews, relations } = response.data;
+      let response;
+      if (isOwnList) {
+        response = await api.get("api/user/games");
+      } else {
+        response = await api.get(`api/user/${userId}/games`);
+      }
+
+      const { games, reviews, relations, profile } = response.data;
+
+      if (profile) setViewedUser(profile);
+
       const fullDataGames = (games || []).map((game) => {
         const relation = (relations || []).find((r) => r.game_id === game.id);
         const review = (reviews || []).find((r) => r.game_id === game.id);
@@ -35,6 +62,7 @@ const ListPage = () => {
           userScore: review ? review.rating : null,
         };
       });
+
       setGames(fullDataGames || []);
     } catch (error) {
       console.error("Failed to fetch games:", error);
@@ -44,45 +72,38 @@ const ListPage = () => {
     }
   };
 
+  // ── Filtering & sorting ──────────────────────────────────────────────────
+
   const getFilteredGames = () => {
     let filtered = [...games];
 
     if (activeTab !== "all") {
-      const statusMap = {
-        wishlist: 0,
-        playing: 1,
-        completed: 2,
-        dropped: 3,
-      };
-      filtered = filtered.filter(
-        (game) => game.status === statusMap[activeTab],
-      );
+      const statusMap = { wishlist: 0, playing: 1, completed: 2, dropped: 3 };
+      filtered = filtered.filter((g) => g.status === statusMap[activeTab]);
     }
 
     if (searchQuery.trim()) {
-      filtered = filtered.filter((game) =>
-        game.name?.toLowerCase().includes(searchQuery.toLowerCase()),
+      filtered = filtered.filter((g) =>
+        g.name?.toLowerCase().includes(searchQuery.toLowerCase()),
       );
     }
 
     if (filters.minScore > 0 || filters.maxScore < 5) {
-      filtered = filtered.filter((game) => {
-        const score = game.userScore || 0;
+      filtered = filtered.filter((g) => {
+        const score = g.userScore || 0;
         return score >= filters.minScore && score <= filters.maxScore;
       });
     }
 
     if (filters.genres.length > 0) {
-      filtered = filtered.filter((game) =>
-        game.genres?.some((genre) => filters.genres.includes(genre.name)),
+      filtered = filtered.filter((g) =>
+        g.genres?.some((genre) => filters.genres.includes(genre.name)),
       );
     }
 
     if (filters.platforms.length > 0) {
-      filtered = filtered.filter((game) =>
-        game.platforms?.some((platform) =>
-          filters.platforms.includes(platform.name),
-        ),
+      filtered = filtered.filter((g) =>
+        g.platforms?.some((p) => filters.platforms.includes(p.name)),
       );
     }
 
@@ -108,61 +129,56 @@ const ListPage = () => {
     { id: "dropped", label: "DROPPED" },
   ];
 
-  const clearFilters = () => {
-    setFilters({
-      minScore: 0,
-      maxScore: 5,
-      genres: [],
-      platforms: [],
-    });
-  };
+  const clearFilters = () =>
+    setFilters({ minScore: 0, maxScore: 5, genres: [], platforms: [] });
 
   const availableGenres = [
-    ...new Set(games.flatMap((game) => game.genres?.map((g) => g.name) || [])),
+    ...new Set(games.flatMap((g) => g.genres?.map((x) => x.name) || [])),
   ].sort();
 
   const availablePlatforms = [
-    ...new Set(
-      games.flatMap((game) => game.platforms?.map((p) => p.name) || []),
-    ),
+    ...new Set(games.flatMap((g) => g.platforms?.map((x) => x.name) || [])),
   ].sort();
 
-  const toggleGenre = (genre) => {
+  const toggleGenre = (genre) =>
     setFilters((prev) => ({
       ...prev,
       genres: prev.genres.includes(genre)
         ? prev.genres.filter((g) => g !== genre)
         : [...prev.genres, genre],
     }));
-  };
 
-  const togglePlatform = (platform) => {
+  const togglePlatform = (platform) =>
     setFilters((prev) => ({
       ...prev,
       platforms: prev.platforms.includes(platform)
         ? prev.platforms.filter((p) => p !== platform)
         : [...prev.platforms, platform],
     }));
-  };
+
+  // ── Game card ────────────────────────────────────────────────────────────
 
   const GameCard = ({ game, index }) => (
     <div className="relative mt-4">
       <Link
         to={`/game/${game.gameId || game.id}`}
-        className={`group block bg-white dark:bg-[#1a1a1a] rounded-lg overflow-hidden hover:ring-2 hover:ring-[#50FCBC] transition-all shadow-sm dark:shadow-none
-      border border-x-gray-200 border-b-gray-200 dark:border-x-transparent dark:border-b-transparent
-      ${
-        game.userScore >= 5
-          ? "border-t-4 border-t-[#EFBF04]"
-          : game.userScore >= 4
-            ? "border-t-4 border-t-[#A7A7AD]"
-            : "border-t-4 border-t-transparent"
-      }`}
+        className={`group block bg-white dark:bg-[#1a1a1a] rounded-lg overflow-hidden
+          hover:ring-2 hover:ring-[#50FCBC] transition-all shadow-sm dark:shadow-none
+          border border-x-gray-200 border-b-gray-200 dark:border-x-transparent dark:border-b-transparent
+          ${
+            game.userScore >= 5
+              ? "border-t-4 border-t-[#EFBF04]"
+              : game.userScore >= 4
+                ? "border-t-4 border-t-[#A7A7AD]"
+                : "border-t-4 border-t-transparent"
+          }`}
       >
         {game.userScore >= 4 && (
           <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-20">
             <div
-              className={`${game.userScore >= 5 ? "bg-[#EFBF04]" : "bg-[#A7A7AD]"} text-gray-900 px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider rounded-md shadow-md whitespace-nowrap`}
+              className={`${
+                game.userScore >= 5 ? "bg-[#EFBF04]" : "bg-[#A7A7AD]"
+              } text-gray-900 px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider rounded-md shadow-md whitespace-nowrap`}
             >
               Top Rated
             </div>
@@ -184,7 +200,6 @@ const ListPage = () => {
           <div className="absolute inset-0 bg-linear-to-t from-white dark:from-[#1a1a1a] via-transparent to-transparent" />
         </div>
 
-        {/* Game Info */}
         <div className="p-4">
           <h3 className="font-bold text-gray-900 dark:text-white mb-2 line-clamp-2 min-h-12">
             {game.name}
@@ -193,20 +208,20 @@ const ListPage = () => {
           <div className="flex items-center justify-between text-sm">
             <div className="flex items-center gap-1">
               <span className="text-gray-600 dark:text-gray-400">
-                {game.status == 0
+                {game.status === 0
                   ? "Wishlisted"
-                  : game.status == 1
+                  : game.status === 1
                     ? "Playing Now"
-                    : game.status == 2
+                    : game.status === 2
                       ? "Completed"
-                      : game.status == 3
+                      : game.status === 3
                         ? "Dropped"
                         : "Unknown"}{" "}
                 |{" "}
               </span>
-              <span className="text-gray-600 dark:text-gray-400">Scored</span>
+              <span className="text-gray-600 dark:text-gray-400">Scored </span>
               <span className="font-bold text-gray-900 dark:text-white">
-                {Math.round(game.userScore * 20) || "-"}
+                {game.userScore != null ? Math.round(game.userScore * 20) : "-"}
               </span>
             </div>
           </div>
@@ -215,11 +230,13 @@ const ListPage = () => {
     </div>
   );
 
+  // ── Loading / empty states ────────────────────────────────────────────────
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-gray-500 dark:text-gray-400 text-lg">
-          Loading your games...
+          Loading games…
         </div>
       </div>
     );
@@ -227,20 +244,80 @@ const ListPage = () => {
 
   const filteredGames = getFilteredGames();
 
+  // ── Render ────────────────────────────────────────────────────────────────
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a] rounded-lg transition-colors duration-200">
-      {/* Header */}
+      {/* ── Header ── */}
       <div className="bg-white dark:bg-[#1a1a1a] rounded-lg top-0 z-20 shadow-sm dark:shadow-none border-b border-gray-200 dark:border-transparent">
         <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-300">
-              Viewing Your Game List
-            </h1>
+          {/* Title row – show other user's info when browsing someone else */}
+          <div className="flex items-center gap-4 mb-4">
+            {!isOwnList && viewedUser ? (
+              <>
+                <img
+                  src={getAvatarUrl(viewedUser.profilePictureUrl)}
+                  alt={viewedUser.username}
+                  className="w-12 h-12 rounded-xl object-cover border-2 border-[#50FCBC]"
+                />
+                <div>
+                  <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
+                    {viewedUser.username}'s Game List
+                  </h1>
+                  {viewedUser.bio && (
+                    <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-1">
+                      {viewedUser.bio}
+                    </p>
+                  )}
+                </div>
+              </>
+            ) : (
+              <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-300">
+                Your Game List
+              </h1>
+            )}
           </div>
 
-          {/* Controls Row */}
+          {/* Quick stats strip */}
+          {games.length > 0 && (
+            <div className="flex flex-wrap gap-4 mb-4 text-sm">
+              {[
+                {
+                  label: "Total",
+                  count: games.length,
+                  color: "text-gray-500 dark:text-gray-400",
+                },
+                {
+                  label: "Wishlist",
+                  count: games.filter((g) => g.status === 0).length,
+                  color: "text-blue-500",
+                },
+                {
+                  label: "Playing",
+                  count: games.filter((g) => g.status === 1).length,
+                  color: "text-green-500",
+                },
+                {
+                  label: "Completed",
+                  count: games.filter((g) => g.status === 2).length,
+                  color: "text-yellow-500",
+                },
+                {
+                  label: "Dropped",
+                  count: games.filter((g) => g.status === 3).length,
+                  color: "text-red-400",
+                },
+              ].map(({ label, count, color }) => (
+                <span key={label} className={`font-semibold ${color}`}>
+                  {label}: <span className="font-bold">{count}</span>
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* Controls row */}
           <div className="flex flex-wrap font-bold items-center gap-3 mb-4">
-            {/* Filters Button */}
+            {/* Filters button */}
             <button
               onClick={() => setShowFilters(!showFilters)}
               className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2 ${
@@ -263,7 +340,7 @@ const ListPage = () => {
               )}
             </button>
 
-            {/* Order Button */}
+            {/* Sort button */}
             <button
               onClick={() =>
                 setSortBy((prev) => (prev === "score" ? "title" : "score"))
@@ -274,13 +351,13 @@ const ListPage = () => {
               Order: {sortBy === "score" ? "Score" : "Title"}
             </button>
 
-            {/* Search Input */}
+            {/* Search */}
             <div className="grow max-w-md ml-auto font-bold">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
                 <input
                   type="text"
-                  placeholder="Search games..."
+                  placeholder="Search games…"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-10 pr-4 py-2 bg-gray-100 dark:bg-[#2a2a2a] text-gray-900 dark:text-white border border-gray-200 dark:border-transparent rounded-lg focus:ring-2 focus:ring-[#50FCBC] outline-none transition-all placeholder-gray-400 dark:placeholder-gray-500"
@@ -289,7 +366,7 @@ const ListPage = () => {
             </div>
           </div>
 
-          {/* Tabs */}
+          {/* Status tabs */}
           <div className="flex items-center gap-6 overflow-x-auto">
             {tabs.map((tab) => (
               <button
@@ -310,7 +387,7 @@ const ListPage = () => {
           </div>
         </div>
 
-        {/* Filter Panel */}
+        {/* ── Filter panel ── */}
         {showFilters && (
           <div className="border-t border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-[#0f0f0f]">
             <div className="max-w-7xl mx-auto px-4 py-6">
@@ -327,10 +404,10 @@ const ListPage = () => {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {/* Score Range */}
+                {/* Score range */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Score Range (Your Rating)
+                    Score Range (User Rating)
                   </label>
                   <div className="flex items-center gap-3">
                     <input
@@ -421,16 +498,16 @@ const ListPage = () => {
                 )}
               </div>
 
-              {/* Active Filters Display */}
+              {/* Active filter chips */}
               {(filters.genres.length > 0 ||
                 filters.platforms.length > 0 ||
                 filters.minScore > 0 ||
                 filters.maxScore < 5) && (
                 <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-800">
                   <div className="flex flex-wrap gap-2">
-                    {filters.minScore > 0 || filters.maxScore < 5 ? (
+                    {(filters.minScore > 0 || filters.maxScore < 5) && (
                       <span className="px-3 py-1 bg-[#50FCBC] text-black text-sm rounded-full font-medium flex items-center gap-1">
-                        Score: {filters.minScore}-{filters.maxScore}
+                        Score: {filters.minScore}–{filters.maxScore}
                         <button
                           onClick={() =>
                             setFilters((prev) => ({
@@ -444,7 +521,7 @@ const ListPage = () => {
                           <X className="w-3 h-3" />
                         </button>
                       </span>
-                    ) : null}
+                    )}
                     {filters.genres.map((genre) => (
                       <span
                         key={genre}
@@ -481,7 +558,7 @@ const ListPage = () => {
         )}
       </div>
 
-      {/* Main Content Area */}
+      {/* ── Main content ── */}
       <div className="max-w-7xl mx-auto px-4 py-8">
         {filteredGames.length === 0 ? (
           <div className="text-center py-20">
@@ -491,7 +568,9 @@ const ListPage = () => {
             <p className="text-gray-500 dark:text-gray-600 text-sm">
               {searchQuery
                 ? "Try adjusting your search"
-                : "Add some games to your list!"}
+                : isOwnList
+                  ? "Add some games to your list!"
+                  : `${viewedUser?.username || "This user"} hasn't added any games yet.`}
             </p>
           </div>
         ) : (

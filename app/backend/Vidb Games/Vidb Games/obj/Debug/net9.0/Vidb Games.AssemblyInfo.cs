@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Vidb Games")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6b68967478f41f532d70c31327b50fdab465d203")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0702e56e89a294710e59ad60feeb9f3d52991269")]
 [assembly: System.Reflection.AssemblyProductAttribute("Vidb Games")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Vidb Games")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

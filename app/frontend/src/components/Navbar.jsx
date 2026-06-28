@@ -4,6 +4,7 @@ import { Search } from "lucide-react";
 import ThemeButton from "./ThemeButton";
 import { useEffect, useRef, useState } from "react";
 import api from "../api/axios";
+import { NotificationBell } from "./NotificationBell";
 
 const Navbar = () => {
   const { logout } = useAuth();
@@ -268,7 +269,7 @@ const Navbar = () => {
                     <li key={u.userId} role="option">
                       <button
                         type="button"
-                        onClick={() => goToUser(u.userId)}
+                        onClick={() => goToUser(u.id || u.userId)}
                         className="w-full flex items-center gap-3 px-3 py-2 text-left hover:bg-gray-100 dark:hover:bg-[#353535] transition-colors"
                       >
                         <img
@@ -300,6 +301,7 @@ const Navbar = () => {
 
         {/* Right — theme + logout */}
         <div className="flex items-center space-x-5 shrink-0">
+          <NotificationBell />
           <ThemeButton />
           <button
             onClick={logout}

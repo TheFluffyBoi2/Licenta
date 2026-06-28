@@ -39,6 +39,24 @@ const getAvatarUrl = (userData) => {
   return `${API_URL}/default_avatar.png`;
 };
 
+const CLUSTER_COLORS = [
+  "#FF6384",
+  "#36A2EB",
+  "#FFCE56",
+  "#4BC0C0",
+  "#9966FF",
+  "#FF9F40",
+  "#FF4757",
+  "#6E4C8A",
+  "#28B463",
+  "#F7C600",
+  "#900C3F",
+  "#581845",
+  "#F3F4F6",
+  "#F5DEB3",
+  "#CD853F",
+];
+
 const GENRE_COLORS = [
   "#FF6384",
   "#36A2EB",
@@ -108,6 +126,32 @@ const CustomTooltip = ({ active, payload }) => {
 
 // ─── UMAP scatter plot (canvas) ─────────────────────────────────────────────
 
+const UMAP_PAD = 48;
+
+/** Uniform scale preserves UMAP geometry instead of stretching X/Y independently. */
+const computeUmapLayout = (points, width, height, pad = UMAP_PAD) => {
+  const xs = points.map((p) => p.x);
+  const ys = points.map((p) => p.y);
+  const minX = Math.min(...xs);
+  const maxX = Math.max(...xs);
+  const minY = Math.min(...ys);
+  const maxY = Math.max(...ys);
+  const rangeX = maxX - minX || 1;
+  const rangeY = maxY - minY || 1;
+  const scale = Math.min(
+    (width - 2 * pad) / rangeX,
+    (height - 2 * pad) / rangeY,
+  );
+  const offsetX = pad + (width - 2 * pad - rangeX * scale) / 2;
+  const offsetY = pad + (height - 2 * pad - rangeY * scale) / 2;
+
+  return {
+    toCanvasX: (x) => offsetX + (x - minX) * scale,
+    toCanvasY: (y) => offsetY + (y - minY) * scale,
+    scale,
+  };
+};
+
 const UMAPMap = ({ points }) => {
   const canvasRef = useRef(null);
 
@@ -118,17 +162,7 @@ const UMAPMap = ({ points }) => {
     const ctx = canvas.getContext("2d");
     const W = canvas.width;
     const H = canvas.height;
-
-    const xs = points.map((p) => p.x);
-    const ys = points.map((p) => p.y);
-    const minX = Math.min(...xs);
-    const maxX = Math.max(...xs);
-    const minY = Math.min(...ys);
-    const maxY = Math.max(...ys);
-
-    const pad = 40;
-    const toCanvasX = (x) => pad + ((x - minX) / (maxX - minX)) * (W - 2 * pad);
-    const toCanvasY = (y) => pad + ((y - minY) / (maxY - minY)) * (H - 2 * pad);
+    const { toCanvasX, toCanvasY } = computeUmapLayout(points, W, H);
 
     // background
     const isDark = document.documentElement.classList.contains("dark");
@@ -140,43 +174,48 @@ const UMAPMap = ({ points }) => {
     ctx.strokeStyle = isDark ? "#2a2a2a" : "#e5e7eb";
     ctx.lineWidth = 1;
     for (let i = 0; i <= 5; i++) {
-      const gx = pad + (i / 5) * (W - 2 * pad);
-      const gy = pad + (i / 5) * (H - 2 * pad);
+      const gx = UMAP_PAD + (i / 5) * (W - 2 * UMAP_PAD);
+      const gy = UMAP_PAD + (i / 5) * (H - 2 * UMAP_PAD);
       ctx.beginPath();
-      ctx.moveTo(gx, pad);
-      ctx.lineTo(gx, H - pad);
+      ctx.moveTo(gx, UMAP_PAD);
+      ctx.lineTo(gx, H - UMAP_PAD);
       ctx.stroke();
       ctx.beginPath();
-      ctx.moveTo(pad, gy);
-      ctx.lineTo(W - pad, gy);
+      ctx.moveTo(UMAP_PAD, gy);
+      ctx.lineTo(W - UMAP_PAD, gy);
       ctx.stroke();
     }
 
-    // points
-    points.forEach((p) => {
+    // points — draw farther points first so nearby labels sit on top
+    const sorted = [...points].sort(
+      (a, b) =>
+        toCanvasX(a.x) + toCanvasY(a.y) - (toCanvasX(b.x) + toCanvasY(b.y)),
+    );
+
+    sorted.forEach((p) => {
       const cx = toCanvasX(p.x);
       const cy = toCanvasY(p.y);
 
-      // glow
-      const grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, 10);
-      grd.addColorStop(0, "#50FCBC55");
+      const grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, 12);
+      grd.addColorStop(0, "#50FCBC44");
       grd.addColorStop(1, "transparent");
       ctx.beginPath();
-      ctx.arc(cx, cy, 10, 0, Math.PI * 2);
+      ctx.arc(cx, cy, 12, 0, Math.PI * 2);
       ctx.fillStyle = grd;
       ctx.fill();
 
-      // dot
+      const color =
+        p.cluster === -1
+          ? "#999999"
+          : CLUSTER_COLORS[p.cluster % CLUSTER_COLORS.length];
       ctx.beginPath();
-      ctx.arc(cx, cy, 5, 0, Math.PI * 2);
-      ctx.fillStyle = "#50FCBC";
+      ctx.arc(cx, cy, 6, 0, Math.PI * 2);
+      ctx.fillStyle = color;
       ctx.fill();
       ctx.strokeStyle = isDark ? "#222222" : "#ffffff";
       ctx.lineWidth = 1.5;
       ctx.stroke();
     });
-
-    // hover labels via mousemove (handled in component)
   }, [points]);
 
   const [hovered, setHovered] = useState(null);
@@ -189,19 +228,7 @@ const UMAPMap = ({ points }) => {
       const my = e.clientY - rect.top;
       const W = canvasRef.current.width;
       const H = canvasRef.current.height;
-      const pad = 40;
-
-      const xs = points.map((p) => p.x);
-      const ys = points.map((p) => p.y);
-      const minX = Math.min(...xs);
-      const maxX = Math.max(...xs);
-      const minY = Math.min(...ys);
-      const maxY = Math.max(...ys);
-
-      const toCanvasX = (x) =>
-        pad + ((x - minX) / (maxX - minX)) * (W - 2 * pad);
-      const toCanvasY = (y) =>
-        pad + ((y - minY) / (maxY - minY)) * (H - 2 * pad);
+      const { toCanvasX, toCanvasY } = computeUmapLayout(points, W, H);
 
       const scaleX = rect.width / W;
       const scaleY = rect.height / H;
@@ -218,7 +245,7 @@ const UMAPMap = ({ points }) => {
         }
       });
 
-      setHovered(minDist < 20 ? closest : null);
+      setHovered(minDist < 24 ? closest : null);
     },
     [points],
   );
@@ -316,7 +343,6 @@ const ProfilePage = () => {
 
         // umap
         if (data.umap_points) {
-          console.log("POINTS");
           setUmapPoints(data.umap_points);
         }
       } catch (err) {
@@ -610,8 +636,8 @@ const ProfilePage = () => {
             <div className="bg-white dark:bg-[#222222] rounded-2xl shadow-lg p-6 mb-6 transition-colors">
               <SectionHeader icon={Map} title="Games Map" />
               <p className="text-sm text-gray-500 dark:text-gray-400 mb-4 -mt-2">
-                Vizualizare UMAP a embedding-urilor jocurilor din lista ta.
-                Jocurile similare apar mai aproape.
+                UMAP visualization for your game embeddings. Closer points mean
+                similar games.
               </p>
               <UMAPMap points={umapPoints} />
             </div>

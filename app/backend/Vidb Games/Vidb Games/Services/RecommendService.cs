@@ -204,7 +204,7 @@ namespace Vidb_Games.Services
                 .Select(ug => ug.GameId)
                 .ToListAsync();
 
-            if (gameIds.Count == 0) {
+            if (gameIds.Count < 5) {
                 return Array.Empty<UMAPPointDto>();
             }
 

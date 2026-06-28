@@ -163,7 +163,7 @@ const RecommendPage = () => {
             type="text"
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
-            placeholder="e.g., A relaxing space exploration game with base building..."
+            placeholder="e.g., A survival game about building a base in space..."
             className="block w-full pl-16 pr-24 py-5 text-lg
                        bg-white dark:bg-[#1C1C1C]
                        text-black dark:text-white

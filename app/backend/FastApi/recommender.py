@@ -1,7 +1,9 @@
 import pandas as pd
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.decomposition import PCA
 from sentence_transformers import SentenceTransformer
+import hdbscan
 import pickle
 import umap
 
@@ -75,11 +77,11 @@ def get_recommendations(game_id, df, top_games, game_to_index, genres_emb, theme
             explanation['rec_for_id'] = game_id
             explanation['rec_for_name'] = source_game_name
 
-            score = (sim_genres * 0.20) + (sim_themes * 0.20) + (sim_keywords * 0.30) + (sim_summary * 0.30)
+            score = (sim_genres * 0.30) + (sim_themes * 0.20) + (sim_keywords * 0.40) + (sim_summary * 0.10)
 
             rating = rec_game['total_score'] if pd.notna(rec_game['total_score']) else 0
 
-            bonus_procent = 0.10
+            bonus_procent = 0.25
             final_score = score * (1 + (rating / 100) * bonus_procent)
 
             potential_rec.append({
@@ -108,10 +110,11 @@ def get_description_recommendations(description, df, model, embeddings, genres_e
 
     recommendations = []
     user_vector_flat = user_vector.flatten()
-    bonus_procent = 0.10
+    bonus_procent = 0.25
     for i in top_indices:
-        game_id = int(df.iloc[i]['id'])
-        final_score= float(similarities[i]) * (1 + (df.iloc[i]['total_score'] / 100) * bonus_procent)
+        row = df.iloc[i]
+        game_id = int(row['id'])
+        final_score= float(similarities[i]) * (1 + (row['total_score'] / 100) * bonus_procent)
         game_idx = game_to_index[game_id]
 
         sim_genres = float(user_vector_flat @ genres_emb[game_idx])
@@ -127,7 +130,7 @@ def get_description_recommendations(description, df, model, embeddings, genres_e
 
         game_data = {
             "id": game_id,
-            "name": str(df.iloc[i]['name']),
+            "name": str(row['name']),
             "recommendation_score": float(final_score),
             "explanation": explanation
         }
@@ -177,7 +180,6 @@ def get_recommendations_from_user(games_tuple, df, top_games, games_to_index, ge
 
     final_recs = []
     for rec_id, rec_data in scores.items():
-        rec_data["recommendation_score"] = rec_data["recommendation_score"] / rec_data["count"]
         del rec_data["count"]
         final_recs.append(rec_data)
 
@@ -186,21 +188,98 @@ def get_recommendations_from_user(games_tuple, df, top_games, games_to_index, ge
     return final_recs[:10]
 
 
+def _adaptive_umap_params(n):
+    """Tune UMAP for library size — fixed params caused clusters too tight or too loose."""
+    if n <= 6:
+        return dict(n_neighbors=max(2, n - 1), min_dist=0.08, spread=0.9)
+    if n <= 15:
+        return dict(n_neighbors=min(10, n - 1), min_dist=0.12, spread=1.0)
+    if n <= 40:
+        return dict(n_neighbors=min(18, max(8, n // 3)), min_dist=0.18, spread=1.1)
+    if n <= 100:
+        return dict(n_neighbors=min(25, max(12, n // 4)), min_dist=0.22, spread=1.2)
+    return dict(n_neighbors=min(30, max(15, int(8 + np.log2(n) * 3))), min_dist=0.28, spread=1.25)
+
+
+def _spread_overlapping_points(points, min_sep):
+    """Nudge overlapping 2D points apart while keeping cluster structure."""
+    spread = points.copy().astype(float)
+    n = len(spread)
+    if n < 2:
+        return spread
+
+    for _ in range(80):
+        moved = False
+        for i in range(n):
+            for j in range(i + 1, n):
+                diff = spread[i] - spread[j]
+                dist = np.linalg.norm(diff)
+                if dist >= min_sep:
+                    continue
+                if dist < 1e-9:
+                    diff = np.random.default_rng(42 + i + j).normal(size=2)
+                    dist = np.linalg.norm(diff)
+                push = (min_sep - dist) / 2
+                direction = diff / dist
+                spread[i] += direction * push
+                spread[j] -= direction * push
+                moved = True
+        if not moved:
+            break
+
+    return spread
+
+
+def _normalize_points(points, margin=0.12):
+    """Scale to [margin, 1-margin] so points don't hug the canvas edges."""
+    lo = np.min(points, axis=0)
+    hi = np.max(points, axis=0)
+    span = hi - lo
+    span[span == 0] = 1e-5
+    normalized = (points - lo) / span
+    return normalized * (1 - 2 * margin) + margin
+
+
 def umap_visualization(game_ids, embeddings, games_to_index):
     game_idxs = [games_to_index[id] for id in game_ids]
     user_embeddings = np.array([embeddings[idx] for idx in game_idxs])
     games_number = len(game_idxs)
-    near_neighbors = max(2, min(5, games_number - 1))
+
+    embedding_dim = user_embeddings.shape[1]
+    if games_number > 20 and embedding_dim > 30:
+        n_components = min(30, games_number - 1, embedding_dim)
+        pca = PCA(n_components=n_components, random_state=42)
+        processed_embeddings = pca.fit_transform(user_embeddings)
+    else:
+        processed_embeddings = user_embeddings
+
+    umap_params = _adaptive_umap_params(games_number)
 
     reducer = umap.UMAP(
-        n_neighbors=near_neighbors,
-        min_dist=0.1,
-        metric='cosine',
+        n_components=2,
+        n_neighbors=umap_params["n_neighbors"],
+        min_dist=umap_params["min_dist"],
+        spread=umap_params["spread"],
+        metric="cosine",
+        random_state=42,
     )
 
-    points = reducer.fit_transform(user_embeddings)
-    print(points)
-    return points, game_ids
+    points = reducer.fit_transform(processed_embeddings)
+
+    min_cluster_size = max(2, min(6, games_number // 4))
+    clusterer = hdbscan.HDBSCAN(
+        min_cluster_size=min_cluster_size,
+        min_samples=max(1, min_cluster_size // 2),
+        cluster_selection_epsilon=0.2 if games_number <= 25 else 0.35,
+        cluster_selection_method="eom",
+    )
+    clusters = clusterer.fit_predict(points)
+
+    min_sep = max(0.025, 0.75 / np.sqrt(games_number))
+    points = _spread_overlapping_points(points, min_sep)
+    points = _normalize_points(points)
+
+    return points, game_ids, clusters
 
 # game_names = ["The Legend of Zelda: Breath of the Wild", "Dark Souls III",
 #              "Sid Meier's Civilization VI", "Factorio", "The Witcher 3: Wild Hunt",

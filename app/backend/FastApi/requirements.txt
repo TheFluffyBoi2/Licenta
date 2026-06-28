@@ -9,3 +9,4 @@ uvicorn
 pandas
 pydantic
 umap-learn
+hdbscan

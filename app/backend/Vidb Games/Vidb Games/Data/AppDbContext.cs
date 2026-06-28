@@ -13,6 +13,7 @@ namespace Vidb_Games.Data
         public DbSet<Review> Reviews { get; set; }
         public DbSet<UserGameEntry> UserGameEntries { get; set; }
         public DbSet<ReviewVote> ReviewVotes { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

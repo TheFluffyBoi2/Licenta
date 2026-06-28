@@ -82,6 +82,11 @@ builder.Services.AddScoped<IIGDBService, IGDBService>();
 builder.Services.AddScoped<IGameService, GameService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddHttpClient<IRecommendService, RecommendService>();
+builder.Services.AddHttpClient<CheapSharkService>(client =>
+{
+    client.DefaultRequestHeaders.UserAgent.ParseAdd("VidbGames/1.0 (wishlist-deals)");
+});
+builder.Services.AddHostedService<WishlistService>();
 builder.Services.AddSingleton(_ => IGDBClient.CreateWithDefaults(
     builder.Configuration["IGDB:ClientId"]!,
     builder.Configuration["IGDB:ClientSecret"]!

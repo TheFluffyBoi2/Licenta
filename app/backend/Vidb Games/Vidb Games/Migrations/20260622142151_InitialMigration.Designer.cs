@@ -12,8 +12,8 @@ using Vidb_Games.Data;
 namespace Vidb_Games.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260521144026_Initial migration")]
-    partial class Initialmigration
+    [Migration("20260622142151_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -67,6 +67,54 @@ namespace Vidb_Games.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Games");
+                });
+
+            modelBuilder.Entity("Vidb_Games.Models.Entities.Notification", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DealUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<long>("GameId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("GameName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("boolean");
+
+                    b.Property<decimal>("NormalPrice")
+                        .HasColumnType("numeric");
+
+                    b.Property<decimal>("SalePrice")
+                        .HasColumnType("numeric");
+
+                    b.Property<int>("SavingsPercent")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("StoreName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GameId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("Vidb_Games.Models.Entities.Review", b =>
@@ -363,6 +411,25 @@ namespace Vidb_Games.Migrations
                     b.Navigation("Platforms");
 
                     b.Navigation("Themes");
+                });
+
+            modelBuilder.Entity("Vidb_Games.Models.Entities.Notification", b =>
+                {
+                    b.HasOne("Vidb_Games.Models.Entities.Game", "Game")
+                        .WithMany()
+                        .HasForeignKey("GameId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Vidb_Games.Models.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Game");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Vidb_Games.Models.Entities.Review", b =>

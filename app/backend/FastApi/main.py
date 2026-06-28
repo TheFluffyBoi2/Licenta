@@ -31,6 +31,11 @@ async def lifespan(app: FastAPI):
         app_data['summary'] = data["summary"]
 
     app_data['model'] = SentenceTransformer(MODEL_PATH)
+    _ = app_data['model'].encode(
+        "celeste, madeline, platformer, mechanics",
+        convert_to_numpy=True,
+        normalize_embeddings=True
+    )
 
     yield
     app_data.clear()
@@ -70,6 +75,7 @@ class UMAPPoint(BaseModel):
     game_id: int
     x: float
     y: float
+    cluster: int
 
 @app.post("/recommendations", response_model=list[RecommendationResponse])
 async def get_games_from_description(request: SearchRequest):
@@ -107,7 +113,7 @@ async def get_games_from_user(request: UserGamesRequest):
 @app.post("/recommendations/umap", response_model=list[UMAPPoint])
 async def get_umap_points(request: UserGamesIds):
     try:
-        points, game_ids = umap_visualization(
+        points, game_ids, clusters = umap_visualization(
             request.game_ids,
             app_data['embeddings'],
             app_data['game_to_index']
@@ -117,6 +123,7 @@ async def get_umap_points(request: UserGamesIds):
                     "game_id": game_ids[i],
                     "x": float(points[i][0]),
                     "y": float(points[i][1]),
+                    "cluster": clusters[i],
                 } for i in range(len(game_ids))
             ]
     except Exception as e:
